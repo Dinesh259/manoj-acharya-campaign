@@ -1,0 +1,65 @@
+{
+  "_readme": "The 12 manifesto points. Hindi text is exactly as printed on the manifesto. Do not add or change promises. 'title' is shown in bold red, 'text' below it.",
+  "points": [
+    {
+      "n": 1,
+      "hi": { "title": "ग्राउंड नंबर 2 का विकास", "text": "खेल मैदान नंबर 2 को स्थायी मान्यता दिलाने, उसकी चारदीवारी (बाउंड्री वॉल) करवाने तथा खिलाड़ियों के लिए आवश्यक खेल उपकरण उपलब्ध कराने का वादा।" },
+      "en": { "title": "Development of Ground No. 2", "text": "A promise to get permanent recognition for Playground No. 2, build a boundary wall around it, and provide the sports equipment that players need." }
+    },
+    {
+      "n": 2,
+      "hi": { "title": "एथलेटिक्स ग्राउंड की स्थापना", "text": "सरकारी स्कूल में आधुनिक एथलेटिक्स ग्राउंड का निर्माण करवाया जाएगा एवं सभी खेल सामग्रियां प्रदान की जाएंगी।" },
+      "en": { "title": "An athletics ground", "text": "A modern athletics ground will be built at the government school, and all sports equipment will be provided." }
+    },
+    {
+      "n": 3,
+      "hi": { "title": "नियमित स्वच्छता अभियान", "text": "गाँव की समस्त गलियों एवं नालियों की समय-समय पर समुचित सफाई व्यवस्था सुनिश्चित की जाएगी।" },
+      "en": { "title": "Regular cleanliness drive", "text": "Proper cleaning of all the village's lanes and drains will be ensured at regular intervals." }
+    },
+    {
+      "n": 4,
+      "hi": { "title": "मार्गों का पुनर्निर्माण", "text": "आबादी क्षेत्र एवं पुरानी जर्जर गलियों तथा सड़कों का पुनः निर्माण करवाया जाएगा।" },
+      "en": { "title": "Rebuilding lanes and roads", "text": "Lanes and roads in the residential area, and old broken-down lanes and roads, will be rebuilt." }
+    },
+    {
+      "n": 5,
+      "hi": { "title": "पंचायत भवन का मुख्य द्वार", "text": "समस्त ग्रामवासियों के सहयोग से पंचायत भवन के नए मुख्य द्वार (गेट) का भव्य निर्माण कराया जाएगा।" },
+      "en": { "title": "Main gate for the Panchayat Bhawan", "text": "With the support of all villagers, a grand new main gate will be built for the Panchayat Bhawan." }
+    },
+    {
+      "n": 6,
+      "hi": { "title": "निःशुल्क डिजिटल लाइब्रेरी", "text": "विद्यार्थियों एवं युवाओं की शिक्षा हेतु सर्वसुविधायुक्त निःशुल्क लाइब्रेरी (पुस्तकालय) का निर्माण किया जाएगा।" },
+      "en": { "title": "Free digital library", "text": "A free library with all facilities will be built for the education of students and young people." }
+    },
+    {
+      "n": 7,
+      "hi": { "title": "स्ट्रीट लाइट व्यवस्था", "text": "गाँव के सभी वार्डों व रास्तों में रात्रिकालीन प्रकाश हेतु आधुनिक स्ट्रीट लाइटें लगवाई जाएंगी।" },
+      "en": { "title": "Street lights", "text": "Modern street lights will be installed in every ward and along the village roads, so they are lit at night." }
+    },
+    {
+      "n": 8,
+      "hi": { "title": "ग्राम पार्क व व्यायामशाला", "text": "गाँव में सुंदर पार्क का निर्माण कराया जाएगा, जिसमें बच्चों के लिए झूले तथा बड़ों के लिए ओपन जिम (व्यायाम उपकरण) स्थापित होंगे।" },
+      "en": { "title": "Village park and gym", "text": "A beautiful park will be built in the village, with swings for children and an open gym (exercise equipment) for adults." }
+    },
+    {
+      "n": 9,
+      "hi": { "title": "कल्याण भूमि का कायाकल्प", "text": "श्मशान/कल्याण भूमि का कायाकल्प, सौंदर्यीकरण एवं पौधरोपण का कार्य प्राथमिकता से किया जाएगा।" },
+      "en": { "title": "Renewal of the Kalyan Bhoomi", "text": "Renewing and beautifying the cremation ground (Kalyan Bhoomi) and planting trees there will be done as a priority." }
+    },
+    {
+      "n": 10,
+      "hi": { "title": "पारदर्शी कृषि व जनकल्याणकारी योजनाएं", "text": "पंचायत में आने वाली बीज, खाद एवं अन्य सरकारी योजनाओं व सुविधाओं का वितरण बिना भेदभाव के सभी वंचितों व ग्रामवासियों को समान रूप से किया जाएगा।" },
+      "en": { "title": "Fair farm and welfare schemes", "text": "Seeds, fertiliser and other government schemes and facilities that come to the Panchayat will be shared equally with all villagers and the needy, without discrimination." }
+    },
+    {
+      "n": 11,
+      "hi": { "title": "मनरेगा (MNREGA) का पूर्ण क्रियान्वयन", "text": "मनरेगा योजना के तहत गाँव में शत-प्रतिशत पूरा काम लाया जाएगा और श्रमिकों को पूरा मेहनताना दिलाना सुनिश्चित किया जाएगा।" },
+      "en": { "title": "Full implementation of MGNREGA (MNREGA)", "text": "The village will get its full 100% share of work under the MGNREGA scheme, and workers will be sure to receive their full wages." }
+    },
+    {
+      "n": 12,
+      "hi": { "title": "हर घर जल योजना", "text": "'हर घर जल' की व्यवस्था हेतु आवश्यकतानुसार नए ओवरहेड वॉटर टैंक (पानी की टंकी) का निर्माण करवाया जाएगा।" },
+      "en": { "title": "Har Ghar Jal (water for every home)", "text": "New overhead water tanks will be built as needed so that every home gets water under 'Har Ghar Jal'." }
+    }
+  ]
+}

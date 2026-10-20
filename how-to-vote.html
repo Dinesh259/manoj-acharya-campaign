@@ -1,0 +1,232 @@
+﻿<!doctype html>
+<html lang="hi" class="js-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="ग्राम पंचायत चुनाव में वोट कैसे दें — आसान कदम, साथ क्या ले जाएँ, और EVM व मतपत्र का अभ्यास।">
+  <title data-i18n="title.howToVote">वोट कैसे दें | ग्राम पंचायत अनूपशहर</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="js/i18n.js?v=danaram" as="script">
+  <link rel="preload" href="js/app.js?v=danaram" as="script">
+  <script>
+    (function(){try{var d=document.documentElement,l=localStorage.getItem('lang');if(l==='en')d.lang='en';if(localStorage.getItem('largeText')==='1')d.classList.add('large-text');if(localStorage.getItem('contrast')==='1')d.classList.add('hc');}catch(e){}})();
+  </script>
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["index.html", "how-to-vote.html", "check-name.html", "find-booth.html", "contact.html", "manifesto.html"],
+        "eagerness": "moderate"
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-page="how-to-vote.html" data-title="howToVote">
+  <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
+  <div data-chrome="header"></div>
+
+  <main id="main" class="wrap zone-neutral">
+    <p class="zone-label neutral" data-i18n="common.labelNeutral">मतदाता जानकारी — सभी मतदाताओं के लिए</p>
+
+    <h1 data-i18n="how.h1">वोट कैसे दें</h1>
+    <p class="lead" data-i18n="how.intro">पहली बार वोट दे रहे हैं? घबराएँ नहीं। ये आसान कदम अपनाएँ।</p>
+
+    <!-- Interactive EVM Practice Machine right at top -->
+    <section class="card demo" id="vote-demo" aria-labelledby="demo-heading">
+      <span class="practice-badge" data-i18n="how.practice">अभ्यास मात्र / Practice only</span>
+      <h2 id="demo-heading" data-i18n="how.demoTitle">अभ्यास करें: वोट डालकर देखें (सभी सरपंच प्रत्याशी)</h2>
+      <div class="demo-stage">
+        <div class="evm">
+          <div class="evm-row">
+            <span class="evm-no">1</span>
+            <img class="evm-photo" src="assets/cand-1.jpg?v=2" width="42" height="42" loading="lazy" decoding="async" alt="मनोज कुमार आचार्य">
+            <span class="evm-name">मनोज कुमार आचार्य</span>
+            <svg class="evm-symbol" viewBox="0 0 40 40" role="img" aria-label="नमूना चुनाव चिह्न" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="5"/></svg>
+            <span class="lamp" aria-hidden="true"></span>
+            <button type="button" class="evm-btn" data-n="1" aria-label="नीला बटन दबाएँ: मनोज कुमार आचार्य"></button>
+          </div>
+          <div class="evm-row">
+            <span class="evm-no">2</span>
+            <img class="evm-photo" src="assets/cand-2-danaram.jpg?v=2" width="42" height="42" loading="lazy" decoding="async" alt="दानाराम वर्मा">
+            <span class="evm-name">दानाराम वर्मा</span>
+            <svg class="evm-symbol" viewBox="0 0 40 40" role="img" aria-label="नमूना चुनाव चिह्न" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="7" y="7" width="26" height="26" rx="3"/></svg>
+            <span class="lamp" aria-hidden="true"></span>
+            <button type="button" class="evm-btn" data-n="2" aria-label="नीला बटन दबाएँ: दानाराम वर्मा"></button>
+          </div>
+          <div class="evm-row">
+            <span class="evm-no">3</span>
+            <img class="evm-photo" src="assets/cand-3.jpg?v=2" width="42" height="42" loading="lazy" decoding="async" alt="देवीलाल शर्मा">
+            <span class="evm-name">देवीलाल शर्मा</span>
+            <svg class="evm-symbol" viewBox="0 0 40 40" role="img" aria-label="नमूना चुनाव चिह्न" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><path d="M20 5 35 33H5z"/></svg>
+            <span class="lamp" aria-hidden="true"></span>
+            <button type="button" class="evm-btn" data-n="3" aria-label="नीला बटन दबाएँ: देवीलाल शर्मा"></button>
+          </div>
+          <div class="evm-row">
+            <span class="evm-no">4</span>
+            <img class="evm-photo" src="assets/cand-4.jpg?v=2" width="42" height="42" loading="lazy" decoding="async" alt="श्रवण सिंह राठौड़">
+            <span class="evm-name">श्रवण सिंह राठौड़</span>
+            <svg class="evm-symbol" viewBox="0 0 40 40" role="img" aria-label="नमूना चुनाव चिह्न" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><path d="m20 4 4.7 10 10.8 1.2-8 7.4 2.3 10.7L20 27.8l-9.8 5.5 2.3-10.7-8-7.4 10.8-1.2z"/></svg>
+            <span class="lamp" aria-hidden="true"></span>
+            <button type="button" class="evm-btn" data-n="4" aria-label="नीला बटन दबाएँ: श्रवण सिंह राठौड़"></button>
+          </div>
+          <div class="evm-row">
+            <span class="evm-no">5</span>
+            <img class="evm-photo" src="assets/cand-5.jpg?v=2" width="42" height="42" loading="lazy" decoding="async" alt="रणसिंह फोजी">
+            <span class="evm-name">रणसिंह फोजी</span>
+            <svg class="evm-symbol" viewBox="0 0 40 40" role="img" aria-label="नमूना चुनाव चिह्न" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><path d="M20 4 36 20 20 36 4 20Z"/></svg>
+            <span class="lamp" aria-hidden="true"></span>
+            <button type="button" class="evm-btn" data-n="5" aria-label="नीला बटन दबाएँ: रणसिंह फोजी"></button>
+          </div>
+        </div>
+      </div>
+      <p class="demo-msg" aria-live="polite">जिस प्रत्याशी को वोट देना है, उसके नाम और फ़ोटो के सामने वाला नीला बटन दबाएँ। (एक डिवाइस से केवल एक बार क्लिक होगा)</p>
+      <p class="small demo-warn" hidden></p>
+    </section>
+
+    <section class="card" aria-labelledby="time-heading">
+      <h2 id="time-heading">
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-clock"></use></svg>
+        <span data-i18n="how.timeTitle">मतदान का समय व स्थान</span>
+      </h2>
+      <p><strong data-i18n="how.time">गुरुवार, 5 नवंबर 2026 — सुबह 7:30 बजे से शाम 5:30 बजे तक (राजकीय उच्च माध्यमिक विद्यालय, अनूपशहर)</strong></p>
+      <p class="small" data-i18n="how.timeNote">भीड़ से बचने के लिए समय से पहले मतदान केंद्र पहुँचें।</p>
+    </section>
+
+    <section aria-labelledby="steps-heading">
+      <h2 id="steps-heading" data-i18n="how.stepsTitle">वोट देने के कदम</h2>
+      <ol class="steps">
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">1</span>
+            <svg class="icon" focusable="false"><use href="#i-search"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s1t">नाम जाँचें</h3>
+            <p data-i18n="how.s1">देखें कि ग्राम पंचायत अनूपशहर की मतदाता सूची में आपका नाम दर्ज है।</p>
+          </div>
+        </li>
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">2</span>
+            <svg class="icon" focusable="false"><use href="#i-pin"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s2t">बूथ पर पहुँचें</h3>
+            <p data-i18n="how.s2">अनूपशहर का मतदान केंद्र राजकीय उच्च माध्यमिक विद्यालय (GSSS), अनूपशहर है।</p>
+          </div>
+        </li>
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">3</span>
+            <svg class="icon" focusable="false"><use href="#i-id"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s3t">पहचान पत्र साथ लें</h3>
+            <p data-i18n="how.s3">मतदाता पहचान पत्र (वोटर ID) या कोई दूसरा मान्य फ़ोटो पहचान पत्र लेकर समय पर बूथ पहुँचें।</p>
+          </div>
+        </li>
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">4</span>
+            <svg class="icon" focusable="false"><use href="#i-people"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s4t">लाइन में लगें</h3>
+            <p data-i18n="how.s4">अपनी बारी का इंतज़ार करें। मतदान अधिकारी सूची में आपका नाम और आपका पहचान पत्र देखेंगे।</p>
+          </div>
+        </li>
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">5</span>
+            <svg class="icon" focusable="false"><use href="#i-finger"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s5t">स्याही और हस्ताक्षर</h3>
+            <p data-i18n="how.s5">आपकी उंगली पर अमिट स्याही का निशान लगेगा। रजिस्टर में हस्ताक्षर करें या अंगूठा लगाएँ।</p>
+          </div>
+        </li>
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">6</span>
+            <svg class="icon" focusable="false"><use href="#i-vote"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s6t">वोट डालें</h3>
+            <p data-i18n="how.s6">EVM पर अपनी पसंद के प्रत्याशी के नाम, फ़ोटो और चिह्न के सामने वाला नीला बटन दबाएँ। लाल बत्ती जलेगी और बीप की आवाज़ आएगी।</p>
+          </div>
+        </li>
+        <li class="card step">
+          <div class="step-icon" aria-hidden="true">
+            <span class="step-num">7</span>
+            <svg class="icon" focusable="false"><use href="#i-lock"></use></svg>
+          </div>
+          <div>
+            <h3 data-i18n="how.s7t">आपका वोट गुप्त है</h3>
+            <p data-i18n="how.s7">किसी को न बताएँ कि आपने किसे वोट दिया। वोट डालते समय फ़ोटो या वीडियो न लें।</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="card" aria-labelledby="carry-heading">
+      <h2 id="carry-heading" data-i18n="how.carryTitle">साथ क्या ले जाएँ</h2>
+      <ul class="checklist">
+        <li>
+          <label>
+            <input type="checkbox">
+            <span data-i18n="how.carry1">मतदाता पहचान पत्र (वोटर ID / EPIC)</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <span data-i18n="how.carry2">वोटर ID न हो तो राज्य निर्वाचन आयोग द्वारा मान्य कोई दूसरा फ़ोटो पहचान पत्र — जैसे आधार कार्ड, ड्राइविंग लाइसेंस, पासपोर्ट, पैन कार्ड या फ़ोटोयुक्त बैंक/डाकघर पासबुक।</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <span data-i18n="how.carry3">मतदाता पर्ची (अगर मिली हो)</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox">
+            <span data-i18n="how.carry4">अपना वार्ड नंबर और मतदाता सूची का भाग/क्रमांक</span>
+          </label>
+        </li>
+      </ul>
+      <p class="small" data-i18n="how.carryNote">इस सूची पर निशान लगाना सिर्फ़ आपकी याद के लिए है। कुछ भी कहीं नहीं भेजा जाता।</p>
+    </section>
+
+    <section class="card" aria-labelledby="media-heading">
+      <h2 id="media-heading" data-i18n="how.mediaTitle">आवाज़ में सुनकर समझें</h2>
+      <div class="media-grid">
+        <div class="media-slot">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-audio"></use></svg>
+          <h3 data-i18n="how.mediaAudio">ऊपर टूलबार में 'सुनें' बटन दबाकर इस पूरे पेज को हिन्दी आवाज़ में सुनें।</h3>
+          <p class="small" data-i18n="how.mediaSoon">ऑनलाइन अभ्यास और वॉइस रीडर उपलब्ध है</p>
+        </div>
+        <div class="media-slot">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-video"></use></svg>
+          <h3 data-i18n="how.mediaVideo">ऊपर दी गई EVM मशीन में सभी 5 प्रत्याशियों की सूची पर नीला बटन दबाकर अभ्यास करें।</h3>
+          <p class="small" data-i18n="how.mediaSoon">ऑनलाइन अभ्यास और वॉइस रीडर उपलब्ध है</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-chrome="footer"></div>
+  <script src="js/i18n.js?v=danaram"></script>
+  <script src="js/app.js?v=danaram"></script>
+</body>
+</html>

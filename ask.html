@@ -1,0 +1,62 @@
+﻿<!doctype html>
+<html lang="hi" class="js-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="मनोज कुमार आचार्य से कोई भी सवाल या सुझाव पूछें — व्हाट्सऐप के ज़रिए।">
+  <title data-i18n="title.ask">सवाल पूछें | मनोज कुमार आचार्य</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="js/i18n.js?v=danaram" as="script">
+  <link rel="preload" href="js/app.js?v=danaram" as="script">
+  <script>
+    (function(){try{var d=document.documentElement,l=localStorage.getItem('lang');if(l==='en')d.lang='en';if(localStorage.getItem('largeText')==='1')d.classList.add('large-text');if(localStorage.getItem('contrast')==='1')d.classList.add('hc');}catch(e){}})();
+  </script>
+</head>
+<body data-page="ask.html" data-title="ask">
+  <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
+  <div data-chrome="header"></div>
+
+  <main id="main" class="wrap zone-candidate">
+    <p class="zone-label candidate" data-i18n="common.labelCandidate">प्रत्याशी का संदेश / Candidate's message</p>
+
+    <h1 data-i18n="ask.h1">सवाल पूछें</h1>
+    <p class="lead" data-i18n="ask.intro">मनोज कुमार आचार्य से कोई भी सवाल या सुझाव भेजें। भेजें बटन दबाने पर व्हाट्सऐप खुलेगा, जिसमें आपका सवाल पहले से लिखा होगा।</p>
+
+    <section class="card" aria-labelledby="ask-form-title">
+      <h2 id="ask-form-title" class="visually-hidden" data-i18n="ask.h1">सवाल पूछें</h2>
+      <form id="ask-form" novalidate>
+        <div class="form-field">
+          <label for="ask-name" data-i18n="ask.name">आपका नाम (ज़रूरी नहीं)</label>
+          <input id="ask-name" name="name" type="text" autocomplete="name">
+        </div>
+        <div class="form-field">
+          <label for="ask-ward" data-i18n="ask.ward">आपका वार्ड (ज़रूरी नहीं)</label>
+          <input id="ask-ward" name="ward" type="text">
+        </div>
+        <div class="form-field">
+          <label for="ask-q" data-i18n="ask.question">आपका सवाल या सुझाव</label>
+          <textarea id="ask-q" name="q" required data-i18n-attr="placeholder:ask.placeholder"></textarea>
+        </div>
+        <p class="note info" data-i18n="ask.privacy">आधार नंबर, वोटर ID नंबर या कोई निजी जानकारी न लिखें। यह फ़ॉर्म कुछ भी सेव नहीं करता।</p>
+        <p class="form-error" role="alert" hidden></p>
+        <p class="form-status" aria-live="polite"></p>
+        <button type="submit" class="btn btn-wa btn-lg btn-block">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-wa"></use></svg>
+          <span data-i18n="ask.submit">व्हाट्सऐप से भेजें</span>
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <div data-chrome="footer"></div>
+  <script src="js/i18n.js?v=danaram"></script>
+  <script src="js/app.js?v=danaram"></script>
+</body>
+</html>

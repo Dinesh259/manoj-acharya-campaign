@@ -1,0 +1,90 @@
+﻿<!--
+  ============================================================================
+  REMINDER FOR SITE OWNER — PRE-POLL SILENCE PERIOD (प्रचार समाप्ति अवधि):
+  As per State Election Commission rules, election campaigning must stop during
+  the silence period before polling (typically 48 hours before the close of
+  poll — confirm exact hours with the Rajasthan State Election Commission).
+  Please pause or hide campaign pages (manifesto.html, about.html, flyer.html)
+  during the silence period while keeping the neutral voter-information pages
+  available.
+  ============================================================================
+-->
+<!doctype html>
+<html lang="hi" class="js-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="मेरे वादे — मेरा काम: ग्राम पंचायत अनूपशहर के विकास के लिए मनोज कुमार आचार्य के 12 वादे।">
+  <title data-i18n="title.manifesto">मेरे वादे — मेरा काम | मनोज कुमार आचार्य</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="js/i18n.js?v=danaram" as="script">
+  <link rel="preload" href="js/app.js?v=danaram" as="script">
+  <script>
+    (function(){try{var d=document.documentElement,l=localStorage.getItem('lang');if(l==='en')d.lang='en';if(localStorage.getItem('largeText')==='1')d.classList.add('large-text');if(localStorage.getItem('contrast')==='1')d.classList.add('hc');}catch(e){}})();
+  </script>
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["index.html", "how-to-vote.html", "check-name.html", "find-booth.html", "contact.html", "manifesto.html"],
+        "eagerness": "moderate"
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-page="manifesto.html" data-title="manifesto">
+  <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
+  <div data-chrome="header"></div>
+
+  <main id="main" class="wrap zone-candidate">
+    <p class="zone-label candidate" data-i18n="common.labelCandidate">प्रत्याशी का संदेश / Candidate's message</p>
+
+    <div class="manifesto-head">
+      <p class="blessing" data-i18n="brand.blessing">॥ जय सिद्ध बाबा - जय संतोष गिरी महाराज ॥</p>
+      <h1 class="slogan-band" data-i18n="brand.slogan">मेरे वादे — मेरा काम</h1>
+      <p class="tagline" data-i18n="brand.tagline">गाँव का विकास — हम सबका संकल्प</p>
+      <p class="lead" data-i18n="manifesto.intro">ग्राम पंचायत अनूपशहर के विकास के लिए मेरे 12 वादे:</p>
+    </div>
+
+    <section aria-labelledby="promises-list-title">
+      <h2 id="promises-list-title" class="visually-hidden" data-i18n="brand.slogan">मेरे वादे — मेरा काम</h2>
+      <ol class="promises grid-2" data-manifesto="full" data-heading="h3"></ol>
+    </section>
+
+    <section class="card" aria-labelledby="printed-manifesto-title">
+      <h2 id="printed-manifesto-title" data-i18n="manifesto.posterTitle">छपा हुआ घोषणा पत्र</h2>
+      <figure class="poster-figure">
+        <img src="assets/manifesto.jpg" width="640" height="860" loading="lazy" decoding="async" alt="" data-i18n-attr="alt:manifesto.posterAlt">
+        <figcaption class="small" data-i18n="manifesto.posterAlt">मनोज कुमार आचार्य का छपा हुआ घोषणा पत्र — मेरे वादे, मेरा काम (12 वादे)</figcaption>
+      </figure>
+    </section>
+
+    <section class="card" aria-labelledby="ask-cta-title">
+      <h2 id="ask-cta-title" data-i18n="manifesto.askText">किसी वादे के बारे में सवाल है?</h2>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="ask.html">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-edit"></use></svg>
+          <span data-i18n="manifesto.askBtn">सवाल पूछें</span>
+        </a>
+        <a class="btn btn-outline" href="flyer.html">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-print"></use></svg>
+          <span data-i18n="nav.flyer">फ़्लायर (प्रिंट)</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <div data-chrome="footer"></div>
+  <script src="js/i18n.js?v=danaram"></script>
+  <script src="js/app.js?v=danaram"></script>
+</body>
+</html>

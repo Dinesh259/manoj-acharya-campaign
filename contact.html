@@ -1,0 +1,80 @@
+﻿<!doctype html>
+<html lang="hi" class="js-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="मनोज कुमार आचार्य से फ़ोन और व्हाट्सऐप (9529205599) पर संपर्क करें।">
+  <title data-i18n="title.contact">संपर्क | मनोज कुमार आचार्य</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="js/i18n.js?v=danaram" as="script">
+  <link rel="preload" href="js/app.js?v=danaram" as="script">
+  <script>
+    (function(){try{var d=document.documentElement,l=localStorage.getItem('lang');if(l==='en')d.lang='en';if(localStorage.getItem('largeText')==='1')d.classList.add('large-text');if(localStorage.getItem('contrast')==='1')d.classList.add('hc');}catch(e){}})();
+  </script>
+  <script type="speculationrules">
+  {
+    "prerender": [
+      {
+        "source": "list",
+        "urls": ["index.html", "how-to-vote.html", "check-name.html", "find-booth.html", "contact.html", "manifesto.html"],
+        "eagerness": "moderate"
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-page="contact.html" data-title="contact">
+  <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
+  <div data-chrome="header"></div>
+
+  <main id="main" class="wrap zone-candidate">
+    <p class="zone-label candidate" data-i18n="common.labelCandidate">प्रत्याशी का संदेश / Candidate's message</p>
+
+    <h1 data-i18n="contact.h1">संपर्क करें</h1>
+    <p class="lead" data-i18n="contact.intro">मनोज कुमार आचार्य से सीधे बात करें या व्हाट्सऐप संदेश भेजें।</p>
+
+    <section class="card" aria-labelledby="num-heading">
+      <h2 id="num-heading" data-i18n="contact.numberLabel">मोबाइल / व्हाट्सऐप नंबर:</h2>
+      <p class="contact-number" data-phone></p>
+      <div class="contact-actions">
+        <a class="btn btn-primary btn-lg" data-link="tel">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-phone"></use></svg>
+          <span data-i18n="contact.call">फ़ोन करें</span>
+          <span class="btn-num">: <span data-phone></span></span>
+        </a>
+        <a class="btn btn-wa btn-lg" data-link="wa-prefill" target="_blank" rel="noopener">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-wa"></use></svg>
+          <span data-i18n="contact.wa">व्हाट्सऐप करें</span>
+          <span class="btn-num">: <span data-phone></span></span>
+        </a>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="office-heading">
+      <h2 id="office-heading" data-i18n="contact.officeTitle">प्रचार कार्यालय एवं निवास</h2>
+      <p data-i18n="contact.office">मनोज कुमार आचार्य (सुपुत्र श्री भागीरथ आचार्य), वार्ड नं. 10, ग्राम पंचायत अनूपशहर, तहसील भादरा, ज़िला हनुमानगढ़, राजस्थान – 335501 · मिलने का समय: प्रतिदिन सुबह 8:00 बजे से शाम 8:00 बजे तक।</p>
+    </section>
+
+    <section class="card" aria-labelledby="written-q-heading">
+      <h2 id="written-q-heading" data-i18n="contact.askText">अपना सवाल लिखकर भेजना चाहते हैं?</h2>
+      <p>
+        <a class="btn btn-outline btn-lg" href="ask.html">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-edit"></use></svg>
+          <span data-i18n="nav.ask">सवाल पूछें</span>
+        </a>
+      </p>
+    </section>
+  </main>
+
+  <div data-chrome="footer"></div>
+  <script src="js/i18n.js?v=danaram"></script>
+  <script src="js/app.js?v=danaram"></script>
+</body>
+</html>

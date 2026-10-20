@@ -1,0 +1,17 @@
+# Firebase cache
+.firebase/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Node dependencies (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs & temp
+*.log
+.system_generated/

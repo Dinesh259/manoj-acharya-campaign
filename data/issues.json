@@ -1,0 +1,56 @@
+{
+  "_readme": "Ward-wise village needs for Gram Panchayat Anoopshahar (335501), Tehsil Bhadra, District Hanumangarh.",
+  "wards": [
+    {
+      "ward": "1–3",
+      "issues": [
+        {
+          "hi": "हर घर तक नियमित व स्वच्छ पेयजल सप्लाई तथा नए ओवरहेड वॉटर टैंक (पानी की टंकी) का निर्माण।",
+          "en": "Regular clean drinking-water supply to every household and construction of a new overhead water tank."
+        },
+        {
+          "hi": "पुरानी जर्जर गलियों का पक्का पुनर्निर्माण और पानी निकासी के लिए पक्की नालियों की व्यवस्था।",
+          "en": "Rebuilding old worn-out lanes and constructing proper drainage channels."
+        },
+        {
+          "hi": "रात्रिकालीन रोशनी के लिए सभी चौराहों व गलियों में आधुनिक LED स्ट्रीट लाइटें लगवाना।",
+          "en": "Installing modern LED street lights across all intersections and residential lanes."
+        }
+      ]
+    },
+    {
+      "ward": "4–6",
+      "issues": [
+        {
+          "hi": "सरकारी स्कूल (GSSS अनूपशहर) में आधुनिक एथलेटिक्स ग्राउंड और विद्यार्थियों के लिए निःशुल्क डिजिटल लाइब्रेरी की स्थापना।",
+          "en": "Setting up a modern athletics ground at GSSS Anoopshahar and a free digital library for students and youth."
+        },
+        {
+          "hi": "पंचायत भवन के भव्य मुख्य द्वार का निर्माण तथा सुंदर ग्राम पार्क व ओपन जिम की व्यवस्था।",
+          "en": "Constructing a grand main gate for the Panchayat Bhawan and developing a village park with swings and an open gym."
+        },
+        {
+          "hi": "गलियों एवं नालियों की नियमित सफ़ाई के लिए समयबद्ध स्वच्छता अभियान।",
+          "en": "Scheduled cleanliness drives for regular cleaning of village streets and drains."
+        }
+      ]
+    },
+    {
+      "ward": "7–11",
+      "issues": [
+        {
+          "hi": "खेल मैदान (ग्राउंड नंबर 2) को स्थायी मान्यता, चारदीवारी (बाउंड्री वॉल) और खिलाड़ियों के लिए खेल सामग्री उपलब्ध कराना।",
+          "en": "Permanent recognition, boundary wall, and sports equipment for Playground (Ground No. 2)."
+        },
+        {
+          "hi": "मनरेगा (MNREGA) के तहत गाँव में शत-प्रतिशत पूरा काम और श्रमिकों को समय पर पूरा मेहनताना दिलाना।",
+          "en": "100% implementation of MGNREGA works in the village with full and timely wages for workers."
+        },
+        {
+          "hi": "कल्याण भूमि (श्मशान भूमि) का कायाकल्प व पौधरोपण तथा किसानों को बीज-खाद व जनकल्याणकारी योजनाओं का पारदर्शी वितरण।",
+          "en": "Renewal and tree plantation at Kalyan Bhoomi, and fair, transparent distribution of seeds, fertiliser and welfare schemes."
+        }
+      ]
+    }
+  ]
+}

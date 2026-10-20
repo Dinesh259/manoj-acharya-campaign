@@ -1,0 +1,28 @@
+{
+  "_readme": "Polling booth for all wards of Gram Panchayat Anoopshahar, Tehsil Bhadra, District Hanumangarh, Rajasthan – 335501. Exact Google Maps pin: GSSS Anupshahr, Bhadra (रा उ मा वि अनूपशहर, भादरा) — X636+7R8 (28.9527705, 75.2112232).",
+  "wards": [
+    {
+      "ward": "1–11",
+      "area": {
+        "hi": "समस्त वार्ड (वार्ड 1 से 11) — ग्राम पंचायत अनूपशहर",
+        "en": "All Wards (Wards 1 to 11) — Gram Panchayat Anoopshahar"
+      },
+      "booths": [
+        {
+          "number": "राजकीय उच्च माध्यमिक विद्यालय (रा.उ.मा.वि.), अनूपशहर",
+          "name": {
+            "hi": "राजकीय उच्च माध्यमिक विद्यालय (रा उ मा वि), अनूपशहर, भादरा",
+            "en": "Govt. Senior Secondary School (GSSS), Anoopshahar, Bhadra"
+          },
+          "reach": {
+            "hi": "X636+7R8, रा उ मा वि अनूपशहर, मुख्य मार्ग, ग्राम पंचायत अनूपशहर, तहसील भादरा, ज़िला हनुमानगढ़, राजस्थान – 335501 (निर्देशांक: 28.95277° N, 75.21122° E)",
+            "en": "X636+7R8, GSSS Anupshahr, Main Road, Gram Panchayat Anoopshahar, Tehsil Bhadra, District Hanumangarh, Rajasthan – 335501 (Coordinates: 28.95277° N, 75.21122° E)"
+          },
+          "map": "GSSS Anupshahr, Bhadra, X636+7R8, Anupshahar, Rajasthan 335501",
+          "lat": 28.9527705,
+          "lng": 75.2112232
+        }
+      ]
+    }
+  ]
+}

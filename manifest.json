@@ -1,0 +1,26 @@
+{
+  "name": "मनोज कुमार आचार्य — सरपंच प्रत्याशी, ग्राम पंचायत अनूपशहर",
+  "short_name": "मनोज आचार्य",
+  "description": "ग्राम पंचायत अनूपशहर — मतदान की जानकारी और सरपंच प्रत्याशी मनोज कुमार आचार्य के 12 वादे।",
+  "lang": "hi-IN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0F172A",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
