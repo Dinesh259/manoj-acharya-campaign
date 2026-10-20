@@ -169,6 +169,9 @@ mark.edit { background: #FEF3C7; color: #78350F; padding: .08em .35em; border-ra
   top: 0;
   z-index: 500;
 }
+.site-header .wrap {
+  max-width: 1240px;
+}
 .site-header .bar {
   display: flex; align-items: center; gap: clamp(6px, 1.2vw, 10px); min-height: 68px; padding-top: 8px; padding-bottom: 8px;
 }
@@ -176,18 +179,18 @@ mark.edit { background: #FEF3C7; color: #78350F; padding: .08em .35em; border-ra
   display: none;
   align-items: center;
   gap: 3px;
-  flex: 0 1 auto;
-  min-width: 0;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 .desktop-nav-link {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  padding: 0 clamp(6px, 1vw, 12px);
+  padding: 0 clamp(6px, 0.75vw, 10px);
   color: #CBD5E1;
   text-decoration: none;
   font-weight: 600;
-  font-size: clamp(0.78rem, 1.1vw, 0.92rem);
+  font-size: clamp(0.78rem, 0.82vw, 0.88rem);
   border-radius: var(--radius-pill);
   transition: background-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
@@ -208,13 +211,14 @@ mark.edit { background: #FEF3C7; color: #78350F; padding: .08em .35em; border-ra
   justify-content: center;
   gap: 5px;
   min-height: 44px;
-  padding: 0 clamp(8px, 1vw, 14px);
+  padding: 0 clamp(8px, 0.85vw, 12px);
+  margin-left: 8px;
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
   text-decoration: none;
   font-weight: 700;
-  font-size: clamp(0.78rem, 1.1vw, 0.9rem);
+  font-size: clamp(0.78rem, 0.82vw, 0.88rem);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   transition: background-color 0.15s ease, border-color 0.15s ease;
   white-space: nowrap;
@@ -1049,18 +1053,30 @@ a.qr-url:hover { background: #DBEAFE; color: var(--brand-navy); }
   .bottom-nav {
     display: none !important;
   }
+}
+
+@media (max-width: 991px) {
   .desktop-nav-links {
-    display: flex;
+    display: none !important;
   }
   .btn-menu {
-    display: none;
+    display: inline-flex !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .btn-menu {
+    display: none !important;
   }
   .site-nav {
     display: none !important;
   }
+  .desktop-nav-links {
+    display: flex !important;
+  }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 992px) and (max-width: 1100px) {
   .site-header .bar {
     gap: 6px;
   }
@@ -1078,6 +1094,7 @@ a.qr-url:hover { background: #DBEAFE; color: var(--brand-navy); }
     font-size: 0.8rem;
   }
   .btn-manifesto-nav {
+    margin-left: 6px;
     padding: 0 8px;
     font-size: 0.8rem;
   }
@@ -1090,6 +1107,7 @@ html.large-text .desktop-nav-link {
 html.large-text .btn-manifesto-nav {
   padding: 0 7px;
   font-size: 0.78rem;
+  margin-left: 6px;
 }
 html.large-text .site-header .brand-role {
   display: none;
