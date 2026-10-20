@@ -259,20 +259,91 @@ mark.edit { background: #FEF3C7; color: #78350F; padding: .08em .35em; border-ra
 }
 .btn-lang:active, .btn-menu:active { transform: scale(0.96); }
 .btn-lang {
-  width: 44px;
+  width: auto;
+  min-width: 68px;
   height: 44px;
-  min-width: 44px;
-  padding: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  gap: 6px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  flex-shrink: 0;
+  transition: transform .12s var(--ease), background-color .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease;
+}
+/* OFF State / Hindi Mode (Default) */
+.btn-lang,
+.btn-lang[aria-pressed="false"],
+.btn-lang[data-lang="hi"] {
   background: var(--accent-primary);
   color: #FFFFFF;
   border: 1.5px solid #FDBA74;
-  box-shadow: 0 2px 8px rgba(234, 88, 12, .3);
+  box-shadow: 0 2px 8px rgba(234, 88, 12, .32);
+}
+.btn-lang[aria-pressed="false"]:hover,
+.btn-lang:not(.is-on):hover {
+  background: var(--accent-primary-active);
+  box-shadow: 0 3px 10px rgba(234, 88, 12, .45);
 }
 .btn-lang .icon {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
-.btn-lang:hover { background: var(--accent-primary-active); }
+.btn-lang .lang-tag {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+.btn-lang .switch-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FED7AA;
+  box-shadow: 0 0 4px #FED7AA;
+  flex-shrink: 0;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+/* ON State / English Mode (Active) */
+.btn-lang[aria-pressed="true"],
+.btn-lang.is-on,
+.btn-lang.is-en,
+.btn-lang[data-lang="en"] {
+  background: #16A34A !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #86EFAC !important;
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.7), 0 2px 8px rgba(22, 163, 74, 0.4) !important;
+}
+.btn-lang[aria-pressed="true"]:hover,
+.btn-lang.is-on:hover,
+.btn-lang.is-en:hover,
+.btn-lang[data-lang="en"]:hover {
+  background: #15803D !important;
+  border-color: #4ADE80 !important;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.85), 0 3px 10px rgba(22, 163, 74, 0.5) !important;
+}
+.btn-lang[aria-pressed="true"] .switch-indicator,
+.btn-lang.is-on .switch-indicator,
+.btn-lang.is-en .switch-indicator,
+.btn-lang[data-lang="en"] .switch-indicator {
+  background: #86EFAC !important;
+  box-shadow: 0 0 8px #4ADE80 !important;
+}
+@media (max-width: 420px) {
+  .btn-lang {
+    min-width: 62px;
+    padding: 0 9px;
+    gap: 5px;
+  }
+  .btn-lang .lang-tag {
+    font-size: 0.78rem;
+  }
+}
 .btn-menu {
   background: rgba(255, 255, 255, .12);
   color: #FFFFFF;
@@ -1268,6 +1339,24 @@ html.hc .site-nav a[aria-current="page"] {
   border-color: #60A5FA !important;
 }
 
+/* Language Button in High-Contrast Mode */
+html.hc .btn-lang,
+html.hc .btn-lang[aria-pressed="false"],
+html.hc .btn-lang[data-lang="hi"] {
+  background: #9A3412 !important;
+  border: 1.5px solid #FDBA74 !important;
+  color: #FFFFFF !important;
+}
+html.hc .btn-lang[aria-pressed="true"],
+html.hc .btn-lang.is-on,
+html.hc .btn-lang.is-en,
+html.hc .btn-lang[data-lang="en"] {
+  background: #15803D !important;
+  border: 1.5px solid #86EFAC !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 14px rgba(74, 222, 128, 0.65) !important;
+}
+
 /* WhatsApp Buttons in Dark Mode */
 html.hc .btn-wa {
   background: #059669 !important;
@@ -1437,7 +1526,11 @@ html.hc .top-announcement-bar {
     min-height: 38px;
     height: 38px;
   }
-  .btn-lang { width: 38px; min-width: 38px; }
+  .btn-lang {
+    width: auto;
+    min-width: 60px;
+    padding: 0 8px;
+  }
   .toolbar-band {
     min-height: 44px;
   }

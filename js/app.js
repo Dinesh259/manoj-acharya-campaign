@@ -217,7 +217,14 @@
               '<a href="contact.html" class="desktop-nav-link"' + (current === 'contact.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.contact">संपर्क</span></a>' +
             '</nav>' +
             '<a href="manifesto.html" class="btn-manifesto-nav"' + (current === 'manifesto.html' ? ' aria-current="page"' : '') + ' data-i18n-attr="aria-label:nav.manifestoNav;title:nav.manifestoNav">' + icon('list') + '<span class="manifesto-nav-text" data-i18n="nav.manifestoNav">मेरे वादे</span></a>' +
-            '<button type="button" class="btn-lang" id="langBtn" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' + icon('globe') + '</button>' +
+            (function () {
+              var isEn = lang === 'en';
+              return '<button type="button" class="btn-lang' + (isEn ? ' is-on is-en' : '') + '" id="langBtn" aria-pressed="' + (isEn ? 'true' : 'false') + '" data-lang="' + lang + '" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' +
+                icon('globe') +
+                '<span class="lang-tag" aria-hidden="true" lang="' + (isEn ? 'hi' : 'en') + '">' + (isEn ? 'HI' : 'EN') + '</span>' +
+                '<span class="switch-indicator" aria-hidden="true"></span>' +
+              '</button>';
+            })() +
             '<button type="button" class="btn-menu" id="menuBtn" aria-expanded="false" aria-controls="siteNav">' +
               '<span class="label" data-i18n="common.menu">मेनू</span></button>' +
           '</div>' +
@@ -304,8 +311,16 @@
     if (tk) doc.title = t('title.' + tk);
     var lb = $('#langBtn');
     if (lb) {
-      var lbSpan = lb.querySelector('span');
-      if (lbSpan) lbSpan.setAttribute('lang', lang === 'hi' ? 'en' : 'hi');
+      var isEn = lang === 'en';
+      lb.setAttribute('aria-pressed', isEn ? 'true' : 'false');
+      lb.setAttribute('data-lang', lang);
+      lb.classList.toggle('is-on', isEn);
+      lb.classList.toggle('is-en', isEn);
+      var lbSpan = lb.querySelector('.lang-tag');
+      if (lbSpan) {
+        lbSpan.setAttribute('lang', isEn ? 'hi' : 'en');
+        lbSpan.textContent = isEn ? 'HI' : 'EN';
+      }
       lb.setAttribute('aria-label', t('common.langBtnLabel'));
       lb.setAttribute('title', t('common.langBtnLabel'));
     }
