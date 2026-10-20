@@ -1187,6 +1187,10 @@
     if (a.hasAttribute('target') && a.getAttribute('target') !== '_self') return false;
     if (a.hasAttribute('download')) return false;
     if (location.protocol === 'file:') return false;
+
+    // Only route internal HTML pages or site root, bypass static files (images, PDFs, media)
+    var cleanPath = href.split('#')[0].split('?')[0];
+    if (/\.(jpg|jpeg|png|gif|svg|webp|ico|pdf|json|zip|txt)$/i.test(cleanPath)) return false;
     return true;
   }
 

@@ -1362,6 +1362,59 @@ html.hc a.qr-url {
   border-color: rgba(96, 165, 250, .35) !important;
 }
 
+/* Meeting Card & Top Announcement Bar in Dark / High Contrast Mode */
+html.hc .meeting-card {
+  background: #1E293B !important;
+  border: 2px solid #FDBA74 !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4) !important;
+}
+html.hc .meeting-header {
+  border-bottom: 1px dashed #475569 !important;
+}
+html.hc .meeting-date-pill {
+  background: #273548 !important;
+  color: #FDBA74 !important;
+  border: 1px solid #475569 !important;
+}
+html.hc .meeting-live-badge {
+  background: #3F1D1D !important;
+  color: #F87171 !important;
+  border-color: #991B1B !important;
+}
+html.hc .meeting-poster-thumb {
+  border-color: #475569 !important;
+}
+html.hc .meeting-title {
+  color: #FDBA74 !important;
+}
+html.hc .meeting-subtitle {
+  color: #FB923C !important;
+}
+html.hc .meeting-intro {
+  color: #E2E8F0 !important;
+}
+html.hc .meeting-details-box {
+  background: #0F172A !important;
+  border: 1px solid #334155 !important;
+  color: #E2E8F0 !important;
+}
+html.hc .meeting-detail-row.highlight-venue {
+  border-top: 1px dashed #334155 !important;
+}
+html.hc .meeting-detail-row strong {
+  color: #F8FAFC !important;
+}
+html.hc .meeting-detail-row span {
+  color: #CBD5E1 !important;
+}
+html.hc .meeting-quote {
+  color: #94A3B8 !important;
+}
+html.hc .top-announcement-bar {
+  background: #1E293B !important;
+  border-bottom: 2px solid #EA580C !important;
+}
+
 /* ---------- Motion Accessibility ---------- */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

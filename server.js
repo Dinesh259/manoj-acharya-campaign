@@ -21,7 +21,11 @@ const server = http.createServer((req, res) => {
   let cleanUrl = req.url.split('?')[0].split('#')[0];
   if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/index.html';
   
-  const filePath = path.join(ROOT, cleanUrl);
+  let filePath = path.join(ROOT, cleanUrl);
+
+  if ((!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) && fs.existsSync(filePath + '.html')) {
+    filePath = filePath + '.html';
+  }
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
     const ext = path.extname(filePath).toLowerCase();
