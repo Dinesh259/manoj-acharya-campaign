@@ -536,17 +536,30 @@
       });
     });
 
-    /* Always include official meeting poster as final photo in lightbox sequence */
-    photoData.push({
-      src: 'assets/meeting-poster.jpg',
-      captionKey: 'meeting.photoPoster',
-      alt: t('meeting.photoPoster')
-    });
+    /* Ensure all 10 meeting photos + official poster are in lightbox sequence */
+    var hasMeeting2 = photoData.some(function (p) { return p.src && p.src.indexOf('meeting-2.jpg') !== -1; });
+    if (!hasMeeting2) {
+      photoData.push({
+        src: 'assets/meeting-2.jpg',
+        captionKey: 'meeting.photo2',
+        alt: t('meeting.photo2')
+      });
+    }
+
+    var hasPoster = photoData.some(function (p) { return p.src && p.src.indexOf('meeting-poster.jpg') !== -1; });
+    if (!hasPoster) {
+      photoData.push({
+        src: 'assets/meeting-poster.jpg',
+        captionKey: 'meeting.photoPoster',
+        alt: t('meeting.photoPoster')
+      });
+    }
 
     var posterBtn = $('#btnMeetingPoster');
     if (posterBtn) {
       posterBtn.addEventListener('click', function () {
-        openModal(photoData.length - 1);
+        var posterIdx = photoData.findIndex(function (p) { return p.src && p.src.indexOf('meeting-poster.jpg') !== -1; });
+        openModal(posterIdx !== -1 ? posterIdx : photoData.length - 1);
       });
     }
 
