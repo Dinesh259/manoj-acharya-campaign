@@ -199,8 +199,8 @@
       head.outerHTML =
         '<aside class="top-announcement-bar" role="region" aria-label="Announcement">' +
           '<div class="wrap ann-content">' +
-            '<span class="ann-badge">🔴 <span data-i18n="meeting.tag">' + esc(t('meeting.tag')) + '</span></span>' +
-            '<a href="index.html#meeting-event" class="ann-link" data-i18n="meeting.alert">' +
+            '<span class="ann-badge">✨ <span data-i18n="meeting.tag">' + esc(t('meeting.tag')) + '</span></span>' +
+            '<a href="index.html#meeting-gallery" class="ann-link" data-i18n="meeting.alert">' +
               esc(t('meeting.alert')) +
             '</a>' +
           '</div>' +
@@ -486,19 +486,121 @@
 
   /* ---------- Today's Meeting (20 Oct 2026) Share & Actions ---------- */
   function setupMeeting() {
-    var btn = $('#btnMeetingShare');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      var text = t('meeting.shareText');
-      trackEvent('meeting_share_wa', { event: 'sarv_samaj_meeting_20oct' });
-      if (navigator.share) {
-        navigator.share({
-          title: t('meeting.title') + ' — ' + t('common.siteName'),
-          text: text,
-          url: 'https://manoj-acharya-anoopshahar.web.app/'
-        }).catch(function () {});
+    var btn = $('#btnMeetingShare') || $('#btn-share-meeting');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var text = t('meeting.shareText') || t('meetingShareWa');
+        trackEvent('meeting_share_wa', { event: 'sarv_samaj_meeting_20oct' });
+        if (navigator.share) {
+          navigator.share({
+            title: (t('meeting.title') || t('meetingTitleConcluded')) + ' — ' + t('common.siteName'),
+            text: text,
+            url: 'https://manoj-acharya-anoopshahar.web.app/'
+          }).catch(function () {});
+        } else {
+          openExternal(waLink(text));
+        }
+      });
+    }
+
+    /* Lightbox Modal for Meeting Photos */
+    var modal = $('#photoModal');
+    if (!modal) return;
+    var modalImg = $('#modalImg');
+    var modalCaption = $('#modalCaption');
+    var modalCounter = $('#modalCounter');
+    var modalClose = $('#modalCloseBtn') || $('#modalClose');
+    var modalPrev = $('#modalPrevBtn') || $('#modalPrev');
+    var modalNext = $('#modalNextBtn') || $('#modalNext');
+    var modalBackdrop = $('#modalBackdrop');
+
+    var items = $$('.gallery-btn, .gallery-thumb-link');
+    if (!items.length) return;
+
+    var currentIndex = 0;
+    var photoData = [];
+
+    items.forEach(function (el, idx) {
+      var img = el.querySelector('img');
+      var captionKey = el.getAttribute('data-caption-key') || '';
+      var photoSrc = el.getAttribute('data-photo') || el.getAttribute('href') || (img ? img.getAttribute('src') : '');
+      photoData.push({
+        src: photoSrc,
+        captionKey: captionKey,
+        alt: img ? img.getAttribute('alt') : ''
+      });
+
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        openModal(idx);
+      });
+    });
+
+    /* Always include official meeting poster as final photo in lightbox sequence */
+    photoData.push({
+      src: 'assets/meeting-poster.jpg',
+      captionKey: 'meeting.photoPoster',
+      alt: t('meeting.photoPoster')
+    });
+
+    var posterBtn = $('#btnMeetingPoster');
+    if (posterBtn) {
+      posterBtn.addEventListener('click', function () {
+        openModal(photoData.length - 1);
+      });
+    }
+
+    function showPhoto(idx) {
+      if (idx < 0) idx = photoData.length - 1;
+      if (idx >= photoData.length) idx = 0;
+      currentIndex = idx;
+      var data = photoData[currentIndex];
+      if (modalImg) {
+        modalImg.src = data.src;
+        modalImg.alt = data.alt || '';
+      }
+      if (modalCaption) {
+        modalCaption.textContent = data.captionKey ? t(data.captionKey) : data.alt;
+      }
+      if (modalCounter) {
+        modalCounter.textContent = (currentIndex + 1) + ' / ' + photoData.length;
+      }
+    }
+
+    function openModal(idx) {
+      showPhoto(idx);
+      if (typeof modal.showModal === 'function') {
+        modal.showModal();
       } else {
-        openExternal(waLink(text));
+        modal.setAttribute('open', '');
+      }
+      document.body.style.overflow = 'hidden';
+      if (modalClose) modalClose.focus();
+      trackEvent('meeting_photo_view', { index: idx });
+    }
+
+    function closeModal() {
+      if (typeof modal.close === 'function') {
+        modal.close();
+      } else {
+        modal.removeAttribute('open');
+      }
+      document.body.style.overflow = '';
+      if (items[currentIndex]) items[currentIndex].focus();
+    }
+
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
+    if (modalPrev) modalPrev.addEventListener('click', function () { showPhoto(currentIndex - 1); });
+    if (modalNext) modalNext.addEventListener('click', function () { showPhoto(currentIndex + 1); });
+
+    modal.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === 'ArrowLeft') {
+        showPhoto(currentIndex - 1);
+      } else if (e.key === 'ArrowRight') {
+        showPhoto(currentIndex + 1);
       }
     });
   }

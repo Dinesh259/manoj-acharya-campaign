@@ -3,7 +3,7 @@
    Pre-caches all core HTML pages, assets, scripts, and stylesheets for 0ms loads
    ========================================================================== */
 
-var CACHE_NAME = 'mka-native-v11';
+var CACHE_NAME = 'mka-native-v12';
 
 var CORE_ASSETS = [
   './',
@@ -27,6 +27,11 @@ var CORE_ASSETS = [
   './assets/icon-512.png',
   './assets/poster.jpg',
   './assets/meeting-poster.jpg',
+  './assets/meeting-1.jpg',
+  './assets/meeting-2.jpg',
+  './assets/meeting-3.jpg',
+  './assets/meeting-4.jpg',
+  './assets/meeting-5.jpg',
   './assets/cand-1.jpg',
   './assets/cand-2.jpg',
   './assets/cand-2-danaram.jpg',
