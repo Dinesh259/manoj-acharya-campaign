@@ -618,6 +618,121 @@
     });
   }
 
+  /* ---------- Meeting Media Hub (Dynamic Video Playlist & Audio Player) ---------- */
+  function setupMeetingMedia() {
+    var video = $('#meetingMainVideo');
+    var frame = $('#videoPlayerFrame');
+    var metaTitle = $('#videoMetaTitle');
+    var metaDesc = $('#videoMetaDesc');
+    var orientationBadge = $('#videoOrientationBadge');
+    var durationTag = $('#videoDurationTag');
+    var playlistButtons = $$('.playlist-item');
+
+    if (video && frame && playlistButtons.length) {
+      playlistButtons.forEach(function (btn, index) {
+        btn.addEventListener('click', function () {
+          var src = btn.getAttribute('data-src');
+          var poster = btn.getAttribute('data-poster');
+          var orientation = btn.getAttribute('data-orientation') || 'portrait';
+          var duration = btn.getAttribute('data-duration') || '';
+          var titleKey = btn.getAttribute('data-title-key') || '';
+          var descKey = btn.getAttribute('data-desc-key') || '';
+
+          /* Update active button state */
+          playlistButtons.forEach(function (b) {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+
+          /* Pause current playback & swap source */
+          try { video.pause(); } catch (e) {}
+
+          video.poster = poster;
+          video.src = src;
+          video.load();
+
+          /* Switch player aspect ratio frame */
+          if (orientation === 'portrait') {
+            frame.classList.remove('is-landscape');
+            frame.classList.add('is-portrait');
+          } else {
+            frame.classList.remove('is-portrait');
+            frame.classList.add('is-landscape');
+          }
+
+          /* Update orientation badge */
+          if (orientationBadge) {
+            var isPort = orientation === 'portrait';
+            orientationBadge.className = 'video-orientation-badge ' + (isPort ? 'is-portrait' : 'is-landscape');
+            var badgeIcon = orientationBadge.querySelector('.badge-icon');
+            if (badgeIcon) badgeIcon.textContent = isPort ? '📱' : '🖥️';
+            var badgeText = orientationBadge.querySelector('span:not(.badge-icon)');
+            var badgeKey = isPort ? 'meeting.videoOrientationPortrait' : 'meeting.videoOrientationLandscape';
+            if (badgeText) {
+              badgeText.setAttribute('data-i18n', badgeKey);
+              badgeText.textContent = t(badgeKey);
+            }
+          }
+
+          /* Update duration tag */
+          if (durationTag) {
+            durationTag.textContent = '⏱️ ' + duration;
+          }
+
+          /* Update active title & description with i18n support */
+          if (metaTitle && titleKey) {
+            metaTitle.setAttribute('data-i18n', titleKey);
+            metaTitle.textContent = t(titleKey);
+          }
+          if (metaDesc && descKey) {
+            metaDesc.setAttribute('data-i18n', descKey);
+            metaDesc.textContent = t(descKey);
+          }
+
+          trackEvent('meeting_video_select', { index: index, orientation: orientation, src: src });
+        });
+      });
+
+      video.addEventListener('play', function () {
+        trackEvent('meeting_video_play', { src: video.currentSrc || video.src });
+      });
+    }
+
+    /* Meeting Audio Player */
+    var audio = $('#meetingAudioPlayer');
+    if (audio) {
+      audio.addEventListener('play', function () {
+        trackEvent('meeting_audio_play', { src: audio.currentSrc || audio.src });
+      });
+    }
+
+    var downloadAudioBtn = $('#btnDownloadAudio');
+    if (downloadAudioBtn) {
+      downloadAudioBtn.addEventListener('click', function () {
+        trackEvent('meeting_audio_download', { file: 'meeting-audio.mp3' });
+      });
+    }
+
+    var shareAudioBtn = $('#btnShareAudio');
+    if (shareAudioBtn) {
+      shareAudioBtn.addEventListener('click', function () {
+        var text = '🎙️ ग्राम पंचायत अनूपशहर: 20 अक्टूबर 2026 की सर्व समाज ऐतिहासिक जनसभा का संपूर्ण मुख्य भाषण (ऑडियो) सुनें व शेयर करें: https://manoj-acharya-anoopshahar.web.app/#meeting-audio';
+        trackEvent('meeting_audio_share', { method: navigator.share ? 'native' : 'whatsapp' });
+        if (navigator.share) {
+          navigator.share({
+            title: (t('meeting.audioTitle') || 'Audio Speech') + ' — ' + t('common.siteName'),
+            text: text,
+            url: 'https://manoj-acharya-anoopshahar.web.app/#meeting-audio'
+          }).catch(function () {});
+        } else {
+          openExternal(waLink(text));
+        }
+      });
+    }
+  }
+
   /* ---------- Countdown to polling day (IST) ---------- */
   function setupCountdown() {
     var box = $('#countdown');
@@ -1360,6 +1475,7 @@
     setupDemo();
     setupAsk();
     setupMeeting();
+    setupMeetingMedia();
     setupQr();
     setupPrint();
     applyI18n(true);
@@ -1543,6 +1659,7 @@
   setupDemo();
   setupAsk();
   setupMeeting();
+  setupMeetingMedia();
   setupQr();
   setupPrint();
   applyI18n();

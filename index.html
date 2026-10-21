@@ -139,33 +139,132 @@
         </div>
       </div>
 
-      <!-- Upcoming Media Hub (Videos & Audios) -->
-      <div class="meeting-media-hub">
-        <h3 class="media-hub-title">
-          <span aria-hidden="true">🎬</span> <span data-i18n="meeting.mediaHeading">मीटिंग वीडियो व ऑडियो (Videos & Audios)</span>
-        </h3>
-        <div class="media-hub-grid">
-          <div class="media-preview-card video-card">
-            <div class="media-icon-badge video" aria-hidden="true">📹</div>
-            <div class="media-content">
-              <h4 class="media-title" data-i18n="meeting.videoTitle">मीटिंग वीडियो भाषण (Video Speeches)</h4>
-              <p class="media-desc" data-i18n="meeting.videoDesc">📹 जनसभा के मुख्य भाषणों, नारों और ऐतिहासिक पलों के वीडियो शीघ्र ही यहाँ जोड़े जा रहे हैं।</p>
-              <span class="media-status-pill upcoming">
-                <span class="pulse-dot" aria-hidden="true"></span>
-                <span data-i18n="meeting.comingSoon">शीघ्र उपलब्ध (Coming Soon)</span>
-              </span>
+      <!-- Media Hub (Videos & Audio) -->
+      <div class="meeting-media-hub" id="meeting-media">
+        <div class="media-hub-head">
+          <h3 class="media-hub-title">
+            <span aria-hidden="true">🎬</span> <span data-i18n="meeting.mediaHeading">मीटिंग के ऐतिहासिक वीडियो व ऑडियो (Videos & Audios)</span>
+          </h3>
+          <p class="media-hub-intro" data-i18n="meeting.videoSub">
+            अनूपशहर मेन चौक बस स्टैंड पर आयोजित जनसभा के मुख्य भाषण व पलों के वीडियो — देखने के लिए किसी भी वीडियो पर क्लिक करें:
+          </p>
+        </div>
+
+        <!-- Video Player Section with Dynamic Orientation -->
+        <div class="meeting-video-section">
+          <div class="video-player-wrapper">
+            <!-- Dynamic orientation frame: .is-portrait (9:16) vs .is-landscape (16:9) -->
+            <div class="video-player-frame is-portrait" id="videoPlayerFrame">
+              <video id="meetingMainVideo" controls playsinline preload="metadata" poster="assets/media/meeting-video-1-thumb.jpg">
+                <source src="assets/media/meeting-video-1.mp4" type="video/mp4">
+                आपका ब्राउज़र वीडियो का समर्थन नहीं करता। (Your browser does not support HTML5 video.)
+              </video>
+            </div>
+
+            <!-- Active Video Metadata Bar -->
+            <div class="video-meta-bar" id="videoMetaBar">
+              <div class="video-meta-top">
+                <span class="video-orientation-badge is-portrait" id="videoOrientationBadge">
+                  <span class="badge-icon" aria-hidden="true">📱</span>
+                  <span data-i18n="meeting.videoOrientationPortrait">वर्टिकल (मोबाइल)</span>
+                </span>
+                <span class="video-duration-tag" id="videoDurationTag">⏱️ 0:07</span>
+              </div>
+              <h4 class="video-meta-title" id="videoMetaTitle" data-i18n="meeting.video1Title">मंच से मुख्य जनसंबोधन (Keynote Address)</h4>
+              <p class="video-meta-desc" id="videoMetaDesc" data-i18n="meeting.video1Desc">
+                अनूपशहर मेन चौक बस स्टैंड पर मंच से सभा को संबोधित करते वक्ता और उपस्थित ग्रामवासी।
+              </p>
             </div>
           </div>
 
-          <div class="media-preview-card audio-card">
-            <div class="media-icon-badge audio" aria-hidden="true">🎙️</div>
-            <div class="media-content">
-              <h4 class="media-title" data-i18n="meeting.audioTitle">ऑडियो संदेश व भाषण (Audio Message)</h4>
-              <p class="media-desc" data-i18n="meeting.audioDesc">🎙️ प्रत्याशी मनोज कुमार आचार्य एवं गाँव के वरिष्ठ वक्ताओं के प्रेरक ऑडियो संदेश शीघ्र उपलब्ध होंगे।</p>
-              <span class="media-status-pill upcoming">
-                <span class="pulse-dot" aria-hidden="true"></span>
-                <span data-i18n="meeting.comingSoon">शीघ्र उपलब्ध (Coming Soon)</span>
-              </span>
+          <!-- 4-Video Interactive Playlist -->
+          <div class="video-playlist" role="tablist" aria-label="Meeting Videos Playlist">
+            <!-- Video 1 (Portrait) -->
+            <button type="button" class="playlist-item is-active" data-video-index="0" data-src="assets/media/meeting-video-1.mp4" data-poster="assets/media/meeting-video-1-thumb.jpg" data-orientation="portrait" data-duration="0:07" data-title-key="meeting.video1Title" data-desc-key="meeting.video1Desc" role="tab" aria-selected="true" aria-controls="meetingMainVideo">
+              <div class="playlist-thumb-box portrait">
+                <img src="assets/media/meeting-video-1-thumb.jpg" alt="Video 1 thumbnail" width="478" height="850" loading="lazy">
+                <span class="playlist-play-icon" aria-hidden="true">▶</span>
+                <span class="playlist-badge portrait">📱 9:16</span>
+              </div>
+              <div class="playlist-info">
+                <span class="playlist-label" data-i18n="meeting.video1Title">मंच से मुख्य जनसंबोधन</span>
+                <span class="playlist-meta"><span class="playlist-dur">⏱️ 0:07</span> · <span data-i18n="meeting.videoOrientationPortrait">वर्टिकल</span></span>
+              </div>
+            </button>
+
+            <!-- Video 2 (Landscape) -->
+            <button type="button" class="playlist-item" data-video-index="1" data-src="assets/media/meeting-video-2.mp4" data-poster="assets/media/meeting-video-2-thumb.jpg" data-orientation="landscape" data-duration="0:16" data-title-key="meeting.video2Title" data-desc-key="meeting.video2Desc" role="tab" aria-selected="false" aria-controls="meetingMainVideo">
+              <div class="playlist-thumb-box landscape">
+                <img src="assets/media/meeting-video-2-thumb.jpg" alt="Video 2 thumbnail" width="848" height="478" loading="lazy">
+                <span class="playlist-play-icon" aria-hidden="true">▶</span>
+                <span class="playlist-badge landscape">🖥️ 16:9</span>
+              </div>
+              <div class="playlist-info">
+                <span class="playlist-label" data-i18n="meeting.video2Title">माल्यार्पण व स्वागत</span>
+                <span class="playlist-meta"><span class="playlist-dur">⏱️ 0:16</span> · <span data-i18n="meeting.videoOrientationLandscape">लैंडस्केप</span></span>
+              </div>
+            </button>
+
+            <!-- Video 3 (Portrait) -->
+            <button type="button" class="playlist-item" data-video-index="2" data-src="assets/media/meeting-video-3.mp4" data-poster="assets/media/meeting-video-3-thumb.jpg" data-orientation="portrait" data-duration="0:42" data-title-key="meeting.video3Title" data-desc-key="meeting.video3Desc" role="tab" aria-selected="false" aria-controls="meetingMainVideo">
+              <div class="playlist-thumb-box portrait">
+                <img src="assets/media/meeting-video-3-thumb.jpg" alt="Video 3 thumbnail" width="478" height="850" loading="lazy">
+                <span class="playlist-play-icon" aria-hidden="true">▶</span>
+                <span class="playlist-badge portrait">📱 9:16</span>
+              </div>
+              <div class="playlist-info">
+                <span class="playlist-label" data-i18n="meeting.video3Title">अनूपशहर सर्व समाज जनसभा</span>
+                <span class="playlist-meta"><span class="playlist-dur">⏱️ 0:42</span> · <span data-i18n="meeting.videoOrientationPortrait">वर्टिकल</span></span>
+              </div>
+            </button>
+
+            <!-- Video 4 (Landscape) -->
+            <button type="button" class="playlist-item" data-video-index="3" data-src="assets/media/meeting-video-4.mp4" data-poster="assets/media/meeting-video-4-thumb.jpg" data-orientation="landscape" data-duration="0:40" data-title-key="meeting.video4Title" data-desc-key="meeting.video4Desc" role="tab" aria-selected="false" aria-controls="meetingMainVideo">
+              <div class="playlist-thumb-box landscape">
+                <img src="assets/media/meeting-video-4-thumb.jpg" alt="Video 4 thumbnail" width="848" height="478" loading="lazy">
+                <span class="playlist-play-icon" aria-hidden="true">▶</span>
+                <span class="playlist-badge landscape">🖥️ 16:9</span>
+              </div>
+              <div class="playlist-info">
+                <span class="playlist-label" data-i18n="meeting.video4Title">ग्राम सभा की जीवंत झलक</span>
+                <span class="playlist-meta"><span class="playlist-dur">⏱️ 0:40</span> · <span data-i18n="meeting.videoOrientationLandscape">लैंडस्केप</span></span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Audio Player Card -->
+        <div class="meeting-audio-card" id="meeting-audio">
+          <div class="audio-card-header">
+            <div class="audio-icon-bubble" aria-hidden="true">🎙️</div>
+            <div class="audio-header-text">
+              <span class="audio-badge" data-i18n="meeting.audioHeading">सम्मेलन मुख्य ऑडियो संबोधन (Audio Recording)</span>
+              <h4 class="audio-card-title" data-i18n="meeting.audioTitle">मनोज कुमार आचार्य एवं वक्ताओं का जनसंबोधन (ऑडियो)</h4>
+              <p class="audio-card-desc" data-i18n="meeting.audioSub">20 अक्टूबर 2026 को आयोजित सर्व समाज सम्मेलन का संपूर्ण मुख्य भाषण व विकास का संकल्प (4 मिनट 35 सेकंड):</p>
+            </div>
+          </div>
+
+          <div class="audio-player-wrapper">
+            <audio id="meetingAudioPlayer" controls preload="none" aria-label="Meeting Audio Speech">
+              <source src="assets/media/meeting-audio.mp3" type="audio/mpeg">
+              <source src="assets/media/meeting-audio.mpeg" type="audio/mpeg">
+              आपका ब्राउज़र ऑडियो का समर्थन नहीं करता। (Your browser does not support HTML5 audio.)
+            </audio>
+          </div>
+
+          <div class="audio-card-actions">
+            <span class="audio-duration-pill">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              <span data-i18n="meeting.audioDuration">अवधि: 4 मिनट 35 सेकंड (MP3)</span>
+            </span>
+            <div class="audio-action-buttons">
+              <a href="assets/media/meeting-audio.mp3" download="Manoj-Acharya-Anoopshahar-Meeting-Speech.mp3" class="btn btn-sm btn-outline" id="btnDownloadAudio">
+                <span aria-hidden="true">⬇️</span> <span data-i18n="meeting.downloadAudio">ऑडियो डाउनलोड करें</span>
+              </a>
+              <button type="button" class="btn btn-sm btn-wa-share" id="btnShareAudio">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-wa"></use></svg>
+                <span data-i18n="meeting.shareAudio">व्हाट्सएप पर शेयर करें</span>
+              </button>
             </div>
           </div>
         </div>
