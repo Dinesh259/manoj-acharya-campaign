@@ -3,6 +3,8 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+      "server.js",
+      "README.md",
       "**/.*",
       "**/node_modules/**"
     ],
@@ -31,6 +33,19 @@
           {
             "key": "Cache-Control",
             "value": "public, max-age=3600, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(mp4|webm|mp3|mpeg|ogg)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400, must-revalidate"
+          },
+          {
+            "key": "Accept-Ranges",
+            "value": "bytes"
           }
         ]
       }
