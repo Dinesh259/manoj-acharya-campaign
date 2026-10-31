@@ -182,6 +182,7 @@
                 <th scope="col" data-i18n="admin.photoCol">तस्वीर</th>
                 <th scope="col" data-i18n="admin.likesCol">लाइक्स</th>
                 <th scope="col" data-i18n="admin.dateCol">दिनांक व समय</th>
+                <th scope="col" data-i18n="admin.actionsCol">कार्रवाई</th>
               </tr>
             </thead>
             <tbody id="adminTableBody">
@@ -220,6 +221,7 @@
                 <th scope="col" data-i18n="admin.commentCol">टिप्पणी संदेश</th>
                 <th scope="col" data-i18n="admin.postRefCol">पोस्ट संदर्भ (ID)</th>
                 <th scope="col" data-i18n="admin.dateCol">दिनांक व समय</th>
+                <th scope="col" data-i18n="admin.actionsCol">कार्रवाई</th>
               </tr>
             </thead>
             <tbody id="adminCommentsTableBody">
@@ -245,6 +247,25 @@
       </div>
       <div class="modal-footer">
         <p class="modal-caption" id="adminModalCaption">समर्थक तस्वीर</p>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Delete Confirmation Modal for Admin Dashboard -->
+  <dialog class="photo-modal admin-confirm-dialog" id="adminDeleteModal" aria-label="Confirm Deletion">
+    <div class="modal-backdrop" id="adminDeleteBackdrop"></div>
+    <div class="modal-box admin-confirm-box">
+      <div class="admin-confirm-header">
+        <span class="confirm-icon" aria-hidden="true">⚠️</span>
+        <h3 id="adminDeleteTitle" class="confirm-title" data-i18n="admin.confirmDeleteTitle">हटाने की पुष्टि करें</h3>
+      </div>
+      <p id="adminDeleteMessage" class="confirm-desc">क्या आप वाकई इस प्रविष्टि को स्थायी रूप से हटाना चाहते हैं?</p>
+      <div class="admin-confirm-details" id="adminDeleteDetails" style="display:none;"></div>
+      <div class="admin-confirm-actions">
+        <button type="button" class="btn btn-outline" id="btnCancelDelete">रद्द करें</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+          <span aria-hidden="true">🗑️</span> <span>स्थायी रूप से हटाएं</span>
+        </button>
       </div>
     </div>
   </dialog>

@@ -1451,22 +1451,15 @@
     var liveCommentsByPost = {};
 
     function getComments(msgId) {
-      var liveList = liveCommentsByPost[msgId] || [];
+      if (liveCommentsByPost && typeof liveCommentsByPost[msgId] !== 'undefined') {
+        return liveCommentsByPost[msgId] || [];
+      }
       var localList = [];
       try {
         var raw = store.get('mka_comments_' + msgId);
         if (raw) localList = JSON.parse(raw);
       } catch (e) {}
-      var map = {};
-      var merged = [];
-      liveList.concat(localList).forEach(function (c) {
-        var key = (c.id || '') + '_' + (c.text || '') + '_' + (c.time || '');
-        if (!map[key]) {
-          map[key] = true;
-          merged.push(c);
-        }
-      });
-      return merged;
+      return localList;
     }
 
     function saveComment(msgId, name, text) {
@@ -2269,6 +2262,8 @@
           var cDocs = cData && cData.documents ? cData.documents : [];
           cDocs.forEach(function (cDoc) {
             var cf = cDoc.fields || {};
+            var cStatus = (cf.status && cf.status.stringValue) || 'active';
+            if (cStatus === 'removed') return;
             var pId = (cf.postId && cf.postId.stringValue) || '';
             if (!pId) return;
             if (!liveCommentsByPost[pId]) liveCommentsByPost[pId] = [];
@@ -2297,9 +2292,12 @@
               photo: (f.photo && f.photo.stringValue) || null,
               ward: (f.ward && f.ward.stringValue) || '',
               avatar: (f.avatar && f.avatar.stringValue) || '👤',
+              status: (f.status && f.status.stringValue) || 'active',
               likes: parseInt((f.likes && f.likes.integerValue) || '0', 10),
               createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
             };
+          }).filter(function (m) {
+            return m.status !== 'removed';
           });
 
           // Sort newest first
@@ -2588,9 +2586,12 @@
               photo: (f.photo && f.photo.stringValue) || null,
               ward: (f.ward && f.ward.stringValue) || 'वार्ड 1',
               avatar: (f.avatar && f.avatar.stringValue) || '🦁',
+              status: (f.status && f.status.stringValue) || 'active',
               likes: parseInt((f.likes && f.likes.integerValue) || '0', 10),
               createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
             };
+          }).filter(function (m) {
+            return m.status !== 'removed';
           });
 
           parsed.sort(function (a, b) {
@@ -2609,8 +2610,11 @@
               text: (f.text && f.text.stringValue) || '',
               name: (f.name && f.name.stringValue) || '',
               ward: (f.ward && f.ward.stringValue) || '',
+              status: (f.status && f.status.stringValue) || 'active',
               createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
             };
+          }).filter(function (c) {
+            return c.status !== 'removed';
           });
 
           parsedComments.sort(function (a, b) {
@@ -2664,6 +2668,129 @@
       });
     }
 
+    // Admin Delete and Purge Management
+    var pendingDeleteAction = null;
+    var deleteModal = $('#adminDeleteModal');
+    var deleteModalBackdrop = $('#adminDeleteBackdrop');
+    var deleteTitle = $('#adminDeleteTitle');
+    var deleteMessage = $('#adminDeleteMessage');
+    var deleteDetails = $('#adminDeleteDetails');
+    var btnConfirmDelete = $('#btnConfirmDelete');
+    var btnCancelDelete = $('#btnCancelDelete');
+
+    function openDeleteModal(action) {
+      pendingDeleteAction = action;
+      if (!deleteModal) return;
+      if (action.type === 'post') {
+        if (deleteTitle) deleteTitle.textContent = t('admin.confirmDeleteTitle') || 'हटाने की पुष्टि करें';
+        if (deleteMessage) deleteMessage.textContent = t('admin.confirmDeletePost') || 'क्या आप वाकई इस समर्थन संदेश को स्थायी रूप से हटाना चाहते हैं?';
+        if (deleteDetails) {
+          deleteDetails.style.display = 'block';
+          deleteDetails.innerHTML = '<strong>संदेश:</strong> ' + esc(action.msg || '') + '<br><strong>मतदाता:</strong> ' + esc(action.name || 'अज्ञात') + ' (' + esc(action.alias || '') + ')';
+        }
+      } else if (action.type === 'comment') {
+        if (deleteTitle) deleteTitle.textContent = t('admin.confirmDeleteTitle') || 'हटाने की पुष्टि करें';
+        if (deleteMessage) deleteMessage.textContent = t('admin.confirmDeleteComment') || 'क्या आप वाकई इस टिप्पणी को स्थायी रूप से हटाना चाहते हैं?';
+        if (deleteDetails) {
+          deleteDetails.style.display = 'block';
+          deleteDetails.innerHTML = '<strong>टिप्पणी:</strong> ' + esc(action.text || '') + '<br><strong>आईडी / नाम:</strong> ' + esc(action.author || '') + (action.name ? (' / ' + esc(action.name)) : '');
+        }
+      } else if (action.type === 'person') {
+        if (deleteTitle) deleteTitle.textContent = t('admin.purgeUserBtn') || 'व्यक्ति का सारा डेटा हटाएं';
+        if (deleteMessage) deleteMessage.textContent = t('admin.confirmPurgeUser') || 'क्या आप वाकई इस मतदाता के सभी पोस्ट और टिप्पणियां हटाना चाहते हैं?';
+        if (deleteDetails) {
+          deleteDetails.style.display = 'block';
+          deleteDetails.innerHTML = '<strong>मतदाता:</strong> ' + esc(action.name || '') + '<br><strong>पब्लिक आईडी:</strong> ' + esc(action.alias || '') + '<br><span style="color:#DC2626; font-size:12px;">⚠️ इस व्यक्ति द्वारा पोस्ट किए गए सभी समर्थन संदेश व टिप्पणियाँ पूरी तरह हटा दी जाएंगी।</span>';
+        }
+      }
+      if (typeof deleteModal.showModal === 'function') deleteModal.showModal();
+      else deleteModal.setAttribute('open', '');
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteAction = null;
+      if (deleteModal) {
+        if (typeof deleteModal.close === 'function') deleteModal.close();
+        else deleteModal.removeAttribute('open');
+      }
+    }
+
+    if (btnCancelDelete) btnCancelDelete.addEventListener('click', closeDeleteModal);
+    if (deleteModalBackdrop) deleteModalBackdrop.addEventListener('click', closeDeleteModal);
+
+    function executeDeleteDoc(collectionUrl, docId) {
+      var patchUrl = collectionUrl + '/' + docId + '?updateMask.fieldPaths=status&updateMask.fieldPaths=adminPasskey';
+      return fetch(patchUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fields: {
+            status: { stringValue: 'removed' },
+            adminPasskey: { stringValue: PASSKEY }
+          }
+        })
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Status update error HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function () {
+        return fetch(collectionUrl + '/' + docId, { method: 'DELETE' }).catch(function () {});
+      });
+    }
+
+    function executePurgePerson(personName, personAlias) {
+      var promises = [];
+      allMessages.forEach(function (m) {
+        var matchName = personName && m.name && m.name.trim().toLowerCase() === personName.trim().toLowerCase();
+        var matchAlias = personAlias && (m.userId === personAlias || m.alias === personAlias);
+        if (matchName || matchAlias) {
+          promises.push(executeDeleteDoc(FIRESTORE_BASE, m.id));
+        }
+      });
+      allComments.forEach(function (c) {
+        var matchName = personName && c.name && c.name.trim().toLowerCase() === personName.trim().toLowerCase();
+        var matchAuthor = personAlias && c.authorId === personAlias;
+        if (matchName || matchAuthor) {
+          promises.push(executeDeleteDoc(FIRESTORE_COMMENTS, c.id));
+        }
+      });
+      return Promise.all(promises);
+    }
+
+    if (btnConfirmDelete) {
+      btnConfirmDelete.addEventListener('click', function () {
+        if (!pendingDeleteAction) return;
+        var act = pendingDeleteAction;
+        btnConfirmDelete.disabled = true;
+        btnConfirmDelete.textContent = 'हटाया जा रहा है...';
+
+        var promise;
+        if (act.type === 'post') {
+          promise = executeDeleteDoc(FIRESTORE_BASE, act.id);
+        } else if (act.type === 'comment') {
+          promise = executeDeleteDoc(FIRESTORE_COMMENTS, act.id);
+        } else if (act.type === 'person') {
+          promise = executePurgePerson(act.name, act.alias);
+        }
+
+        if (promise) {
+          promise
+            .then(function () {
+              closeDeleteModal();
+              loadAdminFeed();
+            })
+            .catch(function () {
+              alert(t('admin.deleteError') || 'हटाने में विफल। कृपया पुनः प्रयास करें।');
+            })
+            .finally(function () {
+              btnConfirmDelete.disabled = false;
+              btnConfirmDelete.innerHTML = '<span aria-hidden="true">🗑️</span> <span>स्थायी रूप से हटाएं</span>';
+            });
+        }
+      });
+    }
+
     function renderAdminTable() {
       var filtered = getFilteredMessages();
       if (showingCount) showingCount.textContent = filtered.length + ' संदेश प्रदर्शित';
@@ -2694,15 +2821,21 @@
           '</button>' :
           '<span class="no-photo-badge">—</span>';
 
+        var purgeUserBtn = (m.name && m.name.trim()) ?
+          '<br><button type="button" class="btn-purge-person" data-name="' + esc(m.name) + '" data-alias="' + esc(m.userId || m.alias) + '" title="इस व्यक्ति के सभी पोस्ट व कमेंट हटाएं">👤 सारा डेटा हटाएं</button>' : '';
+
         tHtml += '<tr>' +
           '<td>' + (idx + 1) + '</td>' +
-          '<td><strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong></td>' +
+          '<td><strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong>' + purgeUserBtn + '</td>' +
           '<td><span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span></td>' +
           '<td><span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span></td>' +
           '<td class="msg-cell-text">' + esc(m.message) + '</td>' +
           '<td>' + photoCell + '</td>' +
           '<td><span class="likes-badge">❤️ ' + (m.likes || 0) + '</span></td>' +
           '<td><time class="time-col">' + esc(dateStr) + '</time></td>' +
+          '<td class="action-cell">' +
+            '<button type="button" class="btn-delete-row btn-delete-post" data-id="' + esc(m.id) + '" data-name="' + esc(m.name) + '" data-alias="' + esc(m.userId || m.alias) + '" data-msg="' + esc(m.message) + '" title="यह पोस्ट हटाएं">🗑️ हटाएं</button>' +
+          '</td>' +
         '</tr>';
 
         mHtml += '<article class="admin-mobile-card">' +
@@ -2720,11 +2853,35 @@
           '</div>' +
           '<p class="admin-mc-msg">' + esc(m.message) + '</p>' +
           (m.photo ? '<div class="admin-mc-photo"><img src="' + esc(m.photo) + '" alt="तस्वीर" class="btn-thumb-view" data-full-photo="' + esc(m.photo) + '"></div>' : '') +
+          '<div class="admin-mc-actions">' +
+            (m.name ? '<button type="button" class="btn-purge-person" data-name="' + esc(m.name) + '" data-alias="' + esc(m.userId || m.alias) + '">👤 सारा डेटा हटाएं</button>' : '<span></span>') +
+            '<button type="button" class="btn-delete-row btn-delete-post" data-id="' + esc(m.id) + '" data-name="' + esc(m.name) + '" data-alias="' + esc(m.userId || m.alias) + '" data-msg="' + esc(m.message) + '">🗑️ पोस्ट हटाएं</button>' +
+          '</div>' +
         '</article>';
       });
 
       if (tableBody) tableBody.innerHTML = tHtml;
       if (mobileCards) mobileCards.innerHTML = mHtml;
+
+      // Bind Delete Buttons for Posts
+      $$('.btn-delete-post', dashView).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-id');
+          var name = btn.getAttribute('data-name');
+          var alias = btn.getAttribute('data-alias');
+          var msg = btn.getAttribute('data-msg');
+          openDeleteModal({ type: 'post', id: id, name: name, alias: alias, msg: msg });
+        });
+      });
+
+      // Bind Purge Person Buttons
+      $$('.btn-purge-person', dashView).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var name = btn.getAttribute('data-name');
+          var alias = btn.getAttribute('data-alias');
+          openDeleteModal({ type: 'person', name: name, alias: alias });
+        });
+      });
 
       $$('.btn-thumb-view', dashView).forEach(function (el) {
         el.addEventListener('click', function () {
@@ -2764,18 +2921,35 @@
           '<span class="alias-pill-sm" title="' + esc(c.postId) + '">📌 ' + esc(c.postId.length > 12 ? c.postId.substring(0, 10) + '…' : c.postId) + '</span>' :
           '<span class="no-photo-badge">—</span>';
 
+        var purgeUserBtn = (c.name && c.name.trim()) ?
+          '<br><button type="button" class="btn-purge-person" data-name="' + esc(c.name) + '" data-alias="' + esc(c.authorId) + '" title="इस व्यक्ति के सभी पोस्ट व कमेंट हटाएं">👤 सारा डेटा हटाएं</button>' : '';
+
         cRowsHtml += '<tr>' +
           '<td>' + (idx + 1) + '</td>' +
           '<td><span class="alias-pill-sm">🆔 ' + esc(c.authorId || 'ANP-0000') + '</span></td>' +
-          '<td>' + (c.name ? '<strong class="real-name-text">👤 ' + esc(c.name) + '</strong>' : '<span style="color:var(--text-muted,#888);">अनामित / केवल आईडी</span>') + '</td>' +
+          '<td>' + (c.name ? ('<strong class="real-name-text">👤 ' + esc(c.name) + '</strong>' + purgeUserBtn) : '<span style="color:var(--text-muted,#888);">अनामित / केवल आईडी</span>') + '</td>' +
           '<td>' + (c.ward ? '<span class="ward-tag-pill">' + esc(c.ward) + '</span>' : '<span style="color:var(--text-muted,#888); font-size:12px;">अचयनित</span>') + '</td>' +
           '<td class="msg-cell-text">' + esc(c.text) + '</td>' +
           '<td>' + postRefHtml + '</td>' +
           '<td><time class="time-col">' + esc(dateStr) + '</time></td>' +
+          '<td class="action-cell">' +
+            '<button type="button" class="btn-delete-row btn-delete-comment" data-id="' + esc(c.id) + '" data-author="' + esc(c.authorId) + '" data-name="' + esc(c.name) + '" data-text="' + esc(c.text) + '" title="यह टिप्पणी हटाएं">🗑️ हटाएं</button>' +
+          '</td>' +
         '</tr>';
       });
 
       if (commentsTableBody) commentsTableBody.innerHTML = cRowsHtml;
+
+      // Bind Delete Buttons for Comments
+      $$('.btn-delete-comment', dashView).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-id');
+          var author = btn.getAttribute('data-author');
+          var name = btn.getAttribute('data-name');
+          var text = btn.getAttribute('data-text');
+          openDeleteModal({ type: 'comment', id: id, author: author, name: name, text: text });
+        });
+      });
     }
 
     var modalClose = $('#adminModalClose');

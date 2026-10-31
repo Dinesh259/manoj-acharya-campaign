@@ -23,13 +23,16 @@ rules_version = '2';
 //   - category: string (optional, max 50 chars, or null) - Supporter category (e.g. youth, senior, farmer)
 //   - avatar: string (optional, max 20 chars, or null) - Avatar emoji, icon identifier, or preset
 //   - photo: string (optional, max 350,000 chars for compressed base64 data URL, or null) - Supporter photo
+//   - status: string (optional, max 20 chars, or null) - Moderation status (e.g. 'removed')
+//   - adminPasskey: string (optional, max 20 chars, or null) - Admin removal authorization passkey
 //
 // Access Patterns:
 //   - Read: Public (anyone can read messages individually or query the collection)
 //   - Create: Public with strict schema, field length, and type validation
-//   - Update: Public ONLY for incrementing (+1) or decrementing (-1) the `likes` field.
+//   - Update: Public ONLY for incrementing (+1) or decrementing (-1) the `likes` field,
+//             OR authorized admin removal (setting status: 'removed', adminPasskey: '9529').
 //             All other fields (name, alias, message, photo, createdAt, etc.) are immutable.
-//   - Delete: Denied for public users
+//   - Delete: Allowed when document was marked for admin deletion (status == 'removed' && adminPasskey == '9529')
 //
 // Collection: support_comments
 // Document ID: Auto-generated Firestore document ID
@@ -42,12 +45,14 @@ rules_version = '2';
 //   - createdAt: timestamp (required, recent/request.time) - Timestamp when comment was created
 //   - name: string (optional, max 100 chars, or null) - Optional confidential real name of commenter if already registered
 //   - ward: string (optional, max 50 chars, or null) - Optional ward of commenter if already registered
+//   - status: string (optional, max 20 chars, or null) - Moderation status (e.g. 'removed')
+//   - adminPasskey: string (optional, max 20 chars, or null) - Admin removal authorization passkey
 //
 // Access Patterns:
 //   - Read: Public (anyone can read single comments or query the collection)
 //   - Create: Public with strict field validation, size constraints, allowed fields check, recent timestamp check
-//   - Update: Denied for public users (allow update: if false;)
-//   - Delete: Denied for public users (allow delete: if false;)
+//   - Update: Authorized admin removal (setting status: 'removed', adminPasskey: '9529'). All other updates denied.
+//   - Delete: Allowed when document was marked for admin deletion (status == 'removed' && adminPasskey == '9529')
 //
 // All other collections: Denied (default-deny at root)
 //
@@ -67,7 +72,7 @@ service cloud.firestore {
 
     // Ensure only the explicitly allowed fields are present in the message document
     function hasOnlyAllowedFields(data) {
-      return data.keys().hasOnly(['alias', 'name', 'message', 'createdAt', 'likes', 'ward', 'category', 'avatar', 'photo']);
+      return data.keys().hasOnly(['alias', 'name', 'message', 'createdAt', 'likes', 'ward', 'category', 'avatar', 'photo', 'status', 'adminPasskey']);
     }
 
     // ===============================================================
@@ -81,7 +86,26 @@ service cloud.firestore {
 
     // Ensure only the explicitly allowed fields are present in the comment document
     function hasOnlyAllowedCommentFields(data) {
-      return data.keys().hasOnly(['postId', 'authorId', 'text', 'createdAt', 'name', 'ward']);
+      return data.keys().hasOnly(['postId', 'authorId', 'text', 'createdAt', 'name', 'ward', 'status', 'adminPasskey']);
+    }
+
+    // ===============================================================
+    // Helper Functions - Admin Removal & Deletion
+    // ===============================================================
+
+    // Validates admin removal update: only status and adminPasskey can be affected,
+    // status must be 'removed', and adminPasskey must match '9529'
+    function isValidAdminRemoval() {
+      let diff = request.resource.data.diff(resource.data);
+      return diff.affectedKeys().hasOnly(['status', 'adminPasskey']) &&
+             request.resource.data.status == 'removed' &&
+             request.resource.data.adminPasskey == '9529';
+    }
+
+    // Validates document deletion: document must have been marked for admin deletion
+    function isMarkedForAdminDeletion() {
+      return resource.data.status == 'removed' &&
+             resource.data.adminPasskey == '9529';
     }
 
     // ===============================================================
@@ -118,7 +142,11 @@ service cloud.firestore {
              // optional avatar: string max 20 chars if provided
              (!('avatar' in data) || data.avatar == null || (data.avatar is string && data.avatar.size() <= 20)) &&
              // optional photo: string max 350,000 chars (compressed base64 data URL) or null
-             (!('photo' in data) || data.photo == null || (data.photo is string && data.photo.size() <= 350000));
+             (!('photo' in data) || data.photo == null || (data.photo is string && data.photo.size() <= 350000)) &&
+             // optional status: string max 20 chars if provided or null
+             (!('status' in data) || data.status == null || (data.status is string && data.status.size() <= 20)) &&
+             // optional adminPasskey: string max 20 chars if provided or null
+             (!('adminPasskey' in data) || data.adminPasskey == null || (data.adminPasskey is string && data.adminPasskey.size() <= 20));
     }
 
     // Specific validation on message document creation
@@ -171,7 +199,11 @@ service cloud.firestore {
              // optional name: string max 100 chars if provided or null
              (!('name' in data) || data.name == null || (data.name is string && data.name.size() <= 100)) &&
              // optional ward: string max 50 chars if provided or null
-             (!('ward' in data) || data.ward == null || (data.ward is string && data.ward.size() <= 50));
+             (!('ward' in data) || data.ward == null || (data.ward is string && data.ward.size() <= 50)) &&
+             // optional status: string max 20 chars if provided or null
+             (!('status' in data) || data.status == null || (data.status is string && data.status.size() <= 20)) &&
+             // optional adminPasskey: string max 20 chars if provided or null
+             (!('adminPasskey' in data) || data.adminPasskey == null || (data.adminPasskey is string && data.adminPasskey.size() <= 20));
     }
 
     // Specific validation on comment document creation
@@ -193,11 +225,11 @@ service cloud.firestore {
       // 2. Public Create: Validated supporter message submission
       allow create: if isValidMessageCreate();
 
-      // 3. Public Update: ONLY for liking / unliking (+1 or -1)
-      allow update: if isValidMessage(request.resource.data) && isValidLikeUpdate();
+      // 3. Update: Liking / unliking (+1 or -1) OR admin removal with passkey
+      allow update: if isValidMessage(request.resource.data) && (isValidLikeUpdate() || isValidAdminRemoval());
 
-      // 4. Delete: Strictly disallowed for public users
-      allow delete: if false;
+      // 4. Delete: Allowed when document was marked for admin deletion
+      allow delete: if isMarkedForAdminDeletion();
     }
 
     // ===============================================================
@@ -211,11 +243,11 @@ service cloud.firestore {
       // 2. Public Create: Validated comment submission with strict field and size limits
       allow create: if isValidCommentCreate();
 
-      // 3. Public Update: Strictly disallowed for public users
-      allow update: if false;
+      // 3. Update: Allowed ONLY for admin removal with passkey
+      allow update: if isValidComment(request.resource.data) && isValidAdminRemoval();
 
-      // 4. Delete: Strictly disallowed for public users
-      allow delete: if false;
+      // 4. Delete: Allowed when document was marked for admin deletion
+      allow delete: if isMarkedForAdminDeletion();
     }
 
     // ===============================================================

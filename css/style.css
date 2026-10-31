@@ -4768,9 +4768,151 @@ html.hc .passkey-input-box input, html.hc .admin-security-notice {
   border-color: #334155 !important;
   color: #F8FAFC !important;
 }
+
+/* Admin Delete Actions & Confirmation Modal */
+.action-cell {
+  white-space: nowrap;
+  text-align: center;
+}
+.btn-delete-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #DC2626;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-delete-row:hover {
+  background: #DC2626;
+  color: #FFFFFF;
+  border-color: #DC2626;
+  transform: scale(1.02);
+}
+.btn-delete-row:active {
+  transform: scale(0.98);
+}
+.btn-purge-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+  padding: 2px 7px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #B91C1C;
+  background: #FEE2E2;
+  border: 1px dashed #FCA5A5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-purge-person:hover {
+  background: #B91C1C;
+  color: #FFFFFF;
+  border-color: #B91C1C;
+}
+.admin-mc-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #E2E8F0;
+}
+.admin-confirm-box {
+  max-width: 440px;
+  padding: 24px;
+  background: #FFFFFF;
+  border-radius: 14px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+.admin-confirm-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.confirm-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.confirm-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+.confirm-desc {
+  font-size: 0.9375rem;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+.admin-confirm-details {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8125rem;
+  color: #334155;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.admin-confirm-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.admin-confirm-actions .btn {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+.admin-confirm-actions .btn-danger {
+  background: #DC2626;
+  color: #FFFFFF;
+  border: 1px solid #B91C1C;
+}
+.admin-confirm-actions .btn-danger:hover {
+  background: #B91C1C;
+}
+html.hc .admin-confirm-box {
+  background: #0F172A !important;
+  border: 1px solid #334155 !important;
+  color: #F8FAFC !important;
+}
+html.hc .confirm-title {
+  color: #F8FAFC !important;
+}
+html.hc .confirm-desc {
+  color: #CBD5E1 !important;
+}
+html.hc .admin-confirm-details {
   background: #1E293B !important;
   border-color: #334155 !important;
   color: #F8FAFC !important;
+}
+html.hc .btn-delete-row {
+  background: #450A0A !important;
+  color: #FCA5A5 !important;
+  border-color: #EF4444 !important;
+}
+html.hc .btn-purge-person {
+  background: #450A0A !important;
+  color: #FCA5A5 !important;
+  border-color: #EF4444 !important;
 }
 
 /* ---------- Print (used by flyer.html; works for any page) ---------- */
