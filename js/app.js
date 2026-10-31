@@ -401,6 +401,8 @@
     if (!b) return;
     function sync() { b.setAttribute('aria-pressed', html.classList.contains(cls) ? 'true' : 'false'); }
     sync();
+    if (b._toggleBound) return;
+    b._toggleBound = true;
     b.addEventListener('click', function () {
       var on = !html.classList.contains(cls);
       html.classList.toggle(cls, on);
