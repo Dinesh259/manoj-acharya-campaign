@@ -116,6 +116,11 @@
           <span class="kpi-label" data-i18n="admin.statsWards">सक्रिय वार्ड (11 वार्ड)</span>
           <strong class="kpi-value" id="kpiWardsCount">0 / 11</strong>
         </div>
+        <div class="admin-kpi-card">
+          <span class="kpi-icon" aria-hidden="true">💬</span>
+          <span class="kpi-label" data-i18n="admin.statsComments">कुल टिप्पणियाँ</span>
+          <strong class="kpi-value" id="kpiTotalComments">0</strong>
+        </div>
       </div>
 
       <!-- Feed Filter & Search Controls -->
@@ -192,6 +197,39 @@
 
         <div id="adminNoResults" class="admin-no-results" hidden>
           <p>कोई संदेश नहीं मिला।</p>
+        </div>
+      </div>
+
+      <!-- Voter Comments Table Card -->
+      <div class="card admin-table-card" style="margin-top: 24px;">
+        <div class="card-head-bar">
+          <h2 class="card-head-title">
+            <span aria-hidden="true">💬</span> <span data-i18n="admin.commentsHeading">मतदाता टिप्पणियाँ रिकॉर्ड (Comments Log)</span>
+          </h2>
+          <span class="showing-count" id="adminCommentsCount">0 टिप्पणियाँ</span>
+        </div>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="adminCommentsTable">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">टिप्पणीकर्ता आईडी</th>
+                <th scope="col" data-i18n="admin.realNameCol">वास्तविक नाम (यदि पंजीकृत)</th>
+                <th scope="col" data-i18n="admin.wardCol">वार्ड</th>
+                <th scope="col" data-i18n="admin.commentCol">टिप्पणी संदेश</th>
+                <th scope="col" data-i18n="admin.postRefCol">पोस्ट संदर्भ (ID)</th>
+                <th scope="col" data-i18n="admin.dateCol">दिनांक व समय</th>
+              </tr>
+            </thead>
+            <tbody id="adminCommentsTableBody">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="adminNoComments" class="admin-no-results" hidden>
+          <p>अभी तक कोई टिप्पणी दर्ज नहीं हुई है।</p>
         </div>
       </div>
     </section>

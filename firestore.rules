@@ -30,7 +30,26 @@ rules_version = '2';
 //   - Update: Public ONLY for incrementing (+1) or decrementing (-1) the `likes` field.
 //             All other fields (name, alias, message, photo, createdAt, etc.) are immutable.
 //   - Delete: Denied for public users
-//   - All other collections: Denied (default-deny)
+//
+// Collection: support_comments
+// Document ID: Auto-generated Firestore document ID
+// Purpose: Store comments posted by users on support posts
+//
+// Fields:
+//   - postId: string (required, 1-100 chars) - ID of the support message being commented on
+//   - authorId: string (required, 1-60 chars) - Public voter ID (e.g. 'ANP-XXXX' or 'समर्थक ANP-XXXX')
+//   - text: string (required, 1-1000 chars) - Comment message text
+//   - createdAt: timestamp (required, recent/request.time) - Timestamp when comment was created
+//   - name: string (optional, max 100 chars, or null) - Optional confidential real name of commenter if already registered
+//   - ward: string (optional, max 50 chars, or null) - Optional ward of commenter if already registered
+//
+// Access Patterns:
+//   - Read: Public (anyone can read single comments or query the collection)
+//   - Create: Public with strict field validation, size constraints, allowed fields check, recent timestamp check
+//   - Update: Denied for public users (allow update: if false;)
+//   - Delete: Denied for public users (allow delete: if false;)
+//
+// All other collections: Denied (default-deny at root)
 //
 // ===============================================================
 
@@ -38,24 +57,38 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ===============================================================
-    // Helper Functions
+    // Helper Functions - support_messages
     // ===============================================================
 
-    // Check if the required fields exist in the incoming document
+    // Check if the required fields exist in the incoming message document
     function hasRequiredFields(data) {
       return data.keys().hasAll(['alias', 'name', 'message', 'createdAt', 'likes']);
     }
 
-    // Ensure only the explicitly allowed fields are present in the document
+    // Ensure only the explicitly allowed fields are present in the message document
     function hasOnlyAllowedFields(data) {
       return data.keys().hasOnly(['alias', 'name', 'message', 'createdAt', 'likes', 'ward', 'category', 'avatar', 'photo']);
     }
 
     // ===============================================================
-    // Domain Validator
+    // Helper Functions - support_comments
     // ===============================================================
 
-    // Validates the document structure, field types, and size constraints.
+    // Check if the required fields exist in the incoming comment document
+    function hasRequiredCommentFields(data) {
+      return data.keys().hasAll(['postId', 'authorId', 'text', 'createdAt']);
+    }
+
+    // Ensure only the explicitly allowed fields are present in the comment document
+    function hasOnlyAllowedCommentFields(data) {
+      return data.keys().hasOnly(['postId', 'authorId', 'text', 'createdAt', 'name', 'ward']);
+    }
+
+    // ===============================================================
+    // Domain Validator - support_messages
+    // ===============================================================
+
+    // Validates the message document structure, field types, and size constraints.
     // MUST be called on both create and update to prevent schema corruption.
     function isValidMessage(data) {
       return hasRequiredFields(data) &&
@@ -88,7 +121,7 @@ service cloud.firestore {
              (!('photo' in data) || data.photo == null || (data.photo is string && data.photo.size() <= 350000));
     }
 
-    // Specific validation on document creation
+    // Specific validation on message document creation
     function isValidMessageCreate() {
       let data = request.resource.data;
       return isValidMessage(data) &&
@@ -98,7 +131,7 @@ service cloud.firestore {
              data.createdAt >= request.time - duration.value(24, 'h');
     }
 
-    // Specific validation on document update (only likes count may be toggled)
+    // Specific validation on message document update (only likes count may be toggled)
     function isValidLikeUpdate() {
       let diff = request.resource.data.diff(resource.data);
       let oldLikes = resource.data.likes;
@@ -110,6 +143,43 @@ service cloud.firestore {
                newLikes == oldLikes + 1 ||
                (oldLikes > 0 && newLikes == oldLikes - 1)
              );
+    }
+
+    // ===============================================================
+    // Domain Validator - support_comments
+    // ===============================================================
+
+    // Validates comment document structure, field types, and size constraints.
+    function isValidComment(data) {
+      return hasRequiredCommentFields(data) &&
+             hasOnlyAllowedCommentFields(data) &&
+             // postId: string, 1-100 chars
+             data.postId is string &&
+             data.postId.size() >= 1 &&
+             data.postId.size() <= 100 &&
+             // authorId: string, 1-60 chars
+             data.authorId is string &&
+             data.authorId.size() >= 1 &&
+             data.authorId.size() <= 60 &&
+             // text: string, 1-1000 chars
+             data.text is string &&
+             data.text.size() >= 1 &&
+             data.text.size() <= 1000 &&
+             // createdAt: valid timestamp, not in the future beyond 5 minutes
+             data.createdAt is timestamp &&
+             data.createdAt <= request.time + duration.value(5, 'm') &&
+             // optional name: string max 100 chars if provided or null
+             (!('name' in data) || data.name == null || (data.name is string && data.name.size() <= 100)) &&
+             // optional ward: string max 50 chars if provided or null
+             (!('ward' in data) || data.ward == null || (data.ward is string && data.ward.size() <= 50));
+    }
+
+    // Specific validation on comment document creation
+    function isValidCommentCreate() {
+      let data = request.resource.data;
+      return isValidComment(data) &&
+             // createdAt must be recent (within the last 24 hours, not far future)
+             data.createdAt >= request.time - duration.value(24, 'h');
     }
 
     // ===============================================================
@@ -125,6 +195,24 @@ service cloud.firestore {
 
       // 3. Public Update: ONLY for liking / unliking (+1 or -1)
       allow update: if isValidMessage(request.resource.data) && isValidLikeUpdate();
+
+      // 4. Delete: Strictly disallowed for public users
+      allow delete: if false;
+    }
+
+    // ===============================================================
+    // Rules for support_comments
+    // ===============================================================
+
+    match /support_comments/{commentId} {
+      // 1. Public Read: Anyone can read single comments or query the collection
+      allow read: if true;
+
+      // 2. Public Create: Validated comment submission with strict field and size limits
+      allow create: if isValidCommentCreate();
+
+      // 3. Public Update: Strictly disallowed for public users
+      allow update: if false;
 
       // 4. Delete: Strictly disallowed for public users
       allow delete: if false;

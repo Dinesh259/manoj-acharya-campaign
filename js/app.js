@@ -1422,13 +1422,26 @@
 
     var STARTER_MESSAGES = [];
     var DEFAULT_COMMENTS = {};
+    var FIRESTORE_COMMENTS = 'https://firestore.googleapis.com/v1/projects/manoj-acharya-anoopshahar/databases/(default)/documents/support_comments';
+    var liveCommentsByPost = {};
 
     function getComments(msgId) {
+      var liveList = liveCommentsByPost[msgId] || [];
+      var localList = [];
       try {
         var raw = store.get('mka_comments_' + msgId);
-        if (raw) return JSON.parse(raw);
+        if (raw) localList = JSON.parse(raw);
       } catch (e) {}
-      return DEFAULT_COMMENTS[msgId] ? DEFAULT_COMMENTS[msgId].slice() : [];
+      var map = {};
+      var merged = [];
+      liveList.concat(localList).forEach(function (c) {
+        var key = (c.id || '') + '_' + (c.text || '') + '_' + (c.time || '');
+        if (!map[key]) {
+          map[key] = true;
+          merged.push(c);
+        }
+      });
+      return merged;
     }
 
     function saveComment(msgId, name, text) {
@@ -1642,7 +1655,7 @@
           '</div>' +
 
           '<!-- Facebook Inline Comments Section -->' +
-          '<section class="fb-comments-section" id="comments-' + esc(msg.id) + '" aria-label="टिप्पणियाँ">' +
+          '<section class="fb-comments-section' + (comments.length === 0 ? ' is-collapsed' : '') + '" id="comments-' + esc(msg.id) + '" aria-label="टिप्पणियाँ">' +
             '<div class="fb-comments-list" id="comments-list-' + esc(msg.id) + '">';
 
         if (comments.length === 0) {
@@ -1735,16 +1748,39 @@
         cForm.addEventListener('submit', function (e) {
           e.preventDefault();
           var msgId = cForm.getAttribute('data-msg-id');
-          var nameInput = cForm.querySelector('.fb-comment-name-input');
           var textInput = cForm.querySelector('.fb-comment-text-input');
-          var nameVal = (nameInput && nameInput.value) ? nameInput.value.trim() : '';
           var textVal = (textInput && textInput.value) ? textInput.value.trim() : '';
-          if (!nameVal || !textVal) return;
+          if (!textVal) return;
 
-          try { localStorage.setItem('mka_last_commenter_name', nameVal); } catch (e) {}
+          var currentUserId = getOrCreateUserUniqueId();
+          var authorDisplayName = getPublicAuthorDisplay({ userId: currentUserId });
 
-          var updated = saveComment(msgId, nameVal, textVal);
+          var updated = saveComment(msgId, authorDisplayName, textVal);
           trackEvent('support_message_comment', { id: msgId });
+
+          // Send to Cloud Firestore support_comments for centralized data collection
+          var commentPayload = {
+            fields: {
+              postId: { stringValue: msgId },
+              authorId: { stringValue: currentUserId },
+              text: { stringValue: textVal },
+              createdAt: { timestampValue: new Date().toISOString() }
+            }
+          };
+          var regName = getRegisteredVoterName();
+          var regWard = getRegisteredVoterWard();
+          if (regName) {
+            commentPayload.fields.name = { stringValue: regName };
+          }
+          if (regWard) {
+            commentPayload.fields.ward = { stringValue: regWard };
+          }
+
+          fetch(FIRESTORE_COMMENTS, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(commentPayload)
+          }).catch(function () {});
 
           // Re-render comments list for this post
           var listEl = $('#comments-list-' + msgId);
@@ -1832,14 +1868,33 @@
       });
     }
 
-    // Fetch messages from Firestore
+    // Fetch live messages and live comments from Firestore
     function fetchMessages() {
-      fetch(FIRESTORE_BASE, { cache: 'no-store' })
-        .then(function (res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function (data) {
+      Promise.all([
+        fetch(FIRESTORE_BASE, { cache: 'no-store' }).then(function (res) { return res.ok ? res.json() : null; }),
+        fetch(FIRESTORE_COMMENTS, { cache: 'no-store' }).then(function (res) { return res.ok ? res.json() : null; })
+      ])
+        .then(function (results) {
+          var data = results[0];
+          var cData = results[1];
+
+          liveCommentsByPost = {};
+          var cDocs = cData && cData.documents ? cData.documents : [];
+          cDocs.forEach(function (cDoc) {
+            var cf = cDoc.fields || {};
+            var pId = (cf.postId && cf.postId.stringValue) || '';
+            if (!pId) return;
+            if (!liveCommentsByPost[pId]) liveCommentsByPost[pId] = [];
+            var author = (cf.authorId && cf.authorId.stringValue) || 'ANP-0000';
+            var authorDisplay = /^ANP-/.test(author) ? (t('wall.supporterPrefix') + ' ' + author) : author;
+            liveCommentsByPost[pId].push({
+              id: cDoc.name ? cDoc.name.split('/').pop() : '',
+              name: authorDisplay,
+              text: (cf.text && cf.text.stringValue) || '',
+              time: (cf.createdAt && cf.createdAt.timestampValue) || new Date().toISOString()
+            });
+          });
+
           var docs = data && data.documents ? data.documents : [];
           var parsed = docs.map(function (doc) {
             var f = doc.fields || {};
@@ -2025,6 +2080,7 @@
     if (!adminSection) return;
 
     var FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/manoj-acharya-anoopshahar/databases/(default)/documents/support_messages';
+    var FIRESTORE_COMMENTS = 'https://firestore.googleapis.com/v1/projects/manoj-acharya-anoopshahar/databases/(default)/documents/support_comments';
 
     var authView = $('#adminAuthView');
     var dashView = $('#adminDashboardView');
@@ -2038,6 +2094,7 @@
     var kpiLikes = $('#kpiTotalLikes');
     var kpiPhotos = $('#kpiTotalPhotos');
     var kpiWards = $('#kpiWardsCount');
+    var kpiComments = $('#kpiTotalComments');
 
     var searchInput = $('#adminSearchInput');
     var wardSelect = $('#adminWardSelect');
@@ -2049,8 +2106,13 @@
     var noResults = $('#adminNoResults');
     var showingCount = $('#adminShowingCount');
 
+    var commentsTableBody = $('#adminCommentsTableBody');
+    var commentsCount = $('#adminCommentsCount');
+    var noComments = $('#adminNoComments');
+
     var PASSKEY = '9529';
     var allMessages = [];
+    var allComments = [];
     var currentFilterWard = 'all';
     var currentSearchQuery = '';
 
@@ -2109,13 +2171,23 @@
 
     // Load feed data
     function loadAdminFeed() {
-      fetch(FIRESTORE_BASE, { cache: 'no-store' })
-        .then(function (res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-          return res.json();
-        })
-        .then(function (data) {
-          var docs = data && data.documents ? data.documents : [];
+      Promise.all([
+        fetch(FIRESTORE_BASE, { cache: 'no-store' })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          }),
+        fetch(FIRESTORE_COMMENTS, { cache: 'no-store' })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+      ])
+        .then(function (results) {
+          var msgsData = results[0];
+          var commentsData = results[1];
+
+          var docs = msgsData && msgsData.documents ? msgsData.documents : [];
           var parsed = docs.map(function (doc) {
             var f = doc.fields || {};
             var docId = doc.name ? doc.name.split('/').pop() : '';
@@ -2137,15 +2209,38 @@
           parsed.sort(function (a, b) {
             return new Date(b.createdAt) - new Date(a.createdAt);
           });
-
           allMessages = parsed;
+
+          var cDocs = commentsData && commentsData.documents ? commentsData.documents : [];
+          var parsedComments = cDocs.map(function (doc) {
+            var f = doc.fields || {};
+            var docId = doc.name ? doc.name.split('/').pop() : '';
+            return {
+              id: docId,
+              postId: (f.postId && f.postId.stringValue) || '',
+              authorId: (f.authorId && f.authorId.stringValue) || 'ANP-0000',
+              text: (f.text && f.text.stringValue) || '',
+              name: (f.name && f.name.stringValue) || '',
+              ward: (f.ward && f.ward.stringValue) || '',
+              createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
+            };
+          });
+
+          parsedComments.sort(function (a, b) {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+          allComments = parsedComments;
+
           updateKpis();
           renderAdminTable();
+          renderAdminCommentsTable();
         })
         .catch(function () {
           allMessages = [];
+          allComments = [];
           updateKpis();
           renderAdminTable();
+          renderAdminCommentsTable();
         });
     }
 
@@ -2162,6 +2257,7 @@
       });
       var activeWardsCount = Object.keys(wardsMap).length;
       if (kpiWards) kpiWards.textContent = activeWardsCount + ' / 11';
+      if (kpiComments) kpiComments.textContent = allComments.length;
     }
 
     function getFilteredMessages() {
@@ -2257,6 +2353,44 @@
       });
     }
 
+    function renderAdminCommentsTable() {
+      if (commentsCount) commentsCount.textContent = allComments.length + ' टिप्पणियाँ';
+
+      if (!allComments.length) {
+        if (commentsTableBody) commentsTableBody.innerHTML = '';
+        if (noComments) noComments.hidden = false;
+        return;
+      }
+      if (noComments) noComments.hidden = true;
+
+      var cRowsHtml = '';
+      allComments.forEach(function (c, idx) {
+        var dateStr = '';
+        try {
+          var d = new Date(c.createdAt);
+          dateStr = d.toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+          dateStr = 'हाल ही में';
+        }
+
+        var postRefHtml = c.postId ?
+          '<span class="alias-pill-sm" title="' + esc(c.postId) + '">📌 ' + esc(c.postId.length > 12 ? c.postId.substring(0, 10) + '…' : c.postId) + '</span>' :
+          '<span class="no-photo-badge">—</span>';
+
+        cRowsHtml += '<tr>' +
+          '<td>' + (idx + 1) + '</td>' +
+          '<td><span class="alias-pill-sm">🆔 ' + esc(c.authorId || 'ANP-0000') + '</span></td>' +
+          '<td>' + (c.name ? '<strong class="real-name-text">👤 ' + esc(c.name) + '</strong>' : '<span style="color:var(--text-muted,#888);">अनामित / केवल आईडी</span>') + '</td>' +
+          '<td>' + (c.ward ? '<span class="ward-tag-pill">' + esc(c.ward) + '</span>' : '<span style="color:var(--text-muted,#888); font-size:12px;">अचयनित</span>') + '</td>' +
+          '<td class="msg-cell-text">' + esc(c.text) + '</td>' +
+          '<td>' + postRefHtml + '</td>' +
+          '<td><time class="time-col">' + esc(dateStr) + '</time></td>' +
+        '</tr>';
+      });
+
+      if (commentsTableBody) commentsTableBody.innerHTML = cRowsHtml;
+    }
+
     var modalClose = $('#adminModalClose');
     var modalBackdrop = $('#adminModalBackdrop');
     var modal = $('#adminPhotoModal');
@@ -2317,6 +2451,30 @@
             dateStr
           ]);
         });
+
+        if (allComments.length) {
+          rows.push([]);
+          rows.push(['--- मतदाता टिप्पणियाँ रिकॉर्ड (Comments Log) ---']);
+          rows.push(['क्र.सं.', 'टिप्पणीकर्ता आईडी', 'वास्तविक नाम (यदि पंजीकृत)', 'वार्ड', 'टिप्पणी संदेश', 'पोस्ट संदर्भ (ID)', 'दिनांक व समय']);
+          allComments.forEach(function (c, ci) {
+            var cDateStr = '';
+            try {
+              var cd = new Date(c.createdAt);
+              cDateStr = cd.toLocaleString('hi-IN');
+            } catch (e) {
+              cDateStr = c.createdAt || '';
+            }
+            rows.push([
+              String(ci + 1),
+              c.authorId || '',
+              c.name || 'अनामित',
+              c.ward || 'अचयनित',
+              c.text ? c.text.replace(/"/g, '""').replace(/\r?\n/g, ' ') : '',
+              c.postId || '',
+              cDateStr
+            ]);
+          });
+        }
 
         var csvContent = '\uFEFF' + rows.map(function (row) {
           return row.map(function (val) {
