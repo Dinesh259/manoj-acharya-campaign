@@ -468,9 +468,11 @@ window.I18N = {
     "wall.daysAgo": "दिन पहले",
     "wall.postAndSupport": "Post and Support",
     "wall.lockedBadge": "पंजीकृत (लॉक)",
-    "wall.lockedNameNotice": "🔒 आप पहले इस नाम से समर्थन दर्ज कर चुके हैं। अभियान की शुचिता एवं प्रॉक्सी रोकथाम हेतु सभी आगामी पोस्ट इसी पंजीकृत नाम से दर्ज होंगी।",
-    "wall.firstTimeNameHint": "ℹ️ कृपया अपना सही नाम लिखें। पहली पोस्ट के बाद नाम सुरक्षित रूप से लॉक हो जाएगा (प्रॉक्सी रोकथाम)।",
-    "wall.proxyAttemptError": "प्रॉक्सी पोस्टिंग की अनुमति नहीं है! आप केवल अपने पंजीकृत नाम से ही पोस्ट कर सकते हैं।",
+    "wall.lockedWardBadge": "वार्ड लॉक",
+    "wall.lockedNameNotice": "🔒 आप पहले इस नाम एवं वार्ड से समर्थन दर्ज कर चुके हैं। अभियान की शुचिता एवं प्रॉक्सी रोकथाम हेतु सभी आगामी पोस्ट इसी पंजीकृत पहचान से दर्ज होंगी।",
+    "wall.firstTimeNameHint": "ℹ️ कृपया अपना वास्तविक नाम एवं वार्ड चुनें। पहली पोस्ट के बाद नाम व वार्ड सुरक्षित रूप से लॉक हो जाएगा (प्रॉक्सी रोकथाम)।",
+    "wall.proxyAttemptError": "प्रॉक्सी पोस्टिंग की अनुमति नहीं है! आप केवल अपने पंजीकृत नाम एवं वार्ड से ही पोस्ट कर सकते हैं।",
+    "wall.selectWardReq": "कृपया अपना वार्ड (वार्ड 1 से 11) चुनें।",
 
     /* ---------- Admin & Candidate Portal ---------- */
     "admin.badge": "गोपनीय एवं सुरक्षित पोर्टल",
@@ -915,9 +917,11 @@ window.I18N = {
     "wall.daysAgo": "d ago",
     "wall.postAndSupport": "Post and Support",
     "wall.lockedBadge": "Registered (Locked)",
-    "wall.lockedNameNotice": "🔒 You previously posted under this name. To prevent proxy submissions and protect campaign integrity, all subsequent posts must use this registered name.",
-    "wall.firstTimeNameHint": "ℹ️ Please enter your real name. After your first post, your name is securely locked to prevent proxy submissions.",
-    "wall.proxyAttemptError": "Proxy posting is not allowed! You can only post using your registered name.",
+    "wall.lockedWardBadge": "Ward Locked",
+    "wall.lockedNameNotice": "🔒 You previously posted under this name and ward. To prevent proxy submissions and protect campaign integrity, all subsequent posts must use this registered identity.",
+    "wall.firstTimeNameHint": "ℹ️ Please enter your real name and select your ward. After your first post, both name and ward will be locked to prevent proxy submissions.",
+    "wall.proxyAttemptError": "Proxy posting is not allowed! You can only post using your registered name and ward.",
+    "wall.selectWardReq": "Please select your ward (Ward 1 to 11).",
 
     /* ---------- Admin & Candidate Portal ---------- */
     "admin.badge": "Confidential & Secure Portal",

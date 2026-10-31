@@ -1685,11 +1685,21 @@ html.hc .voter-name-locked-badge {
   background: rgba(245, 158, 11, 0.18) !important;
   border-color: #D97706 !important;
 }
+html.hc .voter-ward-locked-badge {
+  color: #FCD34D !important;
+  background: rgba(245, 158, 11, 0.18) !important;
+  border-color: #D97706 !important;
+}
 html.hc .fb-input-author-wrap.is-locked {
   background: #1E293B !important;
   border-color: #475569 !important;
 }
 html.hc .fb-input-author-wrap.is-locked .fb-author-input {
+  color: #F8FAFC !important;
+}
+html.hc .fb-select-ward-wrap.is-locked .fb-ward-select {
+  background: #1E293B !important;
+  border-color: #475569 !important;
   color: #F8FAFC !important;
 }
 html.hc .proxy-prevention-banner {
@@ -3519,6 +3529,9 @@ dialog.photo-modal::backdrop {
 }
 .fb-select-ward-wrap {
   min-width: 140px;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 .fb-ward-select {
   width: 100%;
@@ -3555,6 +3568,23 @@ dialog.photo-modal::backdrop {
   margin-left: 6px;
   user-select: none;
 }
+.voter-ward-locked-badge {
+  position: absolute;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #B45309;
+  background: #FEF3C7;
+  border: 1px solid #FCD34D;
+  border-radius: 9999px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
 .fb-input-author-wrap.is-locked {
   background: #F1F5F9;
   border-color: #CBD5E1;
@@ -3562,6 +3592,13 @@ dialog.photo-modal::backdrop {
 .fb-input-author-wrap.is-locked .fb-author-input {
   color: #1E293B;
   cursor: not-allowed;
+}
+.fb-select-ward-wrap.is-locked .fb-ward-select {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #1E293B;
+  cursor: not-allowed;
+  padding-right: 76px;
 }
 .proxy-prevention-banner {
   display: flex;
