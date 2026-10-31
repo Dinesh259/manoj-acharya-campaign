@@ -1217,13 +1217,21 @@
     var grid = $('#wallGrid');
     var countEl = $('#feedCountNumber');
     var photoInput = $('#wallPhotoInput');
+    var photoCameraInput = $('#wallPhotoCameraInput');
+    var photoGalleryInput = $('#wallPhotoGalleryInput');
     var btnPickPhoto = $('#btnPickPhoto');
+    var btnPickCamera = $('#btnPickCamera');
+    var btnPickGallery = $('#btnPickGallery');
     var previewWrap = $('#wallPhotoPreviewWrap');
     var previewImg = $('#wallPhotoPreview');
     var btnRemovePhoto = $('#btnRemovePhoto');
+    var btnFilterBadge = $('#btnFilterBadge');
+    var btnFilterOriginal = $('#btnFilterOriginal');
     var filterPills = $$('.filter-pill');
 
     var currentPhotoBase64 = null;
+    var rawLoadedImage = null;
+    var currentPhotoFilter = 'badge'; // 'badge' or 'original'
     var currentFilter = 'all';
     var messagesList = [];
 
@@ -1373,7 +1381,11 @@
 
     function clearPhotoPreview() {
       currentPhotoBase64 = null;
+      rawLoadedImage = null;
+      currentPhotoFilter = 'badge';
       if (photoInput) photoInput.value = '';
+      if (photoCameraInput) photoCameraInput.value = '';
+      if (photoGalleryInput) photoGalleryInput.value = '';
       if (previewImg) {
         previewImg.src = '';
         previewImg.removeAttribute('src');
@@ -1381,6 +1393,14 @@
       if (previewWrap) {
         previewWrap.hidden = true;
         previewWrap.style.display = 'none';
+      }
+      if (btnFilterBadge) {
+        btnFilterBadge.classList.add('is-active');
+        btnFilterBadge.setAttribute('aria-checked', 'true');
+      }
+      if (btnFilterOriginal) {
+        btnFilterOriginal.classList.remove('is-active');
+        btnFilterOriginal.setAttribute('aria-checked', 'false');
       }
     }
 
@@ -1503,41 +1523,199 @@
       } catch (e) {}
     }
 
-    // Photo selection and compression
+    // Generate photo with or without "I Vote & Support Manoj" campaign frame
+    function generateFilteredPhoto() {
+      if (!rawLoadedImage) return;
+      var img = rawLoadedImage;
+      var maxDimension = 800;
+      var width = img.width, height = img.height;
+      if (width > height) {
+        if (width > maxDimension) { height = Math.round((height * maxDimension) / width); width = maxDimension; }
+      } else {
+        if (height > maxDimension) { width = Math.round((width * maxDimension) / height); height = maxDimension; }
+      }
+
+      var canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      var ctx = canvas.getContext('2d');
+
+      // Draw base photo
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Apply "I Vote & Support Manoj" frame & overlay if badge filter selected
+      if (currentPhotoFilter === 'badge') {
+        // --- Bottom Supporter Banner / Ribbon ---
+        var bannerHeight = Math.max(68, Math.round(height * 0.17));
+        var gradient = ctx.createLinearGradient(0, height - bannerHeight - 20, 0, height);
+        gradient.addColorStop(0, 'rgba(15, 23, 42, 0)');
+        gradient.addColorStop(0.25, 'rgba(15, 23, 42, 0.86)');
+        gradient.addColorStop(1, 'rgba(15, 23, 42, 0.98)');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, height - bannerHeight - 20, width, bannerHeight + 20);
+
+        // Tricolor Accent Line (Saffron - White - Green)
+        var stripeY = height - bannerHeight - 4;
+        var stripeH = Math.max(3, Math.round(height * 0.007));
+        ctx.fillStyle = '#FF9933';
+        ctx.fillRect(0, stripeY, width * 0.334, stripeH);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(width * 0.334, stripeY, width * 0.334, stripeH);
+        ctx.fillStyle = '#138808';
+        ctx.fillRect(width * 0.668, stripeY, width * 0.334, stripeH);
+
+        // Banner Primary Headline
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        var titleFontSize = Math.max(16, Math.min(28, Math.round(width * 0.044)));
+        ctx.font = 'bold ' + titleFontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+
+        // Contrast text shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+
+        ctx.fillStyle = '#FBBF24'; // Golden amber
+        ctx.fillText('🗳️ I VOTE & SUPPORT MANOJ ACHARYA', width / 2, height - (bannerHeight * 0.62));
+
+        // Banner Subtitle
+        var subFontSize = Math.max(11, Math.min(18, Math.round(width * 0.028)));
+        ctx.font = '600 ' + subFontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('मैं मनोज आचार्य को वोट और समर्थन देता हूँ • सरपंच पद हेतु अनूपशहर', width / 2, height - (bannerHeight * 0.26));
+
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // --- Top-Right Corner Supporter Badge Pill ---
+        var pillW = Math.max(140, Math.round(width * 0.30));
+        var pillH = Math.max(26, Math.round(pillW * 0.22));
+        var pillX = width - pillW - 14;
+        var pillY = 14;
+        var pillR = pillH / 2;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.beginPath();
+        ctx.moveTo(pillX + pillR, pillY);
+        ctx.arcTo(pillX + pillW, pillY, pillX + pillW, pillY + pillH, pillR);
+        ctx.arcTo(pillX + pillW, pillY + pillH, pillX, pillY + pillH, pillR);
+        ctx.arcTo(pillX, pillY + pillH, pillX, pillY, pillR);
+        ctx.arcTo(pillX, pillY, pillX + pillW, pillY, pillR);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#F59E0B';
+        ctx.stroke();
+
+        ctx.fillStyle = '#FFFFFF';
+        var pillFontSize = Math.max(9, Math.min(14, Math.round(pillH * 0.52)));
+        ctx.font = '700 ' + pillFontSize + 'px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🇮🇳 सच्चा समर्थक अनूपशहर', pillX + (pillW / 2), pillY + (pillH / 2));
+      }
+
+      currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.74);
+      if (previewImg) previewImg.src = currentPhotoBase64;
+      if (previewWrap) {
+        previewWrap.hidden = false;
+        previewWrap.style.display = 'block';
+      }
+    }
+
+    function handlePhotoFile(file) {
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var img = new Image();
+        img.onload = function () {
+          rawLoadedImage = img;
+          currentPhotoFilter = 'badge';
+          if (btnFilterBadge) {
+            btnFilterBadge.classList.add('is-active');
+            btnFilterBadge.setAttribute('aria-checked', 'true');
+          }
+          if (btnFilterOriginal) {
+            btnFilterOriginal.classList.remove('is-active');
+            btnFilterOriginal.setAttribute('aria-checked', 'false');
+          }
+          generateFilteredPhoto();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Camera button and input
+    if (btnPickCamera && photoCameraInput) {
+      btnPickCamera.addEventListener('click', function () {
+        photoCameraInput.click();
+      });
+    }
+    if (photoCameraInput) {
+      photoCameraInput.addEventListener('change', function () {
+        var file = photoCameraInput.files && photoCameraInput.files[0];
+        handlePhotoFile(file);
+      });
+    }
+
+    // Gallery button and input
+    if (btnPickGallery && photoGalleryInput) {
+      btnPickGallery.addEventListener('click', function () {
+        photoGalleryInput.click();
+      });
+    }
+    if (photoGalleryInput) {
+      photoGalleryInput.addEventListener('change', function () {
+        var file = photoGalleryInput.files && photoGalleryInput.files[0];
+        handlePhotoFile(file);
+      });
+    }
+
+    // Standard fallback photo button and input
     if (btnPickPhoto && photoInput) {
       btnPickPhoto.addEventListener('click', function () {
         photoInput.click();
       });
-
+    }
+    if (photoInput) {
       photoInput.addEventListener('change', function () {
         var file = photoInput.files && photoInput.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          var img = new Image();
-          img.onload = function () {
-            var maxDimension = 800;
-            var width = img.width, height = img.height;
-            if (width > height) {
-              if (width > maxDimension) { height = Math.round((height * maxDimension) / width); width = maxDimension; }
-            } else {
-              if (height > maxDimension) { width = Math.round((width * maxDimension) / height); height = maxDimension; }
-            }
-            var canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.72);
-            if (previewImg) previewImg.src = currentPhotoBase64;
-            if (previewWrap) {
-              previewWrap.hidden = false;
-              previewWrap.style.display = 'inline-block';
-            }
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+        handlePhotoFile(file);
+      });
+    }
+
+    // Filter selector toggles ("I Vote & Support Manoj" vs "Original")
+    if (btnFilterBadge) {
+      btnFilterBadge.addEventListener('click', function () {
+        currentPhotoFilter = 'badge';
+        btnFilterBadge.classList.add('is-active');
+        btnFilterBadge.setAttribute('aria-checked', 'true');
+        if (btnFilterOriginal) {
+          btnFilterOriginal.classList.remove('is-active');
+          btnFilterOriginal.setAttribute('aria-checked', 'false');
+        }
+        generateFilteredPhoto();
+      });
+    }
+
+    if (btnFilterOriginal) {
+      btnFilterOriginal.addEventListener('click', function () {
+        currentPhotoFilter = 'original';
+        btnFilterOriginal.classList.add('is-active');
+        btnFilterOriginal.setAttribute('aria-checked', 'true');
+        if (btnFilterBadge) {
+          btnFilterBadge.classList.remove('is-active');
+          btnFilterBadge.setAttribute('aria-checked', 'false');
+        }
+        generateFilteredPhoto();
       });
     }
 

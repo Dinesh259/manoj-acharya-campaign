@@ -82,10 +82,29 @@
                     data-i18n-attr="placeholder:wall.messagePlaceholder"
                     placeholder="मनोज जी के समर्थन में अपने विचार लिखें... (What's on your mind?)"></textarea>
           
-          <!-- Selected Photo Preview -->
+          <!-- Selected Photo Preview with Filter Options -->
           <div id="wallPhotoPreviewWrap" class="photo-preview-wrap" hidden style="display:none">
-            <img id="wallPhotoPreview" alt="Selected preview">
-            <button type="button" class="btn-remove-photo" id="btnRemovePhoto" data-i18n-attr="aria-label:wall.removePhoto;title:wall.removePhoto">✕</button>
+            <div class="photo-preview-box">
+              <img id="wallPhotoPreview" alt="Selected preview">
+              <button type="button" class="btn-remove-photo" id="btnRemovePhoto" data-i18n-attr="aria-label:wall.removePhoto;title:wall.removePhoto">✕</button>
+            </div>
+
+            <!-- Supporter Frame / Filter Selector -->
+            <div class="photo-filter-selector" id="photoFilterSelector" role="radiogroup" aria-label="फोटो फ़िल्टर चुनें">
+              <span class="photo-filter-label">
+                <span aria-hidden="true">🎨</span> <span data-i18n="wall.filterTitle">फ़ोटो फ़्रेम / फ़िल्टर:</span>
+              </span>
+              <div class="photo-filter-options">
+                <button type="button" class="btn-filter-option is-active" id="btnFilterBadge" data-filter="badge" role="radio" aria-checked="true">
+                  <span class="filter-opt-icon" aria-hidden="true">🇮🇳</span>
+                  <span class="filter-opt-text" data-i18n="wall.filterSupport">"I Vote & Support Manoj" फ़्रेम</span>
+                </button>
+                <button type="button" class="btn-filter-option" id="btnFilterOriginal" data-filter="original" role="radio" aria-checked="false">
+                  <span class="filter-opt-icon" aria-hidden="true">🖼️</span>
+                  <span class="filter-opt-text" data-i18n="wall.filterOriginal">मूल फ़ोटो (बिना फ़िल्टर)</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -94,10 +113,18 @@
 
         <div class="fb-composer-actions-bar">
           <div class="fb-composer-left-actions">
+            <!-- Hidden File Inputs: Camera & Gallery -->
+            <input type="file" id="wallPhotoCameraInput" accept="image/*" capture="environment" style="display:none" aria-hidden="true">
+            <input type="file" id="wallPhotoGalleryInput" accept="image/*" style="display:none" aria-hidden="true">
             <input type="file" id="wallPhotoInput" accept="image/*" style="display:none" aria-hidden="true">
-            <button type="button" class="fb-attach-photo-btn" id="btnPickPhoto">
+
+            <button type="button" class="fb-attach-photo-btn btn-pick-camera" id="btnPickCamera">
               <span class="fb-attach-icon" aria-hidden="true">📷</span>
-              <span data-i18n="wall.photoAttach">फ़ोटो जोड़ें</span>
+              <span data-i18n="wall.photoCamera">कैमरा से लें</span>
+            </button>
+            <button type="button" class="fb-attach-photo-btn btn-pick-gallery" id="btnPickGallery">
+              <span class="fb-attach-icon" aria-hidden="true">🖼️</span>
+              <span data-i18n="wall.photoGallery">गैलरी से चुनें</span>
             </button>
           </div>
           <div class="fb-composer-right-actions">
