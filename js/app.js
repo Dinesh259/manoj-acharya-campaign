@@ -1207,6 +1207,67 @@
     });
   }
 
+  /* ---------- Supporter Avatars & Visual Identity (Shared across Wall & Admin) ---------- */
+  var SUPPORTER_AVATARS = [
+    { icon: '🦁', title: 'बब्बर शेर (साहस व नेतृत्व)' },
+    { icon: '🦅', title: 'गरुड़ (दृष्टि व निष्ठा)' },
+    { icon: '🐎', title: 'अश्व (ऊर्जा व प्रगति)' },
+    { icon: '🦚', title: 'मयूर (गरिमा व सौंदर्य)' },
+    { icon: '🐘', title: 'गजराज (शक्ति व धैर्य)' },
+    { icon: '🌺', title: 'कमल पुष्प (पवित्रता व विकास)' },
+    { icon: '☀️', title: 'सूर्योदय (नई ऊर्जा)' },
+    { icon: '🌟', title: 'ध्रुव तारा (आशा व मार्गदर्शन)' },
+    { icon: '🌾', title: 'सुनहरी बालियां (किसान समृद्धि)' },
+    { icon: '🚜', title: 'किसान सारथी (ग्राम विकास)' },
+    { icon: '🏹', title: 'धनुर्धर (दृढ़ संकल्प)' },
+    { icon: '🕊️', title: 'शांति दूत (सद्भाव व भाईचारा)' },
+    { icon: '🛡️', title: 'ग्राम रक्षक (अधिकार व सुरक्षा)' },
+    { icon: '🇮🇳', title: 'तिरंगा (देशभक्ति व समर्पण)' },
+    { icon: '🧭', title: 'दिशा दर्शक (सत्य व न्याय)' },
+    { icon: '🌳', title: 'वटवृक्ष (संस्कृति व छांव)' }
+  ];
+
+  var AVATAR_GRADIENT_CLASSES = [
+    'avatar-grad-1', // Emerald
+    'avatar-grad-2', // Indigo
+    'avatar-grad-3', // Amber
+    'avatar-grad-4', // Violet
+    'avatar-grad-5', // Crimson
+    'avatar-grad-6', // Cyan
+    'avatar-grad-7', // Forest
+    'avatar-grad-8'  // Saffron
+  ];
+
+  /* Helper: Deterministic & automatic unique avatar for each user */
+  function getUserAvatar(userId) {
+    var uid = (userId || '').trim();
+    if (!uid || uid === 'ANP-0000') {
+      return { icon: '👤', bgClass: 'avatar-grad-2', title: 'समर्थक' };
+    }
+    var numStr = uid.replace(/\D/g, '');
+    var num = parseInt(numStr, 10);
+    if (isNaN(num) || num <= 0) {
+      var hash = 0;
+      for (var i = 0; i < uid.length; i++) hash = ((hash << 5) - hash) + uid.charCodeAt(i);
+      num = Math.abs(hash);
+    }
+    var iconObj = SUPPORTER_AVATARS[num % SUPPORTER_AVATARS.length];
+    var gradClass = AVATAR_GRADIENT_CLASSES[(Math.floor(num / 11)) % AVATAR_GRADIENT_CLASSES.length];
+    return {
+      icon: iconObj.icon,
+      title: iconObj.title,
+      bgClass: gradClass
+    };
+  }
+
+  /* Helper: Render Avatar HTML Disc */
+  function renderAvatarDisc(userId, sizeClass, extraClass) {
+    var av = getUserAvatar(userId);
+    var sz = sizeClass || 'avatar-sm';
+    var extra = extraClass ? (' ' + extraClass) : '';
+    return '<span class="user-avatar-disc ' + sz + ' ' + av.bgClass + extra + '" title="' + esc(av.title) + '" aria-label="' + esc(av.title) + '">' + av.icon + '</span>';
+  }
+
   /* ---------- Community Support Wall (समर्थन दीवार - Facebook Style) ---------- */
   function setupSupportWall() {
     var wallSection = $('#wallFeedSection') || $('#postSupportSection');
@@ -1259,11 +1320,21 @@
         }
         var stored = localStorage.getItem('mka_user_unique_id');
         if (stored && /^ANP-\d{4}$/.test(stored)) {
+          var av = getUserAvatar(stored);
+          try {
+            localStorage.setItem('mka_user_avatar', av.icon);
+            localStorage.setItem('mka_user_avatar_bg', av.bgClass);
+          } catch (e) {}
           return stored;
         }
         var rand = Math.floor(1000 + Math.random() * 9000);
         var newId = 'ANP-' + rand;
         localStorage.setItem('mka_user_unique_id', newId);
+        var newAv = getUserAvatar(newId);
+        try {
+          localStorage.setItem('mka_user_avatar', newAv.icon);
+          localStorage.setItem('mka_user_avatar_bg', newAv.bgClass);
+        } catch (e) {}
         return newId;
       } catch (e) {
         return 'ANP-' + Math.floor(1000 + Math.random() * 9000);
@@ -1352,7 +1423,7 @@
         }
         if (wardWrap) wardWrap.classList.add('is-locked');
         if (authorWrap) authorWrap.classList.add('is-locked');
-        if (authorIcon) authorIcon.textContent = '👤';
+        if (authorIcon) authorIcon.innerHTML = renderAvatarDisc(myUid, 'avatar-sm');
       } else {
         // First-time poster
         if (nameInput) {
@@ -1367,8 +1438,13 @@
         }
         if (wardWrap) wardWrap.classList.remove('is-locked');
         if (authorWrap) authorWrap.classList.remove('is-locked');
-        if (authorIcon) authorIcon.textContent = '👤';
+        if (authorIcon) authorIcon.innerHTML = renderAvatarDisc(myUid, 'avatar-sm');
       }
+
+      var trigAv = document.querySelector('.fb-trigger-avatar');
+      if (trigAv) trigAv.innerHTML = renderAvatarDisc(myUid, 'avatar-md');
+      var compAv = document.querySelector('.fb-composer-avatar');
+      if (compAv) compAv.innerHTML = renderAvatarDisc(myUid, 'avatar-sm');
     }
 
     var myUniqueId = getOrCreateUserUniqueId();
@@ -1462,13 +1538,20 @@
       return localList;
     }
 
-    function saveComment(msgId, name, text) {
+    function saveComment(msgId, name, text, replyToId, replyToAuthor, authorId, avatar) {
       var list = getComments(msgId);
+      var currentUid = authorId || myUniqueId;
+      var avObj = getUserAvatar(currentUid);
       var newComment = {
         id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        postId: msgId,
+        authorId: currentUid,
         name: name,
         text: text,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        replyToId: replyToId || null,
+        replyToAuthor: replyToAuthor || null,
+        avatar: avatar || avObj.icon
       };
       list.push(newComment);
       try {
@@ -1941,6 +2024,147 @@
       });
     });
 
+    // Helper: Render comments and nested replies HTML with unique user avatars
+    function renderPostCommentsHtml(msgId, commentsList) {
+      var comments = commentsList || [];
+      if (comments.length === 0) {
+        return '<p class="fb-no-comments-hint">' + esc(t('wall.noCommentsYet')) + '</p>';
+      }
+
+      var rootComments = [];
+      var repliesMap = {}; // parentId -> [replyComment, ...]
+
+      comments.forEach(function (c) {
+        if (c.replyToId) {
+          if (!repliesMap[c.replyToId]) repliesMap[c.replyToId] = [];
+          repliesMap[c.replyToId].push(c);
+        } else {
+          rootComments.push(c);
+        }
+      });
+
+      // Handle orphans if parent not found
+      var rootIds = {};
+      rootComments.forEach(function (rc) { rootIds[rc.id] = true; });
+      Object.keys(repliesMap).forEach(function (pId) {
+        if (!rootIds[pId]) {
+          repliesMap[pId].forEach(function (orphan) {
+            rootComments.push(orphan);
+          });
+          delete repliesMap[pId];
+        }
+      });
+
+      var html = '';
+      rootComments.forEach(function (c) {
+        var cAuthorDisplay = c.name || (t('wall.supporterPrefix') + ' ' + (c.authorId || myUniqueId));
+        var replies = repliesMap[c.id] || [];
+
+        html += '<div class="fb-comment-item" id="comment-item-' + esc(c.id) + '">' +
+          renderAvatarDisc(c.authorId, 'avatar-sm', 'fb-comment-avatar') +
+          '<div class="fb-comment-content">' +
+            '<div class="fb-comment-bubble">' +
+              '<strong class="fb-commenter-name">' + esc(cAuthorDisplay) + '</strong>' +
+              '<p class="fb-comment-text">' + esc(c.text) + '</p>' +
+            '</div>' +
+            '<div class="fb-comment-meta">' +
+              '<span class="fb-comment-time">' + esc(formatRelativeTime(c.time)) + '</span>' +
+              ' · ' +
+              '<button type="button" class="btn-reply-comment" data-post-id="' + esc(msgId) + '" data-comment-id="' + esc(c.id) + '" data-author-id="' + esc(c.authorId || '') + '" data-author-name="' + esc(cAuthorDisplay) + '" aria-label="' + esc(t('wall.replyBtn')) + '">' +
+                esc(t('wall.replyBtn')) +
+              '</button>' +
+            '</div>';
+
+        if (replies.length > 0) {
+          html += '<div class="fb-nested-replies-list">';
+          replies.forEach(function (r) {
+            var rAuthorDisplay = r.name || (t('wall.supporterPrefix') + ' ' + (r.authorId || ''));
+            var replyTarget = r.replyToAuthor || cAuthorDisplay;
+            html += '<div class="fb-comment-item fb-reply-item" id="comment-item-' + esc(r.id) + '">' +
+              renderAvatarDisc(r.authorId, 'avatar-xs', 'fb-comment-avatar fb-reply-avatar') +
+              '<div class="fb-comment-content">' +
+                '<div class="fb-comment-bubble">' +
+                  '<strong class="fb-commenter-name">' + esc(rAuthorDisplay) + '</strong>' +
+                  '<span class="fb-reply-badge">' + esc(t('wall.replyBadge')) + ' ' + esc(replyTarget) + '</span>' +
+                  '<p class="fb-comment-text">' + esc(r.text) + '</p>' +
+                '</div>' +
+                '<div class="fb-comment-meta">' +
+                  '<span class="fb-comment-time">' + esc(formatRelativeTime(r.time)) + '</span>' +
+                  ' · ' +
+                  '<button type="button" class="btn-reply-comment" data-post-id="' + esc(msgId) + '" data-comment-id="' + esc(c.id) + '" data-author-id="' + esc(r.authorId || '') + '" data-author-name="' + esc(rAuthorDisplay) + '">' +
+                    esc(t('wall.replyBtn')) +
+                  '</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          });
+          html += '</div>';
+        }
+
+        html += '</div></div>';
+      });
+
+      return html;
+    }
+
+    function bindReplyButtons(container) {
+      var root = container || grid;
+      if (!root) return;
+      $$('.btn-reply-comment', root).forEach(function (btn) {
+        btn.onclick = function () {
+          var postId = btn.getAttribute('data-post-id');
+          var commentId = btn.getAttribute('data-comment-id');
+          var authorName = btn.getAttribute('data-author-name') || 'समर्थक';
+
+          // Expand comments section if collapsed
+          var sec = $('#comments-' + postId);
+          if (sec && sec.classList.contains('is-collapsed')) {
+            sec.classList.remove('is-collapsed');
+          }
+
+          // Activate reply bar on comment form
+          var replyBar = $('#reply-context-' + postId);
+          var replyLabel = replyBar ? replyBar.querySelector('.fb-reply-context-label') : null;
+          if (replyBar && replyLabel) {
+            replyLabel.innerHTML = '↩️ <strong>' + esc(authorName) + '</strong> ' + esc(t('wall.replyingTo'));
+            replyBar.style.display = 'flex';
+          }
+
+          var form = sec ? sec.querySelector('.fb-comment-form') : null;
+          var textInput = sec ? sec.querySelector('.fb-comment-text-input') : null;
+          if (form) {
+            form.setAttribute('data-reply-to-id', commentId);
+            form.setAttribute('data-reply-to-author', authorName);
+          }
+          if (textInput) {
+            textInput.placeholder = esc(authorName) + ' ' + esc(t('wall.replyPlaceholder'));
+            textInput.focus();
+            try {
+              textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (e) {}
+          }
+        };
+      });
+
+      $$('.btn-cancel-reply', root).forEach(function (btn) {
+        btn.onclick = function () {
+          var postId = btn.getAttribute('data-post-id');
+          var replyBar = $('#reply-context-' + postId);
+          if (replyBar) replyBar.style.display = 'none';
+          var sec = $('#comments-' + postId);
+          var form = sec ? sec.querySelector('.fb-comment-form') : null;
+          var textInput = sec ? sec.querySelector('.fb-comment-text-input') : null;
+          if (form) {
+            form.removeAttribute('data-reply-to-id');
+            form.removeAttribute('data-reply-to-author');
+          }
+          if (textInput) {
+            textInput.placeholder = t('wall.writeCommentPlaceholder');
+          }
+        };
+      });
+    }
+
     // Render Facebook Feed cards (Unique User ID displayed publicly; Real name strictly confidential for admin)
     function renderFeed() {
       if (!grid) return;
@@ -1970,7 +2194,7 @@
         html += '<article class="card fb-post-card support-msg-card" data-msg-id="' + esc(msg.id) + '">' +
           '<!-- Facebook Post Header: Unique Supporter ID (Real name confidential for admin) -->' +
           '<div class="fb-card-header">' +
-            '<div class="fb-author-avatar" aria-hidden="true">👤</div>' +
+            renderAvatarDisc(msg.userId || msg.alias, 'avatar-md', 'fb-author-avatar') +
             '<div class="fb-author-meta">' +
               '<div class="fb-author-name-row">' +
                 '<strong class="fb-author-name">' + esc(publicAuthor) + '</strong>' +
@@ -2036,32 +2260,17 @@
 
           '<!-- Facebook Inline Comments Section -->' +
           '<section class="fb-comments-section' + (comments.length === 0 ? ' is-collapsed' : '') + '" id="comments-' + esc(msg.id) + '" aria-label="टिप्पणियाँ">' +
-            '<div class="fb-comments-list" id="comments-list-' + esc(msg.id) + '">';
-
-        if (comments.length === 0) {
-          html += '<p class="fb-no-comments-hint">' + esc(t('wall.noCommentsYet')) + '</p>';
-        } else {
-          comments.forEach(function (c) {
-            var cAuthor = c.name || (t('wall.supporterPrefix') + ' ' + myUniqueId);
-            html += '<div class="fb-comment-item">' +
-              '<div class="fb-comment-avatar" aria-hidden="true">👤</div>' +
-              '<div class="fb-comment-content">' +
-                '<div class="fb-comment-bubble">' +
-                  '<strong class="fb-commenter-name">' + esc(cAuthor) + '</strong>' +
-                  '<p class="fb-comment-text">' + esc(c.text) + '</p>' +
-                '</div>' +
-                '<div class="fb-comment-meta">' +
-                  '<span class="fb-comment-time">' + esc(formatRelativeTime(c.time)) + '</span>' +
-                '</div>' +
-              '</div>' +
-            '</div>';
-          });
-        }
-
-        html += '</div>' +
-            '<!-- Inline Comment Composer -->' +
+            '<div class="fb-comments-list" id="comments-list-' + esc(msg.id) + '">' +
+              renderPostCommentsHtml(msg.id, comments) +
+            '</div>' +
+            '<!-- Inline Comment Composer with Reply Context Bar -->' +
             '<form class="fb-comment-form" data-msg-id="' + esc(msg.id) + '">' +
+              '<div class="fb-comment-reply-context" id="reply-context-' + esc(msg.id) + '" style="display:none;">' +
+                '<span class="fb-reply-context-label"></span>' +
+                '<button type="button" class="btn-cancel-reply" data-post-id="' + esc(msg.id) + '" title="' + esc(t('wall.cancelReply')) + '">✕</button>' +
+              '</div>' +
               '<div class="fb-comment-input-row">' +
+                renderAvatarDisc(myUniqueId, 'avatar-xs') +
                 '<input type="text" class="fb-comment-name-input" value="' + esc(defaultCommenterName) + '" readonly aria-label="कमेंटकर्ता यूनिक आईडी" title="आपकी यूनिक आईडी">' +
                 '<input type="text" class="fb-comment-text-input" placeholder="' + esc(t('wall.writeCommentPlaceholder')) + '" required aria-label="कमेंट">' +
                 '<button type="submit" class="fb-comment-submit-btn" aria-label="Send">➤</button>' +
@@ -2072,6 +2281,7 @@
       });
 
       grid.innerHTML = html;
+      bindReplyButtons(grid);
 
       // Bind Likes
       $$('.btn-like', grid).forEach(function (btn) {
@@ -2134,9 +2344,12 @@
 
           var currentUserId = getOrCreateUserUniqueId();
           var authorDisplayName = getPublicAuthorDisplay({ userId: currentUserId });
+          var replyToId = cForm.getAttribute('data-reply-to-id') || null;
+          var replyToAuthor = cForm.getAttribute('data-reply-to-author') || null;
+          var userAv = getUserAvatar(currentUserId);
 
-          var updated = saveComment(msgId, authorDisplayName, textVal);
-          trackEvent('support_message_comment', { id: msgId });
+          var updated = saveComment(msgId, authorDisplayName, textVal, replyToId, replyToAuthor, currentUserId, userAv.icon);
+          trackEvent('support_message_comment', { id: msgId, isReply: !!replyToId });
 
           // Send to Cloud Firestore support_comments for centralized data collection
           var commentPayload = {
@@ -2144,9 +2357,16 @@
               postId: { stringValue: msgId },
               authorId: { stringValue: currentUserId },
               text: { stringValue: textVal },
-              createdAt: { timestampValue: new Date().toISOString() }
+              createdAt: { timestampValue: new Date().toISOString() },
+              avatar: { stringValue: userAv.icon }
             }
           };
+          if (replyToId) {
+            commentPayload.fields.replyToId = { stringValue: replyToId };
+          }
+          if (replyToAuthor) {
+            commentPayload.fields.replyToAuthor = { stringValue: replyToAuthor };
+          }
           var regName = getRegisteredVoterName();
           var regWard = getRegisteredVoterWard();
           if (regName) {
@@ -2162,26 +2382,17 @@
             body: JSON.stringify(commentPayload)
           }).catch(function () {});
 
+          // Reset reply context on form
+          cForm.removeAttribute('data-reply-to-id');
+          cForm.removeAttribute('data-reply-to-author');
+          var replyBar = $('#reply-context-' + msgId);
+          if (replyBar) replyBar.style.display = 'none';
+
           // Re-render comments list for this post
           var listEl = $('#comments-list-' + msgId);
           if (listEl) {
-            var cHtml = '';
-            updated.forEach(function (c) {
-              var cInitial = (c.name || 'G').trim().charAt(0) || '👤';
-              cHtml += '<div class="fb-comment-item">' +
-                '<div class="fb-comment-avatar" aria-hidden="true">' + esc(cInitial) + '</div>' +
-                '<div class="fb-comment-content">' +
-                  '<div class="fb-comment-bubble">' +
-                    '<strong class="fb-commenter-name">' + esc(c.name) + '</strong>' +
-                    '<p class="fb-comment-text">' + esc(c.text) + '</p>' +
-                  '</div>' +
-                  '<div class="fb-comment-meta">' +
-                    '<span class="fb-comment-time">' + esc(formatRelativeTime(c.time)) + '</span>' +
-                  '</div>' +
-                '</div>' +
-              '</div>';
-            });
-            listEl.innerHTML = cHtml;
+            listEl.innerHTML = renderPostCommentsHtml(msgId, updated);
+            bindReplyButtons(listEl);
           }
 
           // Update comment count button
@@ -2193,6 +2404,7 @@
 
           if (textInput) {
             textInput.value = '';
+            textInput.placeholder = t('wall.writeCommentPlaceholder');
             textInput.focus();
           }
         });
@@ -2269,10 +2481,18 @@
             if (!liveCommentsByPost[pId]) liveCommentsByPost[pId] = [];
             var author = (cf.authorId && cf.authorId.stringValue) || 'ANP-0000';
             var authorDisplay = /^ANP-/.test(author) ? (t('wall.supporterPrefix') + ' ' + author) : author;
+            var cAvatar = (cf.avatar && cf.avatar.stringValue) || getUserAvatar(author).icon;
+            var replyToId = (cf.replyToId && cf.replyToId.stringValue) || null;
+            var replyToAuthor = (cf.replyToAuthor && cf.replyToAuthor.stringValue) || null;
             liveCommentsByPost[pId].push({
               id: cDoc.name ? cDoc.name.split('/').pop() : '',
+              postId: pId,
+              authorId: author,
               name: authorDisplay,
               text: (cf.text && cf.text.stringValue) || '',
+              avatar: cAvatar,
+              replyToId: replyToId,
+              replyToAuthor: replyToAuthor,
               time: (cf.createdAt && cf.createdAt.timestampValue) || new Date().toISOString()
             });
           });
@@ -2370,6 +2590,7 @@
           submitBtn.textContent = t('wall.submitting');
         }
 
+        var myAv = getUserAvatar(currentUserId);
         var payload = {
           fields: {
             name: { stringValue: rawName },         // Real name: only visible in Admin Portal
@@ -2378,7 +2599,7 @@
             createdAt: { timestampValue: new Date().toISOString() },
             likes: { integerValue: '1' },
             ward: { stringValue: rawWard },
-            avatar: { stringValue: '👤' }
+            avatar: { stringValue: myAv.icon }
           }
         };
 
@@ -2603,13 +2824,17 @@
           var parsedComments = cDocs.map(function (doc) {
             var f = doc.fields || {};
             var docId = doc.name ? doc.name.split('/').pop() : '';
+            var cAuthor = (f.authorId && f.authorId.stringValue) || 'ANP-0000';
             return {
               id: docId,
               postId: (f.postId && f.postId.stringValue) || '',
-              authorId: (f.authorId && f.authorId.stringValue) || 'ANP-0000',
+              authorId: cAuthor,
               text: (f.text && f.text.stringValue) || '',
               name: (f.name && f.name.stringValue) || '',
               ward: (f.ward && f.ward.stringValue) || '',
+              avatar: (f.avatar && f.avatar.stringValue) || getUserAvatar(cAuthor).icon,
+              replyToId: (f.replyToId && f.replyToId.stringValue) || null,
+              replyToAuthor: (f.replyToAuthor && f.replyToAuthor.stringValue) || null,
               status: (f.status && f.status.stringValue) || 'active',
               createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
             };
@@ -2626,7 +2851,8 @@
           renderAdminTable();
           renderAdminCommentsTable();
         })
-        .catch(function () {
+        .catch(function (err) {
+          console.error('loadAdminFeed error:', err);
           allMessages = [];
           allComments = [];
           updateKpis();
@@ -2697,11 +2923,20 @@
             cascadeMsg;
         }
       } else if (action.type === 'comment') {
+        var childReplies = allComments.filter(function (c) {
+          return c.replyToId === action.id;
+        });
         if (deleteTitle) deleteTitle.textContent = t('admin.confirmDeleteTitle') || 'हटाने की पुष्टि करें';
-        if (deleteMessage) deleteMessage.textContent = t('admin.confirmDeleteComment') || 'क्या आप वाकई इस टिप्पणी को स्थायी रूप से हटाना चाहते हैं?';
+        if (deleteMessage) deleteMessage.textContent = childReplies.length > 0 ?
+          (t('admin.confirmDeleteCommentWithReplies') || 'क्या आप वाकई इस टिप्पणी और इसके सभी जवाबों को स्थायी रूप से हटाना चाहते हैं?') :
+          (t('admin.confirmDeleteComment') || 'क्या आप वाकई इस टिप्पणी को स्थायी रूप से हटाना चाहते हैं?');
         if (deleteDetails) {
           deleteDetails.style.display = 'block';
-          deleteDetails.innerHTML = '<strong>टिप्पणी:</strong> ' + esc(action.text || '') + '<br><strong>आईडी / नाम:</strong> ' + esc(action.author || '') + (action.name ? (' / ' + esc(action.name)) : '');
+          var replyCascadeMsg = childReplies.length > 0 ?
+            ('<br><span style="color:#DC2626; font-size:12.5px; font-weight:600;">↩️ इस टिप्पणी के ' + childReplies.length + ' जवाब भी डेटाबेस से हमेशा के लिए हटा दिए जाएंगे।</span>') : '';
+          deleteDetails.innerHTML = '<strong>टिप्पणी:</strong> ' + esc(action.text || '') +
+            '<br><strong>आईडी / नाम:</strong> ' + esc(action.author || '') + (action.name ? (' / ' + esc(action.name)) : '') +
+            replyCascadeMsg;
         }
       } else if (action.type === 'person') {
         if (deleteTitle) deleteTitle.textContent = t('admin.purgeUserBtn') || 'व्यक्ति का सारा डेटा हटाएं';
@@ -2792,7 +3027,15 @@
         if (act.type === 'post') {
           promise = executeDeletePostWithComments(act.id);
         } else if (act.type === 'comment') {
-          promise = executeDeleteDoc(FIRESTORE_COMMENTS, act.id);
+          var commentId = act.id;
+          var promises = [executeDeleteDoc(FIRESTORE_COMMENTS, commentId)];
+          var childReplies = allComments.filter(function (c) {
+            return c.replyToId === commentId;
+          });
+          childReplies.forEach(function (cr) {
+            promises.push(executeDeleteDoc(FIRESTORE_COMMENTS, cr.id));
+          });
+          promise = Promise.all(promises);
         } else if (act.type === 'person') {
           promise = executePurgePerson(act.name, act.alias);
         }
@@ -2851,7 +3094,7 @@
           '<td>' + (idx + 1) + '</td>' +
           '<td><strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong>' + purgeUserBtn + '</td>' +
           '<td><span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span></td>' +
-          '<td><span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span></td>' +
+          '<td><div class="admin-user-cell">' + renderAvatarDisc(m.userId || m.alias, 'avatar-xs') + ' <span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span></div></td>' +
           '<td class="msg-cell-text">' + esc(m.message) + '</td>' +
           '<td>' + photoCell + '</td>' +
           '<td><span class="likes-badge">❤️ ' + (m.likes || 0) + '</span></td>' +
@@ -2870,7 +3113,7 @@
             '<span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span>' +
           '</div>' +
           '<div class="admin-mc-meta">' +
-            '<span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span>' +
+            '<div class="admin-user-cell">' + renderAvatarDisc(m.userId || m.alias, 'avatar-xs') + ' <span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span></div>' +
             '<span class="likes-badge">❤️ ' + (m.likes || 0) + '</span>' +
             '<time class="time-col">' + esc(dateStr) + '</time>' +
           '</div>' +
@@ -2947,12 +3190,15 @@
         var purgeUserBtn = (c.name && c.name.trim()) ?
           '<br><button type="button" class="btn-purge-person" data-name="' + esc(c.name) + '" data-alias="' + esc(c.authorId) + '" title="इस व्यक्ति के सभी पोस्ट व कमेंट हटाएं">👤 सारा डेटा हटाएं</button>' : '';
 
+        var replyBadge = (c.replyToId || c.replyToAuthor) ?
+          ('<span class="fb-reply-badge">↩️ ' + esc(t('wall.replyBadge')) + ' ' + esc(c.replyToAuthor || c.replyToId) + '</span><br>') : '';
+
         cRowsHtml += '<tr>' +
           '<td>' + (idx + 1) + '</td>' +
-          '<td><span class="alias-pill-sm">🆔 ' + esc(c.authorId || 'ANP-0000') + '</span></td>' +
+          '<td><div class="admin-user-cell">' + renderAvatarDisc(c.authorId, 'avatar-xs') + ' <span class="alias-pill-sm">🆔 ' + esc(c.authorId || 'ANP-0000') + '</span></div></td>' +
           '<td>' + (c.name ? ('<strong class="real-name-text">👤 ' + esc(c.name) + '</strong>' + purgeUserBtn) : '<span style="color:var(--text-muted,#888);">अनामित / केवल आईडी</span>') + '</td>' +
           '<td>' + (c.ward ? '<span class="ward-tag-pill">' + esc(c.ward) + '</span>' : '<span style="color:var(--text-muted,#888); font-size:12px;">अचयनित</span>') + '</td>' +
-          '<td class="msg-cell-text">' + esc(c.text) + '</td>' +
+          '<td class="msg-cell-text">' + replyBadge + esc(c.text) + '</td>' +
           '<td>' + postRefHtml + '</td>' +
           '<td><time class="time-col">' + esc(dateStr) + '</time></td>' +
           '<td class="action-cell">' +

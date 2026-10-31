@@ -21,7 +21,7 @@ rules_version = '2';
 //   - likes: int (required, initial value 0 or 1 on create; atomic +/- 1 on update) - Like count
 //   - ward: string (optional, max 50 chars, or null) - Ward number or neighborhood
 //   - category: string (optional, max 50 chars, or null) - Supporter category (e.g. youth, senior, farmer)
-//   - avatar: string (optional, max 20 chars, or null) - Avatar emoji, icon identifier, or preset
+//   - avatar: string (optional, max 50 chars, or null) - Avatar emoji, icon identifier, or preset
 //   - photo: string (optional, max 350,000 chars for compressed base64 data URL, or null) - Supporter photo
 //   - status: string (optional, max 20 chars, or null) - Moderation status (e.g. 'removed')
 //   - adminPasskey: string (optional, max 20 chars, or null) - Admin removal authorization passkey
@@ -47,6 +47,9 @@ rules_version = '2';
 //   - ward: string (optional, max 50 chars, or null) - Optional ward of commenter if already registered
 //   - status: string (optional, max 20 chars, or null) - Moderation status (e.g. 'removed')
 //   - adminPasskey: string (optional, max 20 chars, or null) - Admin removal authorization passkey
+//   - replyToId: string (optional, 1-100 chars, or null) - ID of comment being replied to
+//   - replyToAuthor: string (optional, 1-60 chars, or null) - Author of comment being replied to
+//   - avatar: string (optional, max 50 chars, or null) - Commenter avatar emoji, icon identifier, or preset
 //
 // Access Patterns:
 //   - Read: Public (anyone can read single comments or query the collection)
@@ -86,7 +89,7 @@ service cloud.firestore {
 
     // Ensure only the explicitly allowed fields are present in the comment document
     function hasOnlyAllowedCommentFields(data) {
-      return data.keys().hasOnly(['postId', 'authorId', 'text', 'createdAt', 'name', 'ward', 'status', 'adminPasskey']);
+      return data.keys().hasOnly(['postId', 'authorId', 'text', 'createdAt', 'name', 'ward', 'status', 'adminPasskey', 'replyToId', 'replyToAuthor', 'avatar']);
     }
 
     // ===============================================================
@@ -139,8 +142,8 @@ service cloud.firestore {
              (!('ward' in data) || data.ward == null || (data.ward is string && data.ward.size() <= 50)) &&
              // optional category: string max 50 chars if provided
              (!('category' in data) || data.category == null || (data.category is string && data.category.size() <= 50)) &&
-             // optional avatar: string max 20 chars if provided
-             (!('avatar' in data) || data.avatar == null || (data.avatar is string && data.avatar.size() <= 20)) &&
+             // optional avatar: string max 50 chars if provided or null
+             (!('avatar' in data) || data.avatar == null || (data.avatar is string && data.avatar.size() <= 50)) &&
              // optional photo: string max 350,000 chars (compressed base64 data URL) or null
              (!('photo' in data) || data.photo == null || (data.photo is string && data.photo.size() <= 350000)) &&
              // optional status: string max 20 chars if provided or null
@@ -203,7 +206,13 @@ service cloud.firestore {
              // optional status: string max 20 chars if provided or null
              (!('status' in data) || data.status == null || (data.status is string && data.status.size() <= 20)) &&
              // optional adminPasskey: string max 20 chars if provided or null
-             (!('adminPasskey' in data) || data.adminPasskey == null || (data.adminPasskey is string && data.adminPasskey.size() <= 20));
+             (!('adminPasskey' in data) || data.adminPasskey == null || (data.adminPasskey is string && data.adminPasskey.size() <= 20)) &&
+             // optional replyToId: string 1-100 chars if provided or null
+             (!('replyToId' in data) || data.replyToId == null || (data.replyToId is string && data.replyToId.size() >= 1 && data.replyToId.size() <= 100)) &&
+             // optional replyToAuthor: string 1-60 chars if provided or null
+             (!('replyToAuthor' in data) || data.replyToAuthor == null || (data.replyToAuthor is string && data.replyToAuthor.size() >= 1 && data.replyToAuthor.size() <= 60)) &&
+             // optional avatar: string max 50 chars if provided or null
+             (!('avatar' in data) || data.avatar == null || (data.avatar is string && data.avatar.size() <= 50));
     }
 
     // Specific validation on comment document creation
