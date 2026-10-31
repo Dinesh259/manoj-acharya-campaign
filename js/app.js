@@ -1226,6 +1226,7 @@
     var previewImg = $('#wallPhotoPreview');
     var btnRemovePhoto = $('#btnRemovePhoto');
     var btnFilterBadge = $('#btnFilterBadge');
+    var btnFilterTricolor = $('#btnFilterTricolor');
     var btnFilterOriginal = $('#btnFilterOriginal');
     var filterPills = $$('.filter-pill');
 
@@ -1398,6 +1399,10 @@
         btnFilterBadge.classList.add('is-active');
         btnFilterBadge.setAttribute('aria-checked', 'true');
       }
+      if (btnFilterTricolor) {
+        btnFilterTricolor.classList.remove('is-active');
+        btnFilterTricolor.setAttribute('aria-checked', 'false');
+      }
       if (btnFilterOriginal) {
         btnFilterOriginal.classList.remove('is-active');
         btnFilterOriginal.setAttribute('aria-checked', 'false');
@@ -1523,7 +1528,7 @@
       } catch (e) {}
     }
 
-    // Generate photo with or without "I Vote & Support Manoj" campaign frame
+    // Generate photo with attractive & soothing supporter frames
     function generateFilteredPhoto() {
       if (!rawLoadedImage) return;
       var img = rawLoadedImage;
@@ -1540,89 +1545,277 @@
       canvas.height = height;
       var ctx = canvas.getContext('2d');
 
+      // Helper: Draw crisp mini Indian flag circular disc
+      function drawMiniFlag(targetCtx, x, y, d) {
+        targetCtx.save();
+        targetCtx.beginPath();
+        targetCtx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2);
+        targetCtx.clip();
+        targetCtx.fillStyle = '#FF9933';
+        targetCtx.fillRect(x, y, d, d * 0.34);
+        targetCtx.fillStyle = '#FFFFFF';
+        targetCtx.fillRect(x, y + d * 0.34, d, d * 0.33);
+        targetCtx.fillStyle = '#138808';
+        targetCtx.fillRect(x, y + d * 0.67, d, d * 0.34);
+        targetCtx.beginPath();
+        targetCtx.arc(x + d / 2, y + d / 2, d * 0.12, 0, Math.PI * 2);
+        targetCtx.fillStyle = '#000080';
+        targetCtx.fill();
+        targetCtx.restore();
+
+        targetCtx.save();
+        targetCtx.beginPath();
+        targetCtx.arc(x + d / 2, y + d / 2, d / 2, 0, Math.PI * 2);
+        targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        targetCtx.lineWidth = 1;
+        targetCtx.stroke();
+        targetCtx.restore();
+      }
+
       // Draw base photo
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Apply "I Vote & Support Manoj" frame & overlay if badge filter selected
-      if (currentPhotoFilter === 'badge') {
-        // --- Bottom Supporter Banner / Ribbon ---
-        var bannerHeight = Math.max(68, Math.round(height * 0.17));
-        var gradient = ctx.createLinearGradient(0, height - bannerHeight - 20, 0, height);
-        gradient.addColorStop(0, 'rgba(15, 23, 42, 0)');
-        gradient.addColorStop(0.25, 'rgba(15, 23, 42, 0.86)');
-        gradient.addColorStop(1, 'rgba(15, 23, 42, 0.98)');
+      // --- STYLE 1: ROYAL GOLD & SAPPHIRE SUPPORTER CARD (Default) ---
+      if (currentPhotoFilter === 'badge' || currentPhotoFilter === 'royal') {
+        // 1. Soothing Ambient Vignette for portrait depth
+        var vigGrad = ctx.createRadialGradient(width / 2, height / 2, width * 0.35, width / 2, height / 2, width * 0.78);
+        vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        vigGrad.addColorStop(1, 'rgba(15, 23, 42, 0.40)');
+        ctx.fillStyle = vigGrad;
+        ctx.fillRect(0, 0, width, height);
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, height - bannerHeight - 20, width, bannerHeight + 20);
+        // Lower ambient gradient to lift the floating card
+        var lowGrad = ctx.createLinearGradient(0, height * 0.65, 0, height);
+        lowGrad.addColorStop(0, 'rgba(15, 23, 42, 0)');
+        lowGrad.addColorStop(1, 'rgba(15, 23, 42, 0.45)');
+        ctx.fillStyle = lowGrad;
+        ctx.fillRect(0, height * 0.65, width, height * 0.35);
 
-        // Tricolor Accent Line (Saffron - White - Green)
-        var stripeY = height - bannerHeight - 4;
-        var stripeH = Math.max(3, Math.round(height * 0.007));
+        // Floating Card dimensions
+        var margin = Math.max(10, Math.round(width * 0.028));
+        var cardW = width - (margin * 2);
+        var cardH = Math.max(84, Math.round(height * 0.18));
+        var cardX = margin;
+        var cardY = height - cardH - margin;
+        var cardR = Math.max(12, Math.round(cardW * 0.025));
+
+        // Floating card 3D shadow
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetY = 6;
+        ctx.beginPath();
+        ctx.moveTo(cardX + cardR, cardY);
+        ctx.arcTo(cardX + cardW, cardY, cardX + cardW, cardY + cardH, cardR);
+        ctx.arcTo(cardX + cardW, cardY + cardH, cardX, cardY + cardH, cardR);
+        ctx.arcTo(cardX, cardY + cardH, cardX, cardY, cardR);
+        ctx.arcTo(cardX, cardY, cardX + cardW, cardY, cardR);
+        ctx.closePath();
+
+        // Card Fill: Deep Sapphire-Navy
+        var cGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
+        cGrad.addColorStop(0, 'rgba(15, 23, 42, 0.94)');
+        cGrad.addColorStop(0.5, 'rgba(30, 41, 59, 0.95)');
+        cGrad.addColorStop(1, 'rgba(18, 38, 48, 0.96)');
+        ctx.fillStyle = cGrad;
+        ctx.fill();
+        ctx.restore();
+
+        // Shimmering Golden Border
+        ctx.save();
+        ctx.lineWidth = Math.max(1.5, width * 0.0022);
+        var bGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY);
+        bGrad.addColorStop(0, '#D97706');
+        bGrad.addColorStop(0.25, '#FDE68A');
+        bGrad.addColorStop(0.5, '#F59E0B');
+        bGrad.addColorStop(0.75, '#FDE68A');
+        bGrad.addColorStop(1, '#D97706');
+        ctx.strokeStyle = bGrad;
+        ctx.stroke();
+        ctx.restore();
+
+        // Top Tricolor stripe on card
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cardX + cardR, cardY);
+        ctx.arcTo(cardX + cardW, cardY, cardX + cardW, cardY + cardH, cardR);
+        ctx.arcTo(cardX + cardW, cardY + cardH, cardX, cardY + cardH, cardR);
+        ctx.arcTo(cardX, cardY + cardH, cardX, cardY, cardR);
+        ctx.arcTo(cardX, cardY, cardX + cardW, cardY, cardR);
+        ctx.closePath();
+        ctx.clip();
+
+        var stripeH = Math.max(4, Math.round(cardH * 0.052));
+        var stripeW = cardW / 3;
         ctx.fillStyle = '#FF9933';
-        ctx.fillRect(0, stripeY, width * 0.334, stripeH);
+        ctx.fillRect(cardX, cardY, stripeW, stripeH);
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(width * 0.334, stripeY, width * 0.334, stripeH);
+        ctx.fillRect(cardX + stripeW, cardY, stripeW, stripeH);
         ctx.fillStyle = '#138808';
-        ctx.fillRect(width * 0.668, stripeY, width * 0.334, stripeH);
+        ctx.fillRect(cardX + stripeW * 2, cardY, stripeW + 4, stripeH);
+        ctx.restore();
 
-        // Banner Primary Headline
+        // Medallion Seal (Left)
+        var sealR = Math.max(20, Math.round(cardH * 0.32));
+        var sealX = cardX + sealR + Math.max(10, Math.round(cardW * 0.028));
+        var sealY = cardY + (cardH / 2) + Math.round(stripeH / 2);
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.45)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(sealX, sealY, sealR, 0, Math.PI * 2);
+        var sGrad = ctx.createRadialGradient(sealX, sealY, 2, sealX, sealY, sealR);
+        sGrad.addColorStop(0, '#FEF3C7');
+        sGrad.addColorStop(0.4, '#FDE68A');
+        sGrad.addColorStop(0.85, '#D97706');
+        sGrad.addColorStop(1, '#92400E');
+        ctx.fillStyle = sGrad;
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.font = Math.round(sealR * 1.05) + 'px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.fillText('🗳️', sealX, sealY - 1);
+        ctx.restore();
 
-        var titleFontSize = Math.max(16, Math.min(28, Math.round(width * 0.044)));
-        ctx.font = 'bold ' + titleFontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+        // Typography with auto-fit width safety
+        var tLeft = sealX + sealR + Math.max(10, Math.round(cardW * 0.024));
+        var textAvailW = (cardX + cardW - margin) - tLeft;
+        var tCenterY = cardY + (cardH / 2) + Math.round(stripeH / 2);
 
-        // Contrast text shadow
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-        ctx.shadowBlur = 6;
+        ctx.save();
+        ctx.textAlign = 'left';
+
+        // Tagline 1: Elegant Golden Header
+        var t1Size = Math.max(10, Math.min(16, Math.round(cardW * 0.024)));
+        ctx.font = '700 ' + t1Size + 'px system-ui, -apple-system, sans-serif';
+        var t1Text = '★ I VOTE & SUPPORT MANOJ ACHARYA ★';
+        while (ctx.measureText(t1Text).width > textAvailW && t1Size > 8) {
+          t1Size -= 0.5;
+          ctx.font = '700 ' + t1Size + 'px system-ui, -apple-system, sans-serif';
+        }
+        ctx.fillStyle = '#FDE68A';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+        ctx.shadowBlur = 4;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
+        ctx.fillText(t1Text, tLeft, tCenterY - (cardH * 0.24));
 
-        ctx.fillStyle = '#FBBF24'; // Golden amber
-        ctx.fillText('🗳️ I VOTE & SUPPORT MANOJ ACHARYA', width / 2, height - (bannerHeight * 0.62));
-
-        // Banner Subtitle
-        var subFontSize = Math.max(11, Math.min(18, Math.round(width * 0.028)));
-        ctx.font = '600 ' + subFontSize + 'px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+        // Tagline 2: Main Slogan in Pure White
+        var t2Size = Math.max(13, Math.min(22, Math.round(cardW * 0.035)));
+        ctx.font = 'bold ' + t2Size + 'px system-ui, -apple-system, sans-serif';
+        var sloganText = 'मेरा वोट, मेरा समर्थन — मनोज कुमार आचार्य';
+        while (ctx.measureText(sloganText).width > textAvailW && t2Size > 10) {
+          t2Size -= 0.5;
+          ctx.font = 'bold ' + t2Size + 'px system-ui, -apple-system, sans-serif';
+        }
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillText('मैं मनोज आचार्य को वोट और समर्थन देता हूँ • सरपंच पद हेतु अनूपशहर', width / 2, height - (bannerHeight * 0.26));
+        ctx.fillText(sloganText, tLeft, tCenterY + (cardH * 0.06));
 
-        // Reset shadow
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
+        // Tagline 3: Subtitle in Warm Saffron Tint
+        var t3Size = Math.max(9, Math.min(13, Math.round(cardW * 0.021)));
+        ctx.font = '500 ' + t3Size + 'px system-ui, -apple-system, sans-serif';
+        var subText = 'भावी सरपंच पद हेतु • ग्राम पंचायत अनूपशहर';
+        while (ctx.measureText(subText).width > textAvailW && t3Size > 7) {
+          t3Size -= 0.5;
+          ctx.font = '500 ' + t3Size + 'px system-ui, -apple-system, sans-serif';
+        }
+        ctx.fillStyle = '#FED7AA';
+        ctx.fillText(subText, tLeft, tCenterY + (cardH * 0.30));
+        ctx.restore();
 
-        // --- Top-Right Corner Supporter Badge Pill ---
-        var pillW = Math.max(140, Math.round(width * 0.30));
-        var pillH = Math.max(26, Math.round(pillW * 0.22));
-        var pillX = width - pillW - 14;
-        var pillY = 14;
-        var pillR = pillH / 2;
+        // Top-Right Pill with auto-measured width
+        var topFontSize = Math.max(9, Math.min(13, Math.round(width * 0.022)));
+        ctx.font = '700 ' + topFontSize + 'px system-ui, sans-serif';
+        var pillLabel = 'सत्यापित समर्थक • अनूपशहर';
+        var labelW = ctx.measureText(pillLabel).width;
+        var flagD = Math.max(16, Math.round(topFontSize * 1.4));
+        var pPadding = Math.max(8, Math.round(width * 0.016));
+        var pW = labelW + flagD + (pPadding * 2) + 6;
+        var pH = Math.max(26, Math.round(flagD + 8));
+        var pX = width - pW - margin;
+        var pY = margin + 2;
+        var pR = pH / 2;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = 8;
         ctx.beginPath();
-        ctx.moveTo(pillX + pillR, pillY);
-        ctx.arcTo(pillX + pillW, pillY, pillX + pillW, pillY + pillH, pillR);
-        ctx.arcTo(pillX + pillW, pillY + pillH, pillX, pillY + pillH, pillR);
-        ctx.arcTo(pillX, pillY + pillH, pillX, pillY, pillR);
-        ctx.arcTo(pillX, pillY, pillX + pillW, pillY, pillR);
+        ctx.moveTo(pX + pR, pY);
+        ctx.arcTo(pX + pW, pY, pX + pW, pY + pH, pR);
+        ctx.arcTo(pX + pW, pY + pH, pX, pY + pH, pR);
+        ctx.arcTo(pX, pY + pH, pX, pY, pR);
+        ctx.arcTo(pX, pY, pX + pW, pY, pR);
         ctx.closePath();
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
         ctx.fill();
-
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.2;
         ctx.strokeStyle = '#F59E0B';
         ctx.stroke();
 
+        var flagX = pX + pPadding;
+        var flagY = pY + Math.round((pH - flagD) / 2);
+        drawMiniFlag(ctx, flagX, flagY, flagD);
+
+        ctx.save();
         ctx.fillStyle = '#FFFFFF';
-        var pillFontSize = Math.max(9, Math.min(14, Math.round(pillH * 0.52)));
-        ctx.font = '700 ' + pillFontSize + 'px system-ui, sans-serif';
+        ctx.font = '700 ' + topFontSize + 'px system-ui, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pillLabel, flagX + flagD + 6, pY + (pH / 2));
+        ctx.restore();
+
+      // --- STYLE 2: TRICOLOR ELEGANCE BANNER ---
+      } else if (currentPhotoFilter === 'tricolor') {
+        var bH = Math.max(76, Math.round(height * 0.18));
+        var bY = height - bH;
+
+        var fGrad = ctx.createLinearGradient(0, bY - 24, 0, height);
+        fGrad.addColorStop(0, 'rgba(15, 23, 42, 0)');
+        fGrad.addColorStop(0.28, 'rgba(15, 23, 42, 0.90)');
+        fGrad.addColorStop(1, 'rgba(15, 23, 42, 0.98)');
+        ctx.fillStyle = fGrad;
+        ctx.fillRect(0, bY - 24, width, bH + 24);
+
+        var sH2 = Math.max(3.5, Math.round(height * 0.007));
+        ctx.fillStyle = '#FF9933';
+        ctx.fillRect(0, bY - 6, width * 0.334, sH2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(width * 0.334, bY - 6, width * 0.334, sH2);
+        ctx.fillStyle = '#138808';
+        ctx.fillRect(width * 0.668, bY - 6, width * 0.334, sH2);
+
+        ctx.save();
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🇮🇳 सच्चा समर्थक अनूपशहर', pillX + (pillW / 2), pillY + (pillH / 2));
-      }
+        var hSize = Math.max(16, Math.min(26, Math.round(width * 0.040)));
+        ctx.font = 'bold ' + hSize + 'px system-ui, -apple-system, sans-serif';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        ctx.fillStyle = '#FDE68A';
+        ctx.fillText('🗳️ I VOTE & SUPPORT MANOJ ACHARYA', width / 2, bY + (bH * 0.35));
 
-      currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.74);
+        var subSize2 = Math.max(11, Math.min(16, Math.round(width * 0.026)));
+        ctx.font = '600 ' + subSize2 + 'px system-ui, -apple-system, sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('ग्राम पंचायत अनूपशहर के उज्ज्वल भविष्य हेतु पूर्ण समर्थन', width / 2, bY + (bH * 0.72));
+        ctx.restore();
+
+        // Top mini badge
+        var flagD2 = Math.max(22, Math.round(width * 0.038));
+        drawMiniFlag(ctx, width - flagD2 - 14, 14, flagD2);
+      }
+      // If 'original': clean base photo with no overlays
+
+      currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.76);
       if (previewImg) previewImg.src = currentPhotoBase64;
       if (previewWrap) {
         previewWrap.hidden = false;
@@ -1641,6 +1834,10 @@
           if (btnFilterBadge) {
             btnFilterBadge.classList.add('is-active');
             btnFilterBadge.setAttribute('aria-checked', 'true');
+          }
+          if (btnFilterTricolor) {
+            btnFilterTricolor.classList.remove('is-active');
+            btnFilterTricolor.setAttribute('aria-checked', 'false');
           }
           if (btnFilterOriginal) {
             btnFilterOriginal.classList.remove('is-active');
@@ -1692,30 +1889,42 @@
       });
     }
 
-    // Filter selector toggles ("I Vote & Support Manoj" vs "Original")
+    // Filter selector toggles ("I Vote & Support Manoj" vs "Tricolor" vs "Original")
+    function updateFilterPills(activeFilter) {
+      currentPhotoFilter = activeFilter;
+      if (btnFilterBadge) {
+        var isBadge = (activeFilter === 'badge' || activeFilter === 'royal');
+        btnFilterBadge.classList.toggle('is-active', isBadge);
+        btnFilterBadge.setAttribute('aria-checked', isBadge ? 'true' : 'false');
+      }
+      if (btnFilterTricolor) {
+        var isTricolor = (activeFilter === 'tricolor');
+        btnFilterTricolor.classList.toggle('is-active', isTricolor);
+        btnFilterTricolor.setAttribute('aria-checked', isTricolor ? 'true' : 'false');
+      }
+      if (btnFilterOriginal) {
+        var isOrig = (activeFilter === 'original');
+        btnFilterOriginal.classList.toggle('is-active', isOrig);
+        btnFilterOriginal.setAttribute('aria-checked', isOrig ? 'true' : 'false');
+      }
+      generateFilteredPhoto();
+    }
+
     if (btnFilterBadge) {
       btnFilterBadge.addEventListener('click', function () {
-        currentPhotoFilter = 'badge';
-        btnFilterBadge.classList.add('is-active');
-        btnFilterBadge.setAttribute('aria-checked', 'true');
-        if (btnFilterOriginal) {
-          btnFilterOriginal.classList.remove('is-active');
-          btnFilterOriginal.setAttribute('aria-checked', 'false');
-        }
-        generateFilteredPhoto();
+        updateFilterPills('badge');
+      });
+    }
+
+    if (btnFilterTricolor) {
+      btnFilterTricolor.addEventListener('click', function () {
+        updateFilterPills('tricolor');
       });
     }
 
     if (btnFilterOriginal) {
       btnFilterOriginal.addEventListener('click', function () {
-        currentPhotoFilter = 'original';
-        btnFilterOriginal.classList.add('is-active');
-        btnFilterOriginal.setAttribute('aria-checked', 'true');
-        if (btnFilterBadge) {
-          btnFilterBadge.classList.remove('is-active');
-          btnFilterBadge.setAttribute('aria-checked', 'false');
-        }
-        generateFilteredPhoto();
+        updateFilterPills('original');
       });
     }
 
