@@ -1172,7 +1172,7 @@
     });
   }
 
-  /* ---------- Community Support Wall (समर्थन दीवार) ---------- */
+  /* ---------- Community Support Wall (समर्थन दीवार - Facebook Style) ---------- */
   function setupSupportWall() {
     var wallSection = $('#wallFeedSection') || $('#postSupportSection');
     if (!wallSection) return;
@@ -1186,27 +1186,16 @@
     var previewWrap = $('#wallPhotoPreviewWrap');
     var previewImg = $('#wallPhotoPreview');
     var btnRemovePhoto = $('#btnRemovePhoto');
-    var liveAliasText = $('#liveAliasText');
-    var liveAliasAvatar = $('#liveAliasAvatar');
-    var liveAliasTag = $('#liveAliasTag');
     var filterPills = $$('.filter-pill');
 
     var currentPhotoBase64 = null;
     var currentFilter = 'all';
     var messagesList = [];
 
-    var AVATARS = ['🦁', '🌾', '🇮🇳', '🌟', '✌️', '🤝', '🎯', '🚩', '🏆', '🚜', '📚', '⚡', '🦅', '🕊️'];
-    var TITLES_GENERIC = [
-      'अनूपशहर विकास समर्थक', 'अनूपशहर युवा शक्ति', 'अनूपशहर गौरव साथी',
-      'जागरूक ग्रामवासी', 'खुशहाली संकल्प साथी', 'अन्नदाता किसान साथी',
-      'मातृशक्ति आशीर्वाद', 'परिवर्तन का सिपाही', 'प्रबुद्ध नागरिक',
-      'सेवा संकल्प साथी', 'निस्वार्थ ग्राम सेवक', 'उज्ज्वल भविष्य समर्थक'
-    ];
-
     var STARTER_MESSAGES = [
       {
         id: 'starter-1',
-        alias: 'वार्ड 1 युवा शक्ति #21',
+        alias: 'सुरेश कुमार जांगिड़',
         name: 'सुरेश कुमार जांगिड़',
         ward: 'वार्ड 1',
         avatar: '🦁',
@@ -1216,7 +1205,7 @@
       },
       {
         id: 'starter-2',
-        alias: 'वार्ड 5 अन्नदाता किसान साथी #08',
+        alias: 'महावीर सिंह',
         name: 'महावीर सिंह',
         ward: 'वार्ड 5',
         avatar: '🌾',
@@ -1226,7 +1215,7 @@
       },
       {
         id: 'starter-3',
-        alias: 'वार्ड 4 मातृशक्ति आशीर्वाद #33',
+        alias: 'कमला देवी',
         name: 'कमला देवी',
         ward: 'वार्ड 4',
         avatar: '🌟',
@@ -1236,7 +1225,7 @@
       },
       {
         id: 'starter-4',
-        alias: 'वार्ड 11 सर्व समाज गौरव #95',
+        alias: 'रामकुमार शर्मा',
         name: 'रामकुमार शर्मा',
         ward: 'वार्ड 11',
         avatar: '🤝',
@@ -1245,6 +1234,65 @@
         createdAt: new Date(Date.now() - 3600000 * 36).toISOString()
       }
     ];
+
+    var DEFAULT_COMMENTS = {
+      'starter-1': [
+        { name: 'अनिल शर्मा', text: 'खेल मैदान 2 और लाइब्रेरी का संकल्प बहुत ही सराहनीय है। पूरा वार्ड 1 आपके साथ है!', time: new Date(Date.now() - 3600000 * 3).toISOString() },
+        { name: 'राकेश कुमार', text: 'मनोज भाई हमेशा युवाओं के साथ खड़े रहे हैं। विजय निश्चित है!', time: new Date(Date.now() - 3600000 * 2).toISOString() }
+      ],
+      'starter-2': [
+        { name: 'बलवान सिंह', text: 'नालियों और पक्की सड़कों के लिए मनोज जी ही सबसे योग्य प्रत्याशी हैं।', time: new Date(Date.now() - 3600000 * 8).toISOString() },
+        { name: 'संदीप जांगिड़', text: 'किसान भाइयों की समस्याओं को हमेशा प्रमुखता से उठाया है। समर्थन जारी रहेगा।', time: new Date(Date.now() - 3600000 * 4).toISOString() }
+      ],
+      'starter-3': [
+        { name: 'सुमन देवी', text: 'गाँव में महिलाओं और बच्चों के लिए पार्क व झूले बहुत जरूरी हैं। हमारा पूरा आशीर्वाद!', time: new Date(Date.now() - 3600000 * 18).toISOString() }
+      ],
+      'starter-4': [
+        { name: 'विकास शर्मा', text: '20 अक्टूबर की ऐतिहासिक जनसभा से साफ हो गया है कि जनता बदलाव चाहती है!', time: new Date(Date.now() - 3600000 * 28).toISOString() },
+        { name: 'पंकज स्वामी', text: 'अनूपशहर की खुशहाली के लिए सभी 11 वार्ड एकजुट हैं।', time: new Date(Date.now() - 3600000 * 16).toISOString() }
+      ]
+    };
+
+    function getComments(msgId) {
+      try {
+        var raw = store.get('mka_comments_' + msgId);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return DEFAULT_COMMENTS[msgId] ? DEFAULT_COMMENTS[msgId].slice() : [];
+    }
+
+    function saveComment(msgId, name, text) {
+      var list = getComments(msgId);
+      var newComment = {
+        id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        name: name,
+        text: text,
+        time: new Date().toISOString()
+      };
+      list.push(newComment);
+      try {
+        store.set('mka_comments_' + msgId, JSON.stringify(list));
+      } catch (e) {}
+      return list;
+    }
+
+    function formatRelativeTime(dateIso) {
+      if (!dateIso) return t('wall.justNow');
+      try {
+        var diffMs = Date.now() - new Date(dateIso).getTime();
+        var diffMins = Math.floor(diffMs / 60000);
+        if (diffMins < 1) return t('wall.justNow');
+        if (diffMins < 60) return diffMins + ' ' + t('wall.minsAgo');
+        var diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return diffHours + ' ' + t('wall.hoursAgo');
+        var diffDays = Math.floor(diffHours / 24);
+        if (diffDays < 7) return diffDays + ' ' + t('wall.daysAgo');
+        var d = new Date(dateIso);
+        return d.toLocaleDateString(lang === 'en' ? 'en-US' : 'hi-IN', { month: 'short', day: 'numeric' });
+      } catch (e) {
+        return t('wall.justNow');
+      }
+    }
 
     function getLikedIds() {
       try {
@@ -1270,48 +1318,6 @@
         }
         store.set('mka_liked_msgs', JSON.stringify(list));
       } catch (e) {}
-    }
-
-    function getRandomAlias(ward) {
-      var base;
-      if (ward && ward.indexOf('वार्ड') !== -1) {
-        var wardTitles = [
-          ward + ' विकास समर्थक',
-          ward + ' युवा शक्ति',
-          ward + ' गौरव साथी',
-          ward + ' जागरूक नागरिक',
-          ward + ' खुशहाली संकल्प',
-          ward + ' सेवा साथी'
-        ];
-        base = wardTitles[Math.floor(Math.random() * wardTitles.length)];
-      } else {
-        base = TITLES_GENERIC[Math.floor(Math.random() * TITLES_GENERIC.length)];
-      }
-      var num = Math.floor(Math.random() * 89) + 10;
-      var av = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      return {
-        alias: base + ' #' + num,
-        avatar: av,
-        ward: ward || 'ग्राम अनूपशहर'
-      };
-    }
-
-    var activeAlias = getRandomAlias('');
-
-    function updateLivePreview() {
-      if (!liveAliasText) return;
-      var ward = form && form.elements.ward ? form.elements.ward.value : '';
-      liveAliasText.textContent = activeAlias.alias;
-      if (liveAliasAvatar) liveAliasAvatar.textContent = activeAlias.avatar;
-      if (liveAliasTag) liveAliasTag.textContent = ward || 'अनूपशहर';
-    }
-
-    if (form && form.elements.ward) {
-      form.elements.ward.addEventListener('change', function () {
-        activeAlias = getRandomAlias(form.elements.ward.value);
-        updateLivePreview();
-      });
-      updateLivePreview();
     }
 
     // Photo selection and compression
@@ -1371,7 +1377,7 @@
       });
     });
 
-    // Render feed cards (Public view: real name is strictly confidential and NEVER rendered)
+    // Render Facebook Feed cards (Person's real name proudly displayed on top)
     function renderFeed() {
       if (!grid) return;
       var filtered = messagesList.filter(function (m) {
@@ -1391,49 +1397,114 @@
       var html = '';
       filtered.forEach(function (msg) {
         var liked = isLiked(msg.id);
-        var timeStr = 'आज';
-        if (msg.createdAt) {
-          try {
-            var d = new Date(msg.createdAt);
-            timeStr = d.toLocaleDateString('hi-IN', { month: 'short', day: 'numeric' });
-          } catch (e) {}
-        }
+        var authorName = msg.name || msg.alias || 'अनूपशहर ग्रामवासी';
+        var authorInitial = authorName.trim().charAt(0) || '👤';
+        var timeStr = formatRelativeTime(msg.createdAt);
+        var comments = getComments(msg.id);
 
-        html += '<article class="support-msg-card" data-msg-id="' + esc(msg.id) + '">' +
-          '<div class="msg-card-top">' +
-            '<div class="msg-card-head">' +
-              '<div class="msg-author-info">' +
-                '<span class="msg-avatar" aria-hidden="true">' + (msg.avatar || '🦁') + '</span>' +
-                '<div class="msg-alias-wrap">' +
-                  '<strong class="msg-alias-name">' + esc(msg.alias) + '</strong>' +
-                  '<div class="msg-meta-row">' +
-                    (msg.ward ? '<span class="msg-ward-tag">📍 ' + esc(msg.ward) + '</span>' : '') +
-                    '<span class="msg-time">· ' + esc(timeStr) + '</span>' +
-                  '</div>' +
-                '</div>' +
+        html += '<article class="card fb-post-card support-msg-card" data-msg-id="' + esc(msg.id) + '">' +
+          '<!-- Facebook Post Header: Person name on top -->' +
+          '<div class="fb-card-header">' +
+            '<div class="fb-author-avatar" aria-hidden="true">' + esc(authorInitial) + '</div>' +
+            '<div class="fb-author-meta">' +
+              '<div class="fb-author-name-row">' +
+                '<strong class="fb-author-name">' + esc(authorName) + '</strong>' +
               '</div>' +
-            '</div>';
+              '<div class="fb-post-subrow">' +
+                '<span class="fb-post-ward">📍 ' + esc(msg.ward || 'अनूपशहर') + '</span>' +
+                '<span class="fb-dot-sep">·</span>' +
+                '<span class="fb-post-time">' + esc(timeStr) + '</span>' +
+                '<span class="fb-dot-sep">·</span>' +
+                '<span class="fb-post-globe" title="सार्वजनिक पोस्ट" aria-label="Public post">🌐</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="fb-card-menu">' +
+              '<button type="button" class="fb-btn-wa-shortcut btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-name="' + esc(authorName) + '" aria-label="' + esc(t('wall.shareMsg')) + '">' +
+                '<svg class="icon" aria-hidden="true"><use href="#i-wa"></use></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
 
-        html += '<p class="msg-body-text">' + esc(msg.message) + '</p>';
+          '<!-- Post Content -->' +
+          '<div class="fb-post-body">' +
+            '<p class="fb-post-text">' + esc(msg.message) + '</p>' +
+          '</div>';
 
         if (msg.photo) {
-          html += '<div class="msg-attached-photo" data-photo="' + esc(msg.photo) + '">' +
-            '<img src="' + esc(msg.photo) + '" alt="Supporter attached photo" loading="lazy">' +
+          html += '<div class="fb-post-photo-wrap msg-attached-photo" data-photo="' + esc(msg.photo) + '">' +
+            '<img src="' + esc(msg.photo) + '" alt="' + esc(authorName) + ' समर्थन फ़ोटो" loading="lazy">' +
           '</div>';
         }
 
-        html += '</div>' +
-          '<div class="msg-card-actions">' +
-            '<button type="button" class="btn-like' + (liked ? ' is-liked' : '') + '" data-like-id="' + esc(msg.id) + '" aria-pressed="' + (liked ? 'true' : 'false') + '">' +
-              '<span class="like-icon" aria-hidden="true">❤️</span> ' +
-              '<span class="like-count">' + (msg.likes || 0) + '</span> ' +
-              '<span class="like-label" data-i18n="wall.likeBtn">' + esc(t('wall.likeBtn')) + '</span>' +
+        html += '<!-- Facebook Reactions & Engagement Bar -->' +
+          '<div class="fb-stats-bar">' +
+            '<div class="fb-reactions-count">' +
+              '<span class="fb-reaction-icons">' +
+                '<span class="fb-react-badge fb-react-like" aria-hidden="true">👍</span>' +
+                '<span class="fb-react-badge fb-react-heart" aria-hidden="true">❤️</span>' +
+              '</span>' +
+              '<span class="fb-like-num like-count">' + (msg.likes || 0) + '</span>' +
+            '</div>' +
+            '<div class="fb-engagement-counts">' +
+              '<button type="button" class="fb-stat-btn btn-toggle-comments" data-comments-id="' + esc(msg.id) + '">' +
+                '<span class="comments-count-num">' + comments.length + '</span> ' + esc(t('wall.commentsLabel')) +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- Facebook Action Bar (Like, Comment, Share) -->' +
+          '<div class="fb-action-bar">' +
+            '<button type="button" class="fb-action-btn btn-like' + (liked ? ' is-liked' : '') + '" data-like-id="' + esc(msg.id) + '" aria-pressed="' + (liked ? 'true' : 'false') + '">' +
+              '<span class="fb-action-icon" aria-hidden="true">' + (liked ? '👍' : '👍🏻') + '</span>' +
+              '<span class="fb-action-label">' + esc(t('wall.likeBtn')) + '</span>' +
             '</button>' +
-            '<button type="button" class="btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-alias="' + esc(msg.alias) + '">' +
-              '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-wa"></use></svg> ' +
-              '<span data-i18n="wall.shareMsg">' + esc(t('wall.shareMsg')) + '</span>' +
+            '<button type="button" class="fb-action-btn btn-comment-trigger" data-comments-id="' + esc(msg.id) + '">' +
+              '<span class="fb-action-icon" aria-hidden="true">💬</span>' +
+              '<span class="fb-action-label">' + esc(t('wall.commentBtn')) + '</span>' +
+            '</button>' +
+            '<button type="button" class="fb-action-btn btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-name="' + esc(authorName) + '">' +
+              '<span class="fb-action-icon" aria-hidden="true">↗️</span>' +
+              '<span class="fb-action-label">' + esc(t('wall.shareBtn')) + '</span>' +
             '</button>' +
           '</div>' +
+
+          '<!-- Facebook Inline Comments Section -->' +
+          '<section class="fb-comments-section" id="comments-' + esc(msg.id) + '" aria-label="टिप्पणियाँ">' +
+            '<div class="fb-comments-list" id="comments-list-' + esc(msg.id) + '">';
+
+        if (comments.length === 0) {
+          html += '<p class="fb-no-comments-hint">' + esc(t('wall.noCommentsYet')) + '</p>';
+        } else {
+          comments.forEach(function (c) {
+            var cInitial = (c.name || 'G').trim().charAt(0) || '👤';
+            html += '<div class="fb-comment-item">' +
+              '<div class="fb-comment-avatar" aria-hidden="true">' + esc(cInitial) + '</div>' +
+              '<div class="fb-comment-content">' +
+                '<div class="fb-comment-bubble">' +
+                  '<strong class="fb-commenter-name">' + esc(c.name) + '</strong>' +
+                  '<p class="fb-comment-text">' + esc(c.text) + '</p>' +
+                '</div>' +
+                '<div class="fb-comment-meta">' +
+                  '<span class="fb-comment-time">' + esc(formatRelativeTime(c.time)) + '</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          });
+        }
+
+        var savedCommenterName = '';
+        try { savedCommenterName = localStorage.getItem('mka_last_commenter_name') || ''; } catch (e) {}
+
+        html += '</div>' +
+            '<!-- Inline Comment Composer -->' +
+            '<form class="fb-comment-form" data-msg-id="' + esc(msg.id) + '">' +
+              '<div class="fb-comment-input-row">' +
+                '<input type="text" class="fb-comment-name-input" value="' + esc(savedCommenterName) + '" placeholder="' + esc(t('wall.commenterNamePlaceholder')) + '" required aria-label="कमेंटकर्ता का नाम">' +
+                '<input type="text" class="fb-comment-text-input" placeholder="' + esc(t('wall.writeCommentPlaceholder')) + '" required aria-label="कमेंट">' +
+                '<button type="submit" class="fb-comment-submit-btn" aria-label="Send">➤</button>' +
+              '</div>' +
+            '</form>' +
+          '</section>' +
         '</article>';
       });
 
@@ -1446,7 +1517,8 @@
           var msg = messagesList.find(function (m) { return m.id === id; });
           if (!msg) return;
           var liked = isLiked(id);
-          var countSpan = btn.querySelector('.like-count');
+          var postCard = btn.closest('.fb-post-card');
+          var countSpan = postCard ? postCard.querySelector('.like-count') : null;
           var oldCount = parseInt(countSpan ? countSpan.textContent : msg.likes, 10) || 0;
           var newCount = liked ? Math.max(0, oldCount - 1) : oldCount + 1;
 
@@ -1455,6 +1527,8 @@
           setLiked(id, !liked);
           btn.classList.toggle('is-liked', !liked);
           btn.setAttribute('aria-pressed', (!liked) ? 'true' : 'false');
+          var iconEl = btn.querySelector('.fb-action-icon');
+          if (iconEl) iconEl.textContent = (!liked) ? '👍' : '👍🏻';
           if (countSpan) countSpan.textContent = newCount;
 
           trackEvent('support_message_like', { id: id, liked: !liked });
@@ -1471,16 +1545,83 @@
         });
       });
 
-      // Bind WhatsApp Share on post
+      // Bind Comment Toggles
+      $$('.btn-comment-trigger, .btn-toggle-comments', grid).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-comments-id');
+          var sec = $('#comments-' + id);
+          if (sec) {
+            sec.classList.toggle('is-collapsed');
+            var input = sec.querySelector('.fb-comment-text-input');
+            if (input && !sec.classList.contains('is-collapsed')) {
+              input.focus();
+            }
+          }
+        });
+      });
+
+      // Bind Comment Forms
+      $$('.fb-comment-form', grid).forEach(function (cForm) {
+        cForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var msgId = cForm.getAttribute('data-msg-id');
+          var nameInput = cForm.querySelector('.fb-comment-name-input');
+          var textInput = cForm.querySelector('.fb-comment-text-input');
+          var nameVal = (nameInput && nameInput.value) ? nameInput.value.trim() : '';
+          var textVal = (textInput && textInput.value) ? textInput.value.trim() : '';
+          if (!nameVal || !textVal) return;
+
+          try { localStorage.setItem('mka_last_commenter_name', nameVal); } catch (e) {}
+
+          var updated = saveComment(msgId, nameVal, textVal);
+          trackEvent('support_message_comment', { id: msgId });
+
+          // Re-render comments list for this post
+          var listEl = $('#comments-list-' + msgId);
+          if (listEl) {
+            var cHtml = '';
+            updated.forEach(function (c) {
+              var cInitial = (c.name || 'G').trim().charAt(0) || '👤';
+              cHtml += '<div class="fb-comment-item">' +
+                '<div class="fb-comment-avatar" aria-hidden="true">' + esc(cInitial) + '</div>' +
+                '<div class="fb-comment-content">' +
+                  '<div class="fb-comment-bubble">' +
+                    '<strong class="fb-commenter-name">' + esc(c.name) + '</strong>' +
+                    '<p class="fb-comment-text">' + esc(c.text) + '</p>' +
+                  '</div>' +
+                  '<div class="fb-comment-meta">' +
+                    '<span class="fb-comment-time">' + esc(formatRelativeTime(c.time)) + '</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+            });
+            listEl.innerHTML = cHtml;
+          }
+
+          // Update comment count button
+          var postCard = cForm.closest('.fb-post-card');
+          if (postCard) {
+            var countBadge = postCard.querySelector('.comments-count-num');
+            if (countBadge) countBadge.textContent = updated.length;
+          }
+
+          if (textInput) {
+            textInput.value = '';
+            textInput.focus();
+          }
+        });
+      });
+
+      // Bind Share button
       $$('.btn-share-post', grid).forEach(function (btn) {
         btn.addEventListener('click', function () {
           var shareText = btn.getAttribute('data-share-text') || '';
-          var shareAlias = btn.getAttribute('data-share-alias') || '';
+          var shareName = btn.getAttribute('data-share-name') || 'गाँववासी';
           var url = 'https://manoj-acharya-anoopshahar.web.app/support-wall.html';
-          var full = '✨ ' + shareAlias + ' का समर्थन संदेश: "' + shareText + '"\n\nअनूपशहर के विकास के लिए मनोज कुमार आचार्य जी को समर्थन दें और अपना संदेश दर्ज करें:\n' + url;
-          trackEvent('support_message_share', { alias: shareAlias });
+          var full = '✨ ' + shareName + ' का जन समर्थन संदेश:\n"' + shareText + '"\n\nअनूपशहर के विकास के लिए मनोज कुमार आचार्य जी को समर्थन दें और अपना संदेश दर्ज करें:\n' + url;
+          trackEvent('support_message_share', { name: shareName });
           if (navigator.share) {
-            navigator.share({ title: 'समर्थन संदेश — मनोज कुमार आचार्य', text: full, url: url }).catch(function () {});
+            navigator.share({ title: shareName + ' — जन समर्थन पोस्ट', text: full, url: url }).catch(function () {});
           } else {
             openExternal(waLink(full));
           }
@@ -1533,14 +1674,15 @@
           var parsed = docs.map(function (doc) {
             var f = doc.fields || {};
             var docId = doc.name ? doc.name.split('/').pop() : '';
+            var pName = (f.name && f.name.stringValue) || (f.alias && f.alias.stringValue) || '';
             return {
               id: docId,
-              alias: (f.alias && f.alias.stringValue) || 'अनूपशहर समर्थक',
-              name: (f.name && f.name.stringValue) || '',
+              alias: pName,
+              name: pName,
               message: (f.message && f.message.stringValue) || '',
               photo: (f.photo && f.photo.stringValue) || null,
               ward: (f.ward && f.ward.stringValue) || '',
-              avatar: (f.avatar && f.avatar.stringValue) || '🦁',
+              avatar: (f.avatar && f.avatar.stringValue) || '👤',
               likes: parseInt((f.likes && f.likes.integerValue) || '0', 10),
               createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
             };
@@ -1591,13 +1733,13 @@
 
         var payload = {
           fields: {
-            alias: { stringValue: activeAlias.alias },
+            alias: { stringValue: name },
             name: { stringValue: name },
             message: { stringValue: message },
             createdAt: { timestampValue: new Date().toISOString() },
             likes: { integerValue: '1' },
-            ward: { stringValue: ward || 'ग्राम अनूपशहर' },
-            avatar: { stringValue: activeAlias.avatar }
+            ward: { stringValue: ward || 'वार्ड 1' },
+            avatar: { stringValue: '👤' }
           }
         };
 
@@ -1617,7 +1759,7 @@
           .then(function (createdDoc) {
             if (submitBtn) {
               submitBtn.disabled = false;
-              submitBtn.innerHTML = '<span aria-hidden="true">✍️</span> ' + esc(t('wall.submit'));
+              submitBtn.innerHTML = '<span aria-hidden="true">✍️</span> ' + esc(t('wall.publishPost'));
             }
             if (status) {
               status.textContent = t('wall.successMsg');
@@ -1628,8 +1770,6 @@
             form.reset();
             currentPhotoBase64 = null;
             if (previewWrap) previewWrap.hidden = true;
-            activeAlias = getRandomAlias('');
-            updateLivePreview();
 
             trackEvent('support_message_post', { ward: ward, has_photo: !!currentPhotoBase64 });
 
@@ -1641,12 +1781,12 @@
             var fallbackId = 'local-' + Date.now();
             var newLocal = {
               id: fallbackId,
-              alias: activeAlias.alias,
+              alias: name,
               name: name,
               message: message,
               photo: currentPhotoBase64,
-              ward: ward || 'ग्राम अनूपशहर',
-              avatar: activeAlias.avatar,
+              ward: ward || 'वार्ड 1',
+              avatar: '👤',
               likes: 1,
               createdAt: new Date().toISOString()
             };
@@ -1655,7 +1795,7 @@
 
             if (submitBtn) {
               submitBtn.disabled = false;
-              submitBtn.innerHTML = '<span aria-hidden="true">✍️</span> ' + esc(t('wall.submit'));
+              submitBtn.innerHTML = '<span aria-hidden="true">✍️</span> ' + esc(t('wall.publishPost'));
             }
             if (status) {
               status.textContent = t('wall.successMsg');
@@ -1664,8 +1804,6 @@
             form.reset();
             currentPhotoBase64 = null;
             if (previewWrap) previewWrap.hidden = true;
-            activeAlias = getRandomAlias('');
-            updateLivePreview();
           });
       });
     }

@@ -23,54 +23,38 @@
   <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
   <div data-chrome="header"></div>
 
-  <main id="main" class="wrap zone-candidate">
-    <p class="zone-label candidate" data-i18n="common.labelCandidate">प्रत्याशी का संदेश / Candidate's message</p>
-
-    <!-- Support Wall Hero Banner -->
-    <div class="wall-hero">
-      <span class="live-pulse-badge">
-        <span class="pulse-dot" aria-hidden="true"></span>
-        <span data-i18n="wall.badge">सर्व समाज जनसमर्थन</span>
-      </span>
-      <h1 data-i18n="wall.title">जन समर्थन दीवार (Public Support Wall)</h1>
-      <p class="lead" data-i18n="wall.subtitle">मनोज कुमार आचार्य जी के समर्थन में गाँववासियों के प्रेरक संदेश व तस्वीरें</p>
-      <p class="wall-intro-text" data-i18n="wall.intro">
-        अनूपशहर के विकास, युवाओं के भविष्य और गाँव की खुशहाली के लिए अपना समर्थन संदेश लिखें और तस्वीर साझा करें। आपका एक-एक संदेश गाँव में नई ऊर्जा का संचार करता है!
-      </p>
-
-      <div class="wall-privacy-alert">
-        <span class="alert-icon" aria-hidden="true">🔒</span>
-        <p data-i18n="wall.privacyNotice">
-          🔒 निजता सुरक्षा: आपका वास्तविक नाम केवल प्रत्याशी व एडमिन को दिखेगा। जनता को आपकी पहचान एक रैंडम उपनाम (जैसे 'अनूपशहर युवा शक्ति') के रूप में दिखेगी।
-        </p>
+  <main id="main" class="wrap fb-feed-wrap">
+    <!-- Facebook Style Feed Header -->
+    <div class="fb-feed-header">
+      <div class="fb-feed-header-text">
+        <h1 class="fb-feed-title" data-i18n="wall.feedHeading">जन समर्थन पोस्ट</h1>
+        <p class="fb-feed-subtitle" data-i18n="wall.feedSub">अनूपशहर के 11 वार्डों से जनसमर्थन व चर्चा</p>
+      </div>
+      <div class="fb-feed-header-stats">
+        <span class="fb-count-badge">
+          <span data-i18n="wall.countLabel">कुल पोस्ट</span>: <strong id="feedCountNumber">0</strong>
+        </span>
       </div>
     </div>
 
-    <!-- Message Posting Form Card -->
-    <section class="card wall-form-card" id="postSupportSection" aria-labelledby="post-form-heading">
-      <div class="card-head-bar">
-        <h2 id="post-form-heading" class="card-head-title">
-          <span aria-hidden="true">✍️</span> <span data-i18n="wall.formHeading">अपना समर्थन संदेश व तस्वीर जोड़ें</span>
-        </h2>
+    <!-- Facebook Style "Create Post" Composer Card -->
+    <section class="card fb-composer-card" id="postSupportSection" aria-label="Create Post">
+      <div class="fb-composer-head">
+        <span class="fb-composer-avatar" aria-hidden="true">✍️</span>
+        <h2 class="fb-composer-title" data-i18n="wall.formHeading">पोस्ट लिखें</h2>
       </div>
 
-      <form id="supportForm" novalidate>
-        <div class="form-row two-col">
-          <div class="form-field">
-            <label for="wallName">
-              <span data-i18n="wall.nameLabel">आपका वास्तविक नाम (केवल एडमिन/प्रत्याशी को दिखेगा)</span>
-              <span class="req-star" aria-hidden="true">*</span>
-            </label>
-            <input id="wallName" name="name" type="text" autocomplete="name" required data-i18n-attr="placeholder:wall.namePlaceholder">
-            <span class="field-hint">यह नाम जनता को नहीं दिखेगा। केवल उम्मीदवार व टीम को दिखेगा।</span>
+      <form id="supportForm" novalidate class="fb-composer-form">
+        <div class="fb-composer-inputs-row">
+          <div class="fb-input-author-wrap">
+            <span class="fb-author-icon" aria-hidden="true">👤</span>
+            <input id="wallName" name="name" type="text" autocomplete="name" required
+                   data-i18n-attr="placeholder:wall.namePlaceholder"
+                   placeholder="आपका नाम लिखें (Your Name)..." class="fb-author-input">
           </div>
-
-          <div class="form-field">
-            <label for="wallWard">
-              <span data-i18n="wall.wardLabel">वार्ड चुनें (अनूपशहर के 11 वार्ड)</span>
-            </label>
-            <select id="wallWard" name="ward">
-              <option value="" data-i18n="wall.selectWard">वार्ड चुनें (वार्ड 1 से 11)</option>
+          <div class="fb-select-ward-wrap">
+            <select id="wallWard" name="ward" class="fb-ward-select" aria-label="वार्ड चुनें">
+              <option value="" data-i18n="wall.selectWard">📍 वार्ड चुनें (वार्ड 1 से 11)</option>
               <option value="वार्ड 1">वार्ड नं. 1</option>
               <option value="वार्ड 2">वार्ड नं. 2</option>
               <option value="वार्ड 3">वार्ड नं. 3</option>
@@ -86,65 +70,40 @@
           </div>
         </div>
 
-        <div class="form-field">
-          <label for="wallPhotoInput" data-i18n="wall.photoLabel">तस्वीर जोड़ें (वैकल्पिक)</label>
-          <div class="file-upload-trigger-wrap">
-            <input type="file" id="wallPhotoInput" accept="image/*" style="display:none" aria-hidden="true">
-            <button type="button" class="btn btn-outline btn-photo-pick" id="btnPickPhoto">
-              <span aria-hidden="true">📷</span> <span data-i18n="wall.photoHint">तस्वीर चुनें (गैलरी या कैमरा)</span>
-            </button>
-          </div>
-          <!-- Thumbnail preview if photo selected -->
+        <div class="fb-composer-textarea-wrap">
+          <textarea id="wallMessage" name="message" rows="3" required
+                    data-i18n-attr="placeholder:wall.messagePlaceholder"
+                    placeholder="मनोज जी के समर्थन में अपने विचार लिखें... (What's on your mind?)"></textarea>
+          
+          <!-- Selected Photo Preview -->
           <div id="wallPhotoPreviewWrap" class="photo-preview-wrap" hidden>
             <img id="wallPhotoPreview" alt="Selected preview">
             <button type="button" class="btn-remove-photo" id="btnRemovePhoto" data-i18n-attr="aria-label:wall.removePhoto;title:wall.removePhoto">✕</button>
           </div>
         </div>
 
-        <div class="form-field">
-          <label for="wallMessage">
-            <span data-i18n="wall.messageLabel">आपका समर्थन संदेश या संकल्प</span>
-            <span class="req-star" aria-hidden="true">*</span>
-          </label>
-          <textarea id="wallMessage" name="message" rows="3" required data-i18n-attr="placeholder:wall.messagePlaceholder"></textarea>
-        </div>
-
-        <!-- Real-time generated alias pill preview -->
-        <div class="alias-preview-box">
-          <span class="alias-preview-label">सार्वजनिक दीवार पर आपकी पहचान (Random Identity):</span>
-          <div class="alias-pill" id="liveAliasPill">
-            <span class="alias-avatar" id="liveAliasAvatar">🦁</span>
-            <span class="alias-text" id="liveAliasText">अनूपशहर युवा शक्ति</span>
-            <span class="alias-tag" id="liveAliasTag">वार्ड 1</span>
-          </div>
-        </div>
-
         <p class="form-error" role="alert" hidden></p>
         <p class="form-status" aria-live="polite"></p>
 
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-lg btn-block" id="btnSubmitSupport">
-            <span aria-hidden="true">✍️</span> <span data-i18n="wall.submit">समर्थन संदेश पोस्ट करें</span>
+        <div class="fb-composer-actions-bar">
+          <div class="fb-composer-left-actions">
+            <input type="file" id="wallPhotoInput" accept="image/*" style="display:none" aria-hidden="true">
+            <button type="button" class="fb-attach-photo-btn" id="btnPickPhoto">
+              <span class="fb-attach-icon" aria-hidden="true">📷</span>
+              <span data-i18n="wall.photoAttach">फ़ोटो जोड़ें</span>
+            </button>
+          </div>
+          <button type="submit" class="btn btn-primary fb-submit-post-btn" id="btnSubmitSupport">
+            <span aria-hidden="true">✍️</span> <span data-i18n="wall.publishPost">पोस्ट करें</span>
           </button>
         </div>
       </form>
     </section>
 
     <!-- Support Feed Stream -->
-    <section class="wall-feed-section" id="wallFeedSection" aria-labelledby="feed-heading">
-      <div class="feed-header-bar">
-        <div>
-          <h2 id="feed-heading" class="feed-title">
-            <span aria-hidden="true">💬</span> <span data-i18n="wall.badge">गाँववासियों का जनसमर्थन</span>
-          </h2>
-          <span class="feed-count-pill" id="feedCountPill">
-            <span data-i18n="wall.countLabel">कुल संदेश</span>: <strong id="feedCountNumber">0</strong>
-          </span>
-        </div>
-      </div>
-
+    <section class="wall-feed-section" id="wallFeedSection" aria-label="Support Posts Feed">
       <!-- Ward Filter Pills (Ward 1 to 11) -->
-      <div class="filter-pills" role="tablist" aria-label="Filter Messages by Ward">
+      <div class="filter-pills fb-filter-bar" role="tablist" aria-label="Filter Posts by Ward">
         <button type="button" class="filter-pill is-active" data-filter="all" role="tab" aria-selected="true" data-i18n="wall.filterAll">सभी 11 वार्ड</button>
         <button type="button" class="filter-pill" data-filter="वार्ड 1" role="tab" aria-selected="false">वार्ड 1</button>
         <button type="button" class="filter-pill" data-filter="वार्ड 2" role="tab" aria-selected="false">वार्ड 2</button>
@@ -160,10 +119,10 @@
       </div>
 
       <!-- Messages Grid -->
-      <div class="wall-grid" id="wallGrid" role="region" aria-label="Support Messages Feed">
+      <div class="wall-grid fb-feed-grid" id="wallGrid" role="feed" aria-label="Support Messages Feed">
         <div class="wall-loading-placeholder">
           <span class="pulse-dot" aria-hidden="true"></span>
-          <span>समर्थन संदेश लोड हो रहे हैं...</span>
+          <span>समर्थन पोस्ट लोड हो रही हैं...</span>
         </div>
       </div>
     </section>
