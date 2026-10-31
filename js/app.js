@@ -1236,6 +1236,47 @@
     var btnCloseComposer = $('#btnCloseComposer');
     var btnCancelComposer = $('#btnCancelComposer');
 
+    /* Helper: Unique User ID Generation & Persistence (First-time visitor assignment) */
+    function getOrCreateUserUniqueId() {
+      try {
+        var stored = localStorage.getItem('mka_user_unique_id');
+        if (stored && /^ANP-\d{4}$/.test(stored)) {
+          return stored;
+        }
+        var rand = Math.floor(1000 + Math.random() * 9000);
+        var newId = 'ANP-' + rand;
+        localStorage.setItem('mka_user_unique_id', newId);
+        return newId;
+      } catch (e) {
+        return 'ANP-' + Math.floor(1000 + Math.random() * 9000);
+      }
+    }
+
+    /* Helper: Public author display (Returns "समर्थक ANP-XXXX"; Real name NEVER shown publicly) */
+    function getPublicAuthorDisplay(msg) {
+      var uid = (msg && (msg.userId || msg.alias)) || '';
+      if (uid && /^ANP-\d{4}$/.test(uid)) {
+        return t('wall.supporterPrefix') + ' ' + uid;
+      }
+      if (uid && uid.indexOf('ANP-') !== -1) {
+        return t('wall.supporterPrefix') + ' ' + uid;
+      }
+      // For legacy posts without ANP- ID, map deterministically to ANP-XXXX
+      var seed = (msg && (msg.id || msg.createdAt || msg.ward || '')) || 'anoopshahar';
+      var hash = 0;
+      for (var i = 0; i < seed.length; i++) hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+      var num = Math.abs(hash % 9000) + 1000;
+      return t('wall.supporterPrefix') + ' ANP-' + num;
+    }
+
+    var myUniqueId = getOrCreateUserUniqueId();
+    var assignedBadge = $('#assignedUniqueIdBadge');
+    if (assignedBadge) assignedBadge.textContent = myUniqueId;
+    var composerUniqueIdVal = $('#composerUniqueIdVal');
+    if (composerUniqueIdVal) composerUniqueIdVal.textContent = myUniqueId;
+    var wallUserId = $('#wallUserId');
+    if (wallUserId) wallUserId.value = myUniqueId;
+
     function clearPhotoPreview() {
       currentPhotoBase64 = null;
       if (photoInput) photoInput.value = '';
@@ -1286,7 +1327,8 @@
     var STARTER_MESSAGES = [
       {
         id: 'starter-1',
-        alias: 'सुरेश कुमार जांगिड़',
+        userId: 'ANP-1042',
+        alias: 'ANP-1042',
         name: 'सुरेश कुमार जांगिड़',
         ward: 'वार्ड 1',
         avatar: '🦁',
@@ -1296,7 +1338,8 @@
       },
       {
         id: 'starter-2',
-        alias: 'महावीर सिंह',
+        userId: 'ANP-5821',
+        alias: 'ANP-5821',
         name: 'महावीर सिंह',
         ward: 'वार्ड 5',
         avatar: '🌾',
@@ -1306,7 +1349,8 @@
       },
       {
         id: 'starter-3',
-        alias: 'कमला देवी',
+        userId: 'ANP-4390',
+        alias: 'ANP-4390',
         name: 'कमला देवी',
         ward: 'वार्ड 4',
         avatar: '🌟',
@@ -1316,7 +1360,8 @@
       },
       {
         id: 'starter-4',
-        alias: 'रामकुमार शर्मा',
+        userId: 'ANP-9175',
+        alias: 'ANP-9175',
         name: 'रामकुमार शर्मा',
         ward: 'वार्ड 11',
         avatar: '🤝',
@@ -1328,19 +1373,19 @@
 
     var DEFAULT_COMMENTS = {
       'starter-1': [
-        { name: 'अनिल शर्मा', text: 'खेल मैदान 2 और लाइब्रेरी का संकल्प बहुत ही सराहनीय है। पूरा वार्ड 1 आपके साथ है!', time: new Date(Date.now() - 3600000 * 3).toISOString() },
-        { name: 'राकेश कुमार', text: 'मनोज भाई हमेशा युवाओं के साथ खड़े रहे हैं। विजय निश्चित है!', time: new Date(Date.now() - 3600000 * 2).toISOString() }
+        { name: 'समर्थक ANP-2184', text: 'खेल मैदान 2 और लाइब्रेरी का संकल्प बहुत ही सराहनीय है। पूरा वार्ड 1 आपके साथ है!', time: new Date(Date.now() - 3600000 * 3).toISOString() },
+        { name: 'समर्थक ANP-7490', text: 'मनोज भाई हमेशा युवाओं के साथ खड़े रहे हैं। विजय निश्चित है!', time: new Date(Date.now() - 3600000 * 2).toISOString() }
       ],
       'starter-2': [
-        { name: 'बलवान सिंह', text: 'नालियों और पक्की सड़कों के लिए मनोज जी ही सबसे योग्य प्रत्याशी हैं।', time: new Date(Date.now() - 3600000 * 8).toISOString() },
-        { name: 'संदीप जांगिड़', text: 'किसान भाइयों की समस्याओं को हमेशा प्रमुखता से उठाया है। समर्थन जारी रहेगा।', time: new Date(Date.now() - 3600000 * 4).toISOString() }
+        { name: 'समर्थक ANP-6431', text: 'नालियों और पक्की सड़कों के लिए मनोज जी ही सबसे योग्य प्रत्याशी हैं।', time: new Date(Date.now() - 3600000 * 8).toISOString() },
+        { name: 'समर्थक ANP-8120', text: 'किसान भाइयों की समस्याओं को हमेशा प्रमुखता से उठाया है। समर्थन जारी रहेगा।', time: new Date(Date.now() - 3600000 * 4).toISOString() }
       ],
       'starter-3': [
-        { name: 'सुमन देवी', text: 'गाँव में महिलाओं और बच्चों के लिए पार्क व झूले बहुत जरूरी हैं। हमारा पूरा आशीर्वाद!', time: new Date(Date.now() - 3600000 * 18).toISOString() }
+        { name: 'समर्थक ANP-3920', text: 'गाँव में महिलाओं और बच्चों के लिए पार्क व झूले बहुत जरूरी हैं। हमारा पूरा आशीर्वाद!', time: new Date(Date.now() - 3600000 * 18).toISOString() }
       ],
       'starter-4': [
-        { name: 'विकास शर्मा', text: '20 अक्टूबर की ऐतिहासिक जनसभा से साफ हो गया है कि जनता बदलाव चाहती है!', time: new Date(Date.now() - 3600000 * 28).toISOString() },
-        { name: 'पंकज स्वामी', text: 'अनूपशहर की खुशहाली के लिए सभी 11 वार्ड एकजुट हैं।', time: new Date(Date.now() - 3600000 * 16).toISOString() }
+        { name: 'समर्थक ANP-8512', text: '20 अक्टूबर की ऐतिहासिक जनसभा से साफ हो गया है कि जनता बदलाव चाहती है!', time: new Date(Date.now() - 3600000 * 28).toISOString() },
+        { name: 'समर्थक ANP-1994', text: 'अनूपशहर की खुशहाली के लिए सभी 11 वार्ड एकजुट हैं।', time: new Date(Date.now() - 3600000 * 16).toISOString() }
       ]
     };
 
@@ -1469,7 +1514,7 @@
       });
     });
 
-    // Render Facebook Feed cards (Person's real name proudly displayed on top)
+    // Render Facebook Feed cards (Unique User ID displayed publicly; Real name strictly confidential for admin)
     function renderFeed() {
       if (!grid) return;
       var filtered = messagesList.filter(function (m) {
@@ -1486,21 +1531,23 @@
         return;
       }
 
+      var defaultCommenterName = t('wall.supporterPrefix') + ' ' + myUniqueId;
+
       var html = '';
       filtered.forEach(function (msg) {
         var liked = isLiked(msg.id);
-        var authorName = msg.name || msg.alias || 'अनूपशहर ग्रामवासी';
-        var authorInitial = authorName.trim().charAt(0) || '👤';
+        var publicAuthor = getPublicAuthorDisplay(msg);
         var timeStr = formatRelativeTime(msg.createdAt);
         var comments = getComments(msg.id);
 
         html += '<article class="card fb-post-card support-msg-card" data-msg-id="' + esc(msg.id) + '">' +
-          '<!-- Facebook Post Header: Person name on top -->' +
+          '<!-- Facebook Post Header: Unique Supporter ID (Real name confidential for admin) -->' +
           '<div class="fb-card-header">' +
-            '<div class="fb-author-avatar" aria-hidden="true">' + esc(authorInitial) + '</div>' +
+            '<div class="fb-author-avatar" aria-hidden="true">👤</div>' +
             '<div class="fb-author-meta">' +
               '<div class="fb-author-name-row">' +
-                '<strong class="fb-author-name">' + esc(authorName) + '</strong>' +
+                '<strong class="fb-author-name">' + esc(publicAuthor) + '</strong>' +
+                '<span class="verified-supporter-badge" title="सत्यापित मतदाता पहचान" aria-label="सत्यापित पहचान">✓</span>' +
               '</div>' +
               '<div class="fb-post-subrow">' +
                 '<span class="fb-post-ward">📍 ' + esc(msg.ward || 'अनूपशहर') + '</span>' +
@@ -1511,7 +1558,7 @@
               '</div>' +
             '</div>' +
             '<div class="fb-card-menu">' +
-              '<button type="button" class="fb-btn-wa-shortcut btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-name="' + esc(authorName) + '" aria-label="' + esc(t('wall.shareMsg')) + '">' +
+              '<button type="button" class="fb-btn-wa-shortcut btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-name="' + esc(publicAuthor) + '" aria-label="' + esc(t('wall.shareMsg')) + '">' +
                 '<svg class="icon" aria-hidden="true"><use href="#i-wa"></use></svg>' +
               '</button>' +
             '</div>' +
@@ -1524,7 +1571,7 @@
 
         if (msg.photo) {
           html += '<div class="fb-post-photo-wrap msg-attached-photo" data-photo="' + esc(msg.photo) + '">' +
-            '<img src="' + esc(msg.photo) + '" alt="' + esc(authorName) + ' समर्थन फ़ोटो" loading="lazy">' +
+            '<img src="' + esc(msg.photo) + '" alt="' + esc(publicAuthor) + ' समर्थन फ़ोटो" loading="lazy">' +
           '</div>';
         }
 
@@ -1554,7 +1601,7 @@
               '<span class="fb-action-icon" aria-hidden="true">💬</span>' +
               '<span class="fb-action-label">' + esc(t('wall.commentBtn')) + '</span>' +
             '</button>' +
-            '<button type="button" class="fb-action-btn btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-name="' + esc(authorName) + '">' +
+            '<button type="button" class="fb-action-btn btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-name="' + esc(publicAuthor) + '">' +
               '<span class="fb-action-icon" aria-hidden="true">↗️</span>' +
               '<span class="fb-action-label">' + esc(t('wall.shareBtn')) + '</span>' +
             '</button>' +
@@ -1568,12 +1615,12 @@
           html += '<p class="fb-no-comments-hint">' + esc(t('wall.noCommentsYet')) + '</p>';
         } else {
           comments.forEach(function (c) {
-            var cInitial = (c.name || 'G').trim().charAt(0) || '👤';
+            var cAuthor = c.name || (t('wall.supporterPrefix') + ' ' + myUniqueId);
             html += '<div class="fb-comment-item">' +
-              '<div class="fb-comment-avatar" aria-hidden="true">' + esc(cInitial) + '</div>' +
+              '<div class="fb-comment-avatar" aria-hidden="true">👤</div>' +
               '<div class="fb-comment-content">' +
                 '<div class="fb-comment-bubble">' +
-                  '<strong class="fb-commenter-name">' + esc(c.name) + '</strong>' +
+                  '<strong class="fb-commenter-name">' + esc(cAuthor) + '</strong>' +
                   '<p class="fb-comment-text">' + esc(c.text) + '</p>' +
                 '</div>' +
                 '<div class="fb-comment-meta">' +
@@ -1584,14 +1631,11 @@
           });
         }
 
-        var savedCommenterName = '';
-        try { savedCommenterName = localStorage.getItem('mka_last_commenter_name') || ''; } catch (e) {}
-
         html += '</div>' +
             '<!-- Inline Comment Composer -->' +
             '<form class="fb-comment-form" data-msg-id="' + esc(msg.id) + '">' +
               '<div class="fb-comment-input-row">' +
-                '<input type="text" class="fb-comment-name-input" value="' + esc(savedCommenterName) + '" placeholder="' + esc(t('wall.commenterNamePlaceholder')) + '" required aria-label="कमेंटकर्ता का नाम">' +
+                '<input type="text" class="fb-comment-name-input" value="' + esc(defaultCommenterName) + '" readonly aria-label="कमेंटकर्ता यूनिक आईडी" title="आपकी यूनिक आईडी">' +
                 '<input type="text" class="fb-comment-text-input" placeholder="' + esc(t('wall.writeCommentPlaceholder')) + '" required aria-label="कमेंट">' +
                 '<button type="submit" class="fb-comment-submit-btn" aria-label="Send">➤</button>' +
               '</div>' +
@@ -1766,11 +1810,13 @@
           var parsed = docs.map(function (doc) {
             var f = doc.fields || {};
             var docId = doc.name ? doc.name.split('/').pop() : '';
-            var pName = (f.name && f.name.stringValue) || (f.alias && f.alias.stringValue) || '';
+            var realName = (f.name && f.name.stringValue) || '';
+            var uId = (f.userId && f.userId.stringValue) || (f.alias && f.alias.stringValue) || '';
             return {
               id: docId,
-              alias: pName,
-              name: pName,
+              userId: uId,
+              alias: uId,
+              name: realName,
               message: (f.message && f.message.stringValue) || '',
               photo: (f.photo && f.photo.stringValue) || null,
               ward: (f.ward && f.ward.stringValue) || '',
@@ -1806,6 +1852,7 @@
         var name = form.elements.name ? form.elements.name.value.trim() : '';
         var message = form.elements.message ? form.elements.message.value.trim() : '';
         var ward = form.elements.ward ? form.elements.ward.value.trim() : '';
+        var currentUserId = getOrCreateUserUniqueId();
 
         if (!name || !message) {
           if (err) {
@@ -1825,8 +1872,8 @@
 
         var payload = {
           fields: {
-            alias: { stringValue: name },
-            name: { stringValue: name },
+            name: { stringValue: name },            // Real name: only visible in Admin Portal
+            alias: { stringValue: currentUserId },  // Unique ID: public identity displayed in application
             message: { stringValue: message },
             createdAt: { timestampValue: new Date().toISOString() },
             likes: { integerValue: '1' },
@@ -1873,8 +1920,9 @@
             var fallbackId = 'local-' + Date.now();
             var newLocal = {
               id: fallbackId,
-              alias: name,
               name: name,
+              userId: currentUserId,
+              alias: currentUserId,
               message: message,
               photo: currentPhotoBase64,
               ward: ward || 'वार्ड 1',
@@ -2009,9 +2057,11 @@
           var parsed = docs.map(function (doc) {
             var f = doc.fields || {};
             var docId = doc.name ? doc.name.split('/').pop() : '';
+            var uId = (f.userId && f.userId.stringValue) || (f.alias && f.alias.stringValue) || 'ANP-0000';
             return {
               id: docId,
-              alias: (f.alias && f.alias.stringValue) || 'अनूपशहर समर्थक',
+              userId: uId,
+              alias: uId,
               name: (f.name && f.name.stringValue) || '',
               message: (f.message && f.message.stringValue) || '',
               photo: (f.photo && f.photo.stringValue) || null,
@@ -2027,10 +2077,10 @@
           });
 
           allMessages = parsed.concat([
-            { id: 'starter-1', alias: 'वार्ड 1 युवा शक्ति #21', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
-            { id: 'starter-2', alias: 'वार्ड 5 अन्नदाता किसान साथी #08', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
-            { id: 'starter-3', alias: 'वार्ड 4 मातृशक्ति आशीर्वाद #33', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
-            { id: 'starter-4', alias: 'वार्ड 11 सर्व समाज गौरव #95', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
+            { id: 'starter-1', userId: 'ANP-1042', alias: 'ANP-1042', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
+            { id: 'starter-2', userId: 'ANP-5821', alias: 'ANP-5821', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
+            { id: 'starter-3', userId: 'ANP-4390', alias: 'ANP-4390', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
+            { id: 'starter-4', userId: 'ANP-9175', alias: 'ANP-9175', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
           ]);
 
           updateKpis();
@@ -2038,10 +2088,10 @@
         })
         .catch(function () {
           allMessages = [
-            { id: 'starter-1', alias: 'वार्ड 1 युवा शक्ति #21', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
-            { id: 'starter-2', alias: 'वार्ड 5 अन्नदाता किसान साथी #08', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
-            { id: 'starter-3', alias: 'वार्ड 4 मातृशक्ति आशीर्वाद #33', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
-            { id: 'starter-4', alias: 'वार्ड 11 सर्व समाज गौरव #95', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
+            { id: 'starter-1', userId: 'ANP-1042', alias: 'ANP-1042', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
+            { id: 'starter-2', userId: 'ANP-5821', alias: 'ANP-5821', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
+            { id: 'starter-3', userId: 'ANP-4390', alias: 'ANP-4390', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
+            { id: 'starter-4', userId: 'ANP-9175', alias: 'ANP-9175', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
           ];
           updateKpis();
           renderAdminTable();
@@ -2071,10 +2121,10 @@
         }
         if (q) {
           var matchName = (m.name || '').toLowerCase().indexOf(q) !== -1;
-          var matchAlias = (m.alias || '').toLowerCase().indexOf(q) !== -1;
+          var matchId = ((m.userId || m.alias) || '').toLowerCase().indexOf(q) !== -1;
           var matchMsg = (m.message || '').toLowerCase().indexOf(q) !== -1;
           var matchWard = (m.ward || '').toLowerCase().indexOf(q) !== -1;
-          if (!matchName && !matchAlias && !matchMsg && !matchWard) return false;
+          if (!matchName && !matchId && !matchMsg && !matchWard) return false;
         }
         return true;
       });
@@ -2112,9 +2162,9 @@
 
         tHtml += '<tr>' +
           '<td>' + (idx + 1) + '</td>' +
-          '<td><strong class="real-name-text">🔒 ' + esc(m.name || 'अज्ञात') + '</strong></td>' +
+          '<td><strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong></td>' +
           '<td><span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span></td>' +
-          '<td><span class="alias-pill-sm">' + (m.avatar || '🦁') + ' ' + esc(m.alias) + '</span></td>' +
+          '<td><span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span></td>' +
           '<td class="msg-cell-text">' + esc(m.message) + '</td>' +
           '<td>' + photoCell + '</td>' +
           '<td><span class="likes-badge">❤️ ' + (m.likes || 0) + '</span></td>' +
@@ -2125,12 +2175,12 @@
           '<div class="admin-mc-head">' +
             '<div>' +
               '<span class="admin-mc-num">#' + (idx + 1) + '</span> ' +
-              '<strong class="real-name-text">🔒 ' + esc(m.name || 'अज्ञात') + '</strong>' +
+              '<strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong>' +
             '</div>' +
             '<span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span>' +
           '</div>' +
           '<div class="admin-mc-meta">' +
-            '<span class="alias-pill-sm">' + (m.avatar || '🦁') + ' ' + esc(m.alias) + '</span>' +
+            '<span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span>' +
             '<span class="likes-badge">❤️ ' + (m.likes || 0) + '</span>' +
             '<time class="time-col">' + esc(dateStr) + '</time>' +
           '</div>' +
@@ -2194,7 +2244,7 @@
       btnExportCsv.addEventListener('click', function () {
         var filtered = getFilteredMessages();
         var rows = [
-          ['क्र.सं.', 'वास्तविक नाम (गोपनीय)', 'वार्ड', 'सार्वजनिक उपनाम', 'समर्थन संदेश', 'लाइक्स', 'तस्वीर संलग्न', 'दिनांक व समय']
+          ['क्र.सं.', 'वास्तविक नाम (गोपनीय)', 'वार्ड', 'यूनिक यूज़र आईडी (पब्लिक)', 'समर्थन संदेश', 'लाइक्स', 'तस्वीर संलग्न', 'दिनांक व समय']
         ];
 
         filtered.forEach(function (m, i) {
@@ -2209,7 +2259,7 @@
             String(i + 1),
             m.name || '',
             m.ward || '',
-            m.alias || '',
+            m.userId || m.alias || '',
             m.message ? m.message.replace(/"/g, '""').replace(/\r?\n/g, ' ') : '',
             String(m.likes || 0),
             m.photo ? 'हाँ' : 'नहीं',

@@ -24,6 +24,21 @@
   <div data-chrome="header"></div>
 
   <main id="main" class="wrap fb-feed-wrap">
+    <!-- User Unique ID Welcome & Privacy Banner (First-time visitor recognition) -->
+    <div class="user-id-welcome-card" id="userUniqueIdCard" role="region" aria-label="आपकी यूनिक यूज़र आईडी">
+      <div class="user-id-card-icon" aria-hidden="true">🆔</div>
+      <div class="user-id-card-content">
+        <div class="user-id-title-row">
+          <span class="user-id-label" data-i18n="wall.userIdLabel">आपकी यूनिक यूज़र आईडी:</span>
+          <strong class="user-id-badge" id="assignedUniqueIdBadge">ANP-....</strong>
+          <span class="user-id-hint" data-i18n="wall.assignedIdHint">सार्वजनिक पहचान</span>
+        </div>
+        <p class="user-id-privacy-text" data-i18n="wall.idPrivacyNotice">
+          🔒 पूर्ण गोपनीयता: आपका वास्तविक नाम केवल चुनाव संचालन एवं प्रत्याशी एडमिन पोर्टल में सुरक्षित रहेगा। सार्वजनिक दीवार पर केवल आपकी यह यूनिक यूज़र आईडी दिखेगी।
+        </p>
+      </div>
+    </div>
+
     <!-- Facebook Style "Create Post" Trigger Card -->
     <div class="fb-create-trigger-card" id="fbCreateTriggerCard">
       <div class="fb-trigger-avatar" aria-hidden="true">👤</div>
@@ -45,13 +60,20 @@
         <button type="button" class="fb-composer-close-btn" id="btnCloseComposer" aria-label="बंद करें" title="बंद करें">✕</button>
       </div>
 
+      <!-- Composer Privacy Notice -->
+      <div class="composer-id-notice">
+        <span class="composer-id-badge">🆔 <span data-i18n="wall.publicIdNotice">आपकी पब्लिक आईडी</span>: <strong id="composerUniqueIdVal">ANP-....</strong></span>
+        <span class="composer-privacy-tag">🔒 <span data-i18n="wall.adminOnlyBadge">केवल एडमिन को दिखेगा</span></span>
+      </div>
+
       <form id="supportForm" novalidate class="fb-composer-form">
+        <input type="hidden" id="wallUserId" name="userId" value="">
         <div class="fb-composer-inputs-row">
           <div class="fb-input-author-wrap">
             <span class="fb-author-icon" aria-hidden="true">👤</span>
             <input id="wallName" name="name" type="text" autocomplete="name" required
                    data-i18n-attr="placeholder:wall.namePlaceholder"
-                   placeholder="आपका नाम लिखें (Your Name)..." class="fb-author-input">
+                   placeholder="आपका असली नाम लिखें (केवल एडमिन को दिखेगा)..." class="fb-author-input">
           </div>
           <div class="fb-select-ward-wrap">
             <select id="wallWard" name="ward" class="fb-ward-select" aria-label="वार्ड चुनें">
