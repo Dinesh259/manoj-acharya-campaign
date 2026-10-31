@@ -1680,6 +1680,32 @@ html.hc .verified-supporter-badge {
   color: #FFFFFF !important;
 }
 
+html.hc .voter-name-locked-badge {
+  color: #FCD34D !important;
+  background: rgba(245, 158, 11, 0.18) !important;
+  border-color: #D97706 !important;
+}
+html.hc .fb-input-author-wrap.is-locked {
+  background: #1E293B !important;
+  border-color: #475569 !important;
+}
+html.hc .fb-input-author-wrap.is-locked .fb-author-input {
+  color: #F8FAFC !important;
+}
+html.hc .proxy-prevention-banner {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: #D97706 !important;
+  color: #FDE68A !important;
+}
+html.hc .proxy-prevention-banner strong {
+  color: #FCD34D !important;
+}
+html.hc .first-time-voter-banner {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border-color: #2563EB !important;
+  color: #93C5FD !important;
+}
+
 html.hc .fb-create-trigger-card {
   background: #1E293B !important;
   border: 1px solid #334155 !important;
@@ -3511,6 +3537,71 @@ dialog.photo-modal::backdrop {
   border-color: #EA580C;
   background: #FFFFFF;
   box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.12);
+}
+
+/* Voter Identity Lock & Anti-Proxy Controls */
+.voter-name-locked-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #B45309;
+  background: #FEF3C7;
+  border: 1px solid #FCD34D;
+  border-radius: 9999px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  margin-left: 6px;
+  user-select: none;
+}
+.fb-input-author-wrap.is-locked {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+.fb-input-author-wrap.is-locked .fb-author-input {
+  color: #1E293B;
+  cursor: not-allowed;
+}
+.proxy-prevention-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #92400E;
+}
+.proxy-prevention-banner .proxy-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.proxy-prevention-banner strong {
+  color: #78350F;
+  font-weight: 800;
+}
+.first-time-voter-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #1E40AF;
+}
+.first-time-voter-banner .first-voter-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 .fb-composer-textarea-wrap textarea {
   width: 100%;

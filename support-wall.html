@@ -53,11 +53,12 @@
       <form id="supportForm" novalidate class="fb-composer-form">
         <input type="hidden" id="wallUserId" name="userId" value="">
         <div class="fb-composer-inputs-row">
-          <div class="fb-input-author-wrap">
-            <span class="fb-author-icon" aria-hidden="true">👤</span>
+          <div class="fb-input-author-wrap" id="fbAuthorInputWrap">
+            <span class="fb-author-icon" id="fbAuthorIcon" aria-hidden="true">👤</span>
             <input id="wallName" name="name" type="text" autocomplete="name" required
                    data-i18n-attr="placeholder:wall.namePlaceholder"
                    placeholder="आपका नाम लिखें (Your Name)..." class="fb-author-input">
+            <span class="voter-name-locked-badge" id="voterNameLockedBadge" hidden title="पंजीकृत नाम लॉक है">🔒 <span data-i18n="wall.lockedBadge">पंजीकृत (लॉक)</span></span>
           </div>
           <div class="fb-select-ward-wrap">
             <select id="wallWard" name="ward" class="fb-ward-select" aria-label="वार्ड चुनें">
@@ -75,6 +76,16 @@
               <option value="वार्ड 11">वार्ड नं. 11</option>
             </select>
           </div>
+        </div>
+
+        <!-- Anti-Proxy Guidance / Registered Notice -->
+        <div class="proxy-prevention-banner" id="proxyPreventionBanner" hidden>
+          <span class="proxy-icon" aria-hidden="true">🔒</span>
+          <span class="proxy-text" id="proxyPreventionText"></span>
+        </div>
+        <div class="first-time-voter-banner" id="firstTimeVoterBanner">
+          <span class="first-voter-icon" aria-hidden="true">ℹ️</span>
+          <span class="first-voter-text" data-i18n="wall.firstTimeNameHint">कृपया अपना सही नाम लिखें। पहली पोस्ट के बाद नाम सुरक्षित रूप से लॉक हो जाएगा (प्रॉक्सी रोकथाम)।</span>
         </div>
 
         <div class="fb-composer-textarea-wrap">

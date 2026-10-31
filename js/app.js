@@ -1241,6 +1241,8 @@
         // Support testing as a new user via ?new=1 or ?reset=1 query parameter
         if (window.location.search && /[?&](new|reset)=1/.test(window.location.search)) {
           localStorage.removeItem('mka_user_unique_id');
+          localStorage.removeItem('mka_registered_voter_name');
+          localStorage.removeItem('mka_registered_voter_ward');
         }
         var stored = localStorage.getItem('mka_user_unique_id');
         if (stored && /^ANP-\d{4}$/.test(stored)) {
@@ -1272,6 +1274,112 @@
       return t('wall.supporterPrefix') + ' ANP-' + num;
     }
 
+    /* Helper: Retrieve Registered Voter Name to strictly prevent proxy / name manipulation */
+    function getRegisteredVoterName() {
+      try {
+        var stored = localStorage.getItem('mka_registered_voter_name');
+        if (stored && stored.trim()) return stored.trim();
+      } catch (e) {}
+      var uid = getOrCreateUserUniqueId();
+      if (messagesList && messagesList.length) {
+        var matched = messagesList.find(function (m) {
+          return (m.userId === uid || m.alias === uid) && m.name && m.name.trim();
+        });
+        if (matched && matched.name) {
+          try {
+            localStorage.setItem('mka_registered_voter_name', matched.name.trim());
+            if (matched.ward) localStorage.setItem('mka_registered_voter_ward', matched.ward);
+          } catch (e) {}
+          return matched.name.trim();
+        }
+      }
+      return '';
+    }
+
+    /* Helper: Retrieve Registered Voter Ward */
+    function getRegisteredVoterWard() {
+      try {
+        var stored = localStorage.getItem('mka_registered_voter_ward');
+        if (stored && stored.trim()) return stored.trim();
+      } catch (e) {}
+      var uid = getOrCreateUserUniqueId();
+      if (messagesList && messagesList.length) {
+        var matched = messagesList.find(function (m) {
+          return (m.userId === uid || m.alias === uid) && m.ward;
+        });
+        if (matched && matched.ward) return matched.ward;
+      }
+      return '';
+    }
+
+    /* Helper: Synchronize Voter Identity and Anti-Proxy UI Controls */
+    function syncVoterIdentityUI() {
+      var regName = getRegisteredVoterName();
+      var regWard = getRegisteredVoterWard();
+
+      var nameInput = $('#wallName');
+      var wardSelect = $('#wallWard');
+      var authorWrap = $('#fbAuthorInputWrap');
+      var authorIcon = $('#fbAuthorIcon');
+      var lockedBadge = $('#voterNameLockedBadge');
+      var proxyBanner = $('#proxyPreventionBanner');
+      var proxyText = $('#proxyPreventionText');
+      var firstTimeBanner = $('#firstTimeVoterBanner');
+
+      if (regName) {
+        // Voter has previously posted — lock identity to prevent proxy submissions
+        if (nameInput) {
+          nameInput.value = regName;
+          nameInput.readOnly = true;
+          nameInput.setAttribute('aria-readonly', 'true');
+          nameInput.setAttribute('title', (lang === 'en') ? 'Your registered name is locked to prevent proxy submissions' : 'प्रॉक्सी रोकथाम के लिए आपका पंजीकृत नाम लॉक है');
+        }
+        if (wardSelect && regWard && !wardSelect.value) {
+          wardSelect.value = regWard;
+        }
+        if (authorWrap) authorWrap.classList.add('is-locked');
+        if (authorIcon) authorIcon.textContent = '🔒';
+        if (lockedBadge) {
+          lockedBadge.hidden = false;
+          lockedBadge.style.display = 'inline-flex';
+        }
+        if (proxyBanner) {
+          proxyBanner.hidden = false;
+          proxyBanner.style.display = 'flex';
+        }
+        if (proxyText) {
+          proxyText.innerHTML = (lang === 'en')
+            ? '🔒 You have previously posted as <strong>' + esc(regName) + '</strong>. To prevent proxy submissions, all subsequent posts are registered under this name.'
+            : '🔒 आप पहले "<strong>' + esc(regName) + '</strong>" नाम से पोस्ट कर चुके हैं। अभियान में निष्पक्षता व प्रॉक्सी रोकथाम हेतु आपकी सभी पोस्ट इसी नाम से दर्ज होंगी।';
+        }
+        if (firstTimeBanner) {
+          firstTimeBanner.hidden = true;
+          firstTimeBanner.style.display = 'none';
+        }
+      } else {
+        // First-time poster
+        if (nameInput) {
+          nameInput.readOnly = false;
+          nameInput.removeAttribute('aria-readonly');
+          nameInput.removeAttribute('title');
+        }
+        if (authorWrap) authorWrap.classList.remove('is-locked');
+        if (authorIcon) authorIcon.textContent = '👤';
+        if (lockedBadge) {
+          lockedBadge.hidden = true;
+          lockedBadge.style.display = 'none';
+        }
+        if (proxyBanner) {
+          proxyBanner.hidden = true;
+          proxyBanner.style.display = 'none';
+        }
+        if (firstTimeBanner) {
+          firstTimeBanner.hidden = false;
+          firstTimeBanner.style.display = 'flex';
+        }
+      }
+    }
+
     var myUniqueId = getOrCreateUserUniqueId();
     var assignedBadge = $('#assignedUniqueIdBadge');
     if (assignedBadge) assignedBadge.textContent = myUniqueId;
@@ -1279,6 +1387,7 @@
     if (composerUniqueIdVal) composerUniqueIdVal.textContent = myUniqueId;
     var wallUserId = $('#wallUserId');
     if (wallUserId) wallUserId.value = myUniqueId;
+    syncVoterIdentityUI();
 
     function clearPhotoPreview() {
       currentPhotoBase64 = null;
@@ -1297,9 +1406,11 @@
       if (composerSection) {
         composerSection.hidden = false;
         if (triggerCard) triggerCard.hidden = true;
+        syncVoterIdentityUI();
         var nameInput = $('#wallName');
         var msgInput = $('#wallMessage');
-        if (nameInput && !nameInput.value) {
+        var regName = getRegisteredVoterName();
+        if (!regName && nameInput && !nameInput.value) {
           nameInput.focus();
         } else if (msgInput) {
           msgInput.focus();
@@ -1775,11 +1886,13 @@
           // Merge live docs with starters (live docs on top)
           messagesList = parsed.concat(STARTER_MESSAGES);
           renderFeed();
+          syncVoterIdentityUI();
         })
         .catch(function () {
           // Fallback to starters
           messagesList = STARTER_MESSAGES.slice();
           renderFeed();
+          syncVoterIdentityUI();
         });
     }
 
@@ -1790,19 +1903,44 @@
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var name = form.elements.name ? form.elements.name.value.trim() : '';
+        var rawName = form.elements.name ? form.elements.name.value.trim() : '';
         var message = form.elements.message ? form.elements.message.value.trim() : '';
         var ward = form.elements.ward ? form.elements.ward.value.trim() : '';
         var currentUserId = getOrCreateUserUniqueId();
+        var regName = getRegisteredVoterName();
 
-        if (!name || !message) {
+        // Anti-Proxy Verification:
+        // If voter has already posted, strictly enforce the identical registered name!
+        if (regName) {
+          if (rawName && rawName !== regName) {
+            if (err) {
+              err.textContent = (lang === 'en')
+                ? 'Proxy posting is not allowed! You can only post with your registered name: ' + regName
+                : 'प्रॉक्सी पोस्टिंग की अनुमति नहीं है! आप केवल अपने पंजीकृत नाम "' + regName + '" से ही पोस्ट कर सकते हैं।';
+              err.hidden = false;
+            }
+            if (form.elements.name) form.elements.name.value = regName;
+            return;
+          }
+          rawName = regName;
+        }
+
+        if (!rawName || !message) {
           if (err) {
             err.textContent = t('wall.errorMsg');
             err.hidden = false;
           }
-          if (!name && form.elements.name) form.elements.name.focus();
+          if (!rawName && form.elements.name) form.elements.name.focus();
           else if (!message && form.elements.message) form.elements.message.focus();
           return;
+        }
+
+        // Lock & register name permanently on first submission to prevent any future proxy manipulation
+        if (!regName) {
+          try {
+            localStorage.setItem('mka_registered_voter_name', rawName);
+            if (ward) localStorage.setItem('mka_registered_voter_ward', ward);
+          } catch (e) {}
         }
 
         if (err) err.hidden = true;
@@ -1813,7 +1951,7 @@
 
         var payload = {
           fields: {
-            name: { stringValue: name },            // Real name: only visible in Admin Portal
+            name: { stringValue: rawName },         // Real name: only visible in Admin Portal
             alias: { stringValue: currentUserId },  // Unique ID: public identity displayed in application
             message: { stringValue: message },
             createdAt: { timestampValue: new Date().toISOString() },
@@ -1846,9 +1984,10 @@
               setTimeout(function () { status.textContent = ''; }, 6000);
             }
 
-            // Reset form and explicitly clear photo preview from DOM
+            // Reset form, synchronize locked state, and explicitly clear photo preview from DOM
             form.reset();
             clearPhotoPreview();
+            syncVoterIdentityUI();
             closeComposer();
 
             trackEvent('support_message_post', { ward: ward, has_photo: !!currentPhotoBase64 });
@@ -1861,7 +2000,7 @@
             var fallbackId = 'local-' + Date.now();
             var newLocal = {
               id: fallbackId,
-              name: name,
+              name: rawName,
               userId: currentUserId,
               alias: currentUserId,
               message: message,
@@ -1884,6 +2023,7 @@
             }
             form.reset();
             clearPhotoPreview();
+            syncVoterIdentityUI();
             closeComposer();
           });
       });

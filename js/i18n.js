@@ -467,6 +467,10 @@ window.I18N = {
     "wall.hoursAgo": "घंटे पहले",
     "wall.daysAgo": "दिन पहले",
     "wall.postAndSupport": "Post and Support",
+    "wall.lockedBadge": "पंजीकृत (लॉक)",
+    "wall.lockedNameNotice": "🔒 आप पहले इस नाम से समर्थन दर्ज कर चुके हैं। अभियान की शुचिता एवं प्रॉक्सी रोकथाम हेतु सभी आगामी पोस्ट इसी पंजीकृत नाम से दर्ज होंगी।",
+    "wall.firstTimeNameHint": "ℹ️ कृपया अपना सही नाम लिखें। पहली पोस्ट के बाद नाम सुरक्षित रूप से लॉक हो जाएगा (प्रॉक्सी रोकथाम)।",
+    "wall.proxyAttemptError": "प्रॉक्सी पोस्टिंग की अनुमति नहीं है! आप केवल अपने पंजीकृत नाम से ही पोस्ट कर सकते हैं।",
 
     /* ---------- Admin & Candidate Portal ---------- */
     "admin.badge": "गोपनीय एवं सुरक्षित पोर्टल",
@@ -910,6 +914,10 @@ window.I18N = {
     "wall.hoursAgo": "h ago",
     "wall.daysAgo": "d ago",
     "wall.postAndSupport": "Post and Support",
+    "wall.lockedBadge": "Registered (Locked)",
+    "wall.lockedNameNotice": "🔒 You previously posted under this name. To prevent proxy submissions and protect campaign integrity, all subsequent posts must use this registered name.",
+    "wall.firstTimeNameHint": "ℹ️ Please enter your real name. After your first post, your name is securely locked to prevent proxy submissions.",
+    "wall.proxyAttemptError": "Proxy posting is not allowed! You can only post using your registered name.",
 
     /* ---------- Admin & Candidate Portal ---------- */
     "admin.badge": "Confidential & Secure Portal",
