@@ -461,6 +461,7 @@ window.I18N = {
     "wall.minsAgo": "मिनट पहले",
     "wall.hoursAgo": "घंटे पहले",
     "wall.daysAgo": "दिन पहले",
+    "wall.postAndSupport": "Post and Support",
 
     /* ---------- Admin & Candidate Portal ---------- */
     "admin.badge": "गोपनीय एवं सुरक्षित पोर्टल",
@@ -898,6 +899,7 @@ window.I18N = {
     "wall.minsAgo": "m ago",
     "wall.hoursAgo": "h ago",
     "wall.daysAgo": "d ago",
+    "wall.postAndSupport": "Post and Support",
 
     /* ---------- Admin & Candidate Portal ---------- */
     "admin.badge": "Confidential & Secure Portal",

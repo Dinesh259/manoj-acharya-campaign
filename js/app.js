@@ -199,48 +199,66 @@
     var current = body.getAttribute('data-page') || 'index.html';
     var head = $('[data-chrome="header"]');
     if (head) {
-      head.outerHTML =
-        '<aside class="top-announcement-bar" role="region" aria-label="Announcement">' +
-          '<div class="wrap ann-content">' +
-            '<span class="ann-badge">✨ <span data-i18n="meeting.tag">' + esc(t('meeting.tag')) + '</span></span>' +
-            '<a href="index.html#meeting-gallery" class="ann-link" data-i18n="meeting.alert">' +
-              esc(t('meeting.alert')) +
-            '</a>' +
-          '</div>' +
-        '</aside>' +
-        '<header class="site-header">' +
-          '<div class="wrap bar">' +
-            '<a class="brand" href="index.html"><span class="brand-name" data-i18n="common.siteName">मनोज कुमार आचार्य</span>' +
-            '<span class="brand-role" data-i18n="common.siteRole">सरपंच प्रत्याशी · ग्राम पंचायत अनूपशहर</span></a>' +
-            '<nav class="desktop-nav-links" aria-label="Desktop Navigation">' +
-              '<a href="index.html" class="desktop-nav-link"' + (current === 'index.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.home">मुख्य पेज</span></a>' +
-              '<a href="how-to-vote.html" class="desktop-nav-link"' + (current === 'how-to-vote.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.howToVote">वोट कैसे दें</span></a>' +
-              '<a href="check-name.html" class="desktop-nav-link"' + (current === 'check-name.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.checkName">नाम जाँचें</span></a>' +
-              '<a href="find-booth.html" class="desktop-nav-link"' + (current === 'find-booth.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.findBooth">बूथ खोजें</span></a>' +
-              '<a href="contact.html" class="desktop-nav-link"' + (current === 'contact.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.contact">संपर्क</span></a>' +
-            '</nav>' +
-            '<a href="manifesto.html" class="btn-manifesto-nav"' + (current === 'manifesto.html' ? ' aria-current="page"' : '') + ' data-i18n-attr="aria-label:nav.manifestoNav;title:nav.manifestoNav">' + icon('list') + '<span class="manifesto-nav-text" data-i18n="nav.manifestoNav">मेरे वादे</span></a>' +
-            (function () {
-              var isEn = lang === 'en';
-              return '<button type="button" class="btn-lang' + (isEn ? ' is-on is-en' : '') + '" id="langBtn" aria-pressed="' + (isEn ? 'true' : 'false') + '" data-lang="' + lang + '" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' +
-                icon('globe') +
-                '<span class="lang-tag" aria-hidden="true" lang="' + (isEn ? 'hi' : 'en') + '">' + (isEn ? 'HI' : 'EN') + '</span>' +
-                '<span class="switch-indicator" aria-hidden="true"></span>' +
-              '</button>';
-            })() +
-            '<button type="button" class="btn-menu" id="menuBtn" aria-expanded="false" aria-controls="siteNav">' +
-              '<span class="label" data-i18n="common.menu">मेनू</span></button>' +
-          '</div>' +
-          '<nav id="siteNav" class="site-nav" data-i18n-attr="aria-label:common.navLabel"><div class="wrap">' +
-            '<div class="nav-group"><p class="nav-head" data-i18n="common.navVoter">' + esc(t('common.navVoter')) + '</p><ul>' + navList(NAV_VOTER, current) + '</ul></div>' +
-            '<div class="nav-group cand"><p class="nav-head" data-i18n="common.navCandidate">' + esc(t('common.navCandidate')) + '</p><ul>' + navList(NAV_CAND, current) + '</ul></div>' +
-          '</div></nav>' +
-        '</header>' +
-        '<div class="toolbar-band"><div class="wrap toolbar" role="group" data-i18n-attr="aria-label:common.toolsLabel">' +
-          '<button type="button" class="tool-btn icon-only" id="ttsBtn" aria-pressed="false" data-i18n-attr="aria-label:common.listen;title:common.listen">' + icon('speaker') + '</button>' +
-          '<button type="button" class="tool-btn icon-only" id="textBtn" aria-pressed="false" data-i18n-attr="aria-label:common.largeText;title:common.largeText">' + icon('text') + '</button>' +
-          '<button type="button" class="tool-btn icon-only" id="hcBtn" aria-pressed="false" data-i18n-attr="aria-label:common.contrast;title:common.contrast">' + icon('contrast') + '</button>' +
-        '</div></div>';
+      if (current === 'support-wall.html') {
+        head.outerHTML =
+          '<header class="post-page-header" role="banner">' +
+            '<div class="wrap post-page-header-inner">' +
+              '<h1 class="post-page-title">' +
+                '<a href="index.html" class="post-page-title-link" title="मुख्य पेज">' +
+                  'Post and Support' +
+                '</a>' +
+              '</h1>' +
+              '<div class="post-page-header-tools">' +
+                '<button type="button" class="tool-btn icon-only" id="hcBtn" aria-pressed="' + (body.parentElement.classList.contains('hc') ? 'true' : 'false') + '" data-i18n-attr="aria-label:common.contrast;title:common.contrast">' +
+                  icon('contrast') +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+          '</header>';
+      } else {
+        head.outerHTML =
+          '<aside class="top-announcement-bar" role="region" aria-label="Announcement">' +
+            '<div class="wrap ann-content">' +
+              '<span class="ann-badge">✨ <span data-i18n="meeting.tag">' + esc(t('meeting.tag')) + '</span></span>' +
+              '<a href="index.html#meeting-gallery" class="ann-link" data-i18n="meeting.alert">' +
+                esc(t('meeting.alert')) +
+              '</a>' +
+            '</div>' +
+          '</aside>' +
+          '<header class="site-header">' +
+            '<div class="wrap bar">' +
+              '<a class="brand" href="index.html"><span class="brand-name" data-i18n="common.siteName">मनोज कुमार आचार्य</span>' +
+              '<span class="brand-role" data-i18n="common.siteRole">सरपंच प्रत्याशी · ग्राम पंचायत अनूपशहर</span></a>' +
+              '<nav class="desktop-nav-links" aria-label="Desktop Navigation">' +
+                '<a href="index.html" class="desktop-nav-link"' + (current === 'index.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.home">मुख्य पेज</span></a>' +
+                '<a href="how-to-vote.html" class="desktop-nav-link"' + (current === 'how-to-vote.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.howToVote">वोट कैसे दें</span></a>' +
+                '<a href="check-name.html" class="desktop-nav-link"' + (current === 'check-name.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.checkName">नाम जाँचें</span></a>' +
+                '<a href="find-booth.html" class="desktop-nav-link"' + (current === 'find-booth.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.findBooth">बूथ खोजें</span></a>' +
+                '<a href="contact.html" class="desktop-nav-link"' + (current === 'contact.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.contact">संपर्क</span></a>' +
+              '</nav>' +
+              '<a href="manifesto.html" class="btn-manifesto-nav"' + (current === 'manifesto.html' ? ' aria-current="page"' : '') + ' data-i18n-attr="aria-label:nav.manifestoNav;title:nav.manifestoNav">' + icon('list') + '<span class="manifesto-nav-text" data-i18n="nav.manifestoNav">मेरे वादे</span></a>' +
+              (function () {
+                var isEn = lang === 'en';
+                return '<button type="button" class="btn-lang' + (isEn ? ' is-on is-en' : '') + '" id="langBtn" aria-pressed="' + (isEn ? 'true' : 'false') + '" data-lang="' + lang + '" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' +
+                  icon('globe') +
+                  '<span class="lang-tag" aria-hidden="true" lang="' + (isEn ? 'hi' : 'en') + '">' + (isEn ? 'HI' : 'EN') + '</span>' +
+                  '<span class="switch-indicator" aria-hidden="true"></span>' +
+                '</button>';
+              })() +
+              '<button type="button" class="btn-menu" id="menuBtn" aria-expanded="false" aria-controls="siteNav">' +
+                '<span class="label" data-i18n="common.menu">मेनू</span></button>' +
+            '</div>' +
+            '<nav id="siteNav" class="site-nav" data-i18n-attr="aria-label:common.navLabel"><div class="wrap">' +
+              '<div class="nav-group"><p class="nav-head" data-i18n="common.navVoter">' + esc(t('common.navVoter')) + '</p><ul>' + navList(NAV_VOTER, current) + '</ul></div>' +
+              '<div class="nav-group cand"><p class="nav-head" data-i18n="common.navCandidate">' + esc(t('common.navCandidate')) + '</p><ul>' + navList(NAV_CAND, current) + '</ul></div>' +
+            '</div></nav>' +
+          '</header>' +
+          '<div class="toolbar-band"><div class="wrap toolbar" role="group" data-i18n-attr="aria-label:common.toolsLabel">' +
+            '<button type="button" class="tool-btn icon-only" id="ttsBtn" aria-pressed="false" data-i18n-attr="aria-label:common.listen;title:common.listen">' + icon('speaker') + '</button>' +
+            '<button type="button" class="tool-btn icon-only" id="textBtn" aria-pressed="false" data-i18n-attr="aria-label:common.largeText;title:common.largeText">' + icon('text') + '</button>' +
+            '<button type="button" class="tool-btn icon-only" id="hcBtn" aria-pressed="false" data-i18n-attr="aria-label:common.contrast;title:common.contrast">' + icon('contrast') + '</button>' +
+          '</div></div>';
+      }
     }
     var foot = $('[data-chrome="footer"]');
     if (foot) {
@@ -1200,6 +1218,19 @@
     var btnCloseComposer = $('#btnCloseComposer');
     var btnCancelComposer = $('#btnCancelComposer');
 
+    function clearPhotoPreview() {
+      currentPhotoBase64 = null;
+      if (photoInput) photoInput.value = '';
+      if (previewImg) {
+        previewImg.src = '';
+        previewImg.removeAttribute('src');
+      }
+      if (previewWrap) {
+        previewWrap.hidden = true;
+        previewWrap.style.display = 'none';
+      }
+    }
+
     function openComposer() {
       if (composerSection) {
         composerSection.hidden = false;
@@ -1220,6 +1251,7 @@
         composerSection.hidden = true;
         if (triggerCard) triggerCard.hidden = false;
       }
+      clearPhotoPreview();
     }
 
     if (btnToggleCreatePost) {
@@ -1388,7 +1420,10 @@
             ctx.drawImage(img, 0, 0, width, height);
             currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.72);
             if (previewImg) previewImg.src = currentPhotoBase64;
-            if (previewWrap) previewWrap.hidden = false;
+            if (previewWrap) {
+              previewWrap.hidden = false;
+              previewWrap.style.display = 'inline-block';
+            }
           };
           img.src = e.target.result;
         };
@@ -1398,9 +1433,7 @@
 
     if (btnRemovePhoto) {
       btnRemovePhoto.addEventListener('click', function () {
-        currentPhotoBase64 = null;
-        if (photoInput) photoInput.value = '';
-        if (previewWrap) previewWrap.hidden = true;
+        clearPhotoPreview();
       });
     }
 
@@ -1807,10 +1840,9 @@
               setTimeout(function () { status.textContent = ''; }, 6000);
             }
 
-            // Reset form
+            // Reset form and explicitly clear photo preview from DOM
             form.reset();
-            currentPhotoBase64 = null;
-            if (previewWrap) previewWrap.hidden = true;
+            clearPhotoPreview();
             closeComposer();
 
             trackEvent('support_message_post', { ward: ward, has_photo: !!currentPhotoBase64 });
@@ -1844,12 +1876,14 @@
               setTimeout(function () { status.textContent = ''; }, 6000);
             }
             form.reset();
-            currentPhotoBase64 = null;
-            if (previewWrap) previewWrap.hidden = true;
+            clearPhotoPreview();
             closeComposer();
           });
       });
     }
+
+    // Ensure photo preview is clean on load
+    clearPhotoPreview();
 
     // Initialize with starters and fetch live docs
     messagesList = STARTER_MESSAGES.slice();

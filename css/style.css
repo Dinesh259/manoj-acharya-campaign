@@ -1611,14 +1611,17 @@ html.hc .about-photo-label {
   border-color: #334155 !important;
   color: #CBD5E1 !important;
 }
-html.hc .fb-app-header {
+html.hc .post-page-header {
   background: #000000 !important;
   border-bottom: 2px solid #F59E0B !important;
 }
-html.hc .fb-header-back {
-  background: #1E293B !important;
-  color: #FDE68A !important;
-  border: 1px solid #475569 !important;
+html.hc .post-page-title {
+  color: #F8FAFC !important;
+}
+html.hc .post-page-header-tools .tool-btn {
+  background: #0F172A !important;
+  border-color: #475569 !important;
+  color: #F8FAFC !important;
 }
 html.hc .fb-create-trigger-card {
   background: #0F172A !important;
@@ -2849,101 +2852,75 @@ dialog.photo-modal::backdrop {
 }
 
 /* ==========================================================================
-   Dedicated App Header on Support Wall (Only Post-Related Navigation)
+   Post Interface Minimal Top Header ("Post and Support" + Contrast Button)
    ========================================================================== */
-.fb-app-header {
-  background: #0F172A;
-  border-bottom: 1px solid #1E293B;
+.post-page-header {
+  background: #FFFFFF;
+  border-bottom: 1px solid #CBD5E1;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
-.fb-app-header-inner {
+.post-page-header-inner {
   max-width: 720px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  gap: 10px;
+  min-height: 52px;
 }
-.fb-header-back {
+.post-page-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.post-page-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.post-page-title-link:hover {
+  opacity: 0.85;
+}
+.post-page-header-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.post-page-header-tools .tool-btn {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: #CBD5E1;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 0.875rem;
-  padding: 6px 12px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-.fb-header-back:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #FFFFFF;
-}
-.fb-header-title-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.fb-header-logo-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-.fb-header-title-wrap {
-  min-width: 0;
-}
-.fb-header-title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #FFFFFF;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-.fb-header-sub {
-  display: block;
-  font-size: 0.7rem;
-  color: #94A3B8;
-  white-space: nowrap;
-}
-.fb-header-right-tools {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-.fb-header-btn-create {
-  background: #1877F2;
-  border: 1px solid #1877F2;
-  color: #FFFFFF;
-  padding: 6px 12px;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  border-radius: 6px;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.15s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
-.fb-header-btn-create:hover {
-  background: #166FE5;
-  transform: translateY(-1px);
+.post-page-header-tools .tool-btn:hover {
+  background: #E2E8F0;
+}
+.post-page-header-tools .tool-btn .icon {
+  width: 20px;
+  height: 20px;
 }
 
 @media (max-width: 600px) {
-  .fb-header-sub { display: none; }
-  .fb-header-back .fb-back-text { display: none; }
-  .fb-header-back { padding: 6px 8px; font-size: 1rem; }
-  .fb-header-title { font-size: 0.95rem; }
-  .fb-header-btn-create { padding: 6px 8px; font-size: 0.75rem; }
+  .post-page-header-inner {
+    padding: 8px 12px;
+    min-height: 48px;
+  }
+  .post-page-title {
+    font-size: 1.125rem;
+  }
 }
 
 /* ==========================================================================
@@ -3241,6 +3218,10 @@ dialog.photo-modal::backdrop {
   overflow: hidden;
   border: 1px solid #CBD5E1;
   max-width: 140px;
+}
+.photo-preview-wrap[hidden],
+[hidden] {
+  display: none !important;
 }
 .photo-preview-wrap img {
   display: block;
