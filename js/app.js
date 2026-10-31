@@ -168,7 +168,8 @@
     edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
     calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
     globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
-    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>'
+    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    post: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>'
   };
   function injectSprite() {
     var s = '';
@@ -264,9 +265,9 @@
             '<span class="bottom-tab-icon">' + icon('vote') + '</span>' +
             '<span class="bottom-tab-label" data-i18n="nav.howToVote">वोट कैसे दें</span>' +
           '</a>' +
-          '<a href="check-name.html" class="bottom-tab"' + (current === 'check-name.html' ? ' aria-current="page"' : '') + '>' +
-            '<span class="bottom-tab-icon">' + icon('search') + '</span>' +
-            '<span class="bottom-tab-label" data-i18n="nav.checkName">नाम जाँचें</span>' +
+          '<a href="support-wall.html" class="bottom-tab"' + (current === 'support-wall.html' ? ' aria-current="page"' : '') + '>' +
+            '<span class="bottom-tab-icon">' + icon('post') + '</span>' +
+            '<span class="bottom-tab-label" data-i18n="nav.post">' + esc(t('nav.post')) + '</span>' +
           '</a>' +
           '<a href="find-booth.html" class="bottom-tab"' + (current === 'find-booth.html' ? ' aria-current="page"' : '') + '>' +
             '<span class="bottom-tab-icon">' + icon('pin') + '</span>' +
