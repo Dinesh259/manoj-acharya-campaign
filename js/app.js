@@ -251,6 +251,7 @@
           '<p data-i18n="footer.place">' + esc(t('footer.place')) + '</p>' +
           '<p data-i18n="footer.date">' + esc(t('footer.date')) + '</p>' +
           '<p data-i18n="footer.privacy">' + esc(t('footer.privacy')) + '</p>' +
+          '<p class="footer-admin-row"><a href="admin.html" class="footer-admin-link">🔒 <span data-i18n="nav.adminLink">' + esc(t('nav.adminLink')) + '</span></a></p>' +
           '<p><button type="button" class="btn btn-outline" data-share-site>' + icon('share') + '<span data-i18n="common.share">' + esc(t('common.share')) + '</span></button></p>' +
         '</div></footer>' +
         '<a class="wa-float" data-link="wa" target="_blank" rel="noopener" data-i18n-attr="aria-label:common.waFloat">' + icon('wa') + '</a>' +
@@ -1187,29 +1188,25 @@
     var liveAliasText = $('#liveAliasText');
     var liveAliasAvatar = $('#liveAliasAvatar');
     var liveAliasTag = $('#liveAliasTag');
-    var btnAdminUnlock = $('#btnAdminUnlock');
     var filterPills = $$('.filter-pill');
 
     var currentPhotoBase64 = null;
     var currentFilter = 'all';
-    var isAdmin = sessionStorage.getItem('mka_wall_admin') === '1';
     var messagesList = [];
 
     var AVATARS = ['🦁', '🌾', '🇮🇳', '🌟', '✌️', '🤝', '🎯', '🚩', '🏆', '🚜', '📚', '⚡', '🦅', '🕊️'];
-    var TITLES = {
-      'युवा शक्ति': ['अनूपशहर युवा शक्ति', 'नौजवान साथी', 'विकास समर्थक युवा', 'गाँव का युवा गौरव', 'युवा मोर्चा अनूपशहर'],
-      'किसान भाई': ['अन्नदाता किसान साथी', 'मेहनती किसान भाई', 'किसान एकता समर्थक', 'गाँव का कृषक गौरव'],
-      'मातृशक्ति': ['मातृशक्ति आशीर्वाद', 'जागरूक महिला मतदाता', 'गाँव की मातृशक्ति', 'खुशहाल गाँव संकल्प'],
-      'बुज़ुर्ग आशीर्वाद': ['वरिष्ठ बुज़ुर्ग आशीर्वाद', 'प्रबुद्ध ग्रामवासी', 'गाँव का मार्गदर्शक', 'अनुभवी अभिभावक'],
-      'सर्व समाज': ['सर्व समाज शुभचिंतक', 'अनूपशहर गौरव', 'जागरूक मतदाता', 'विकास साथी', 'सच्चा सहयोगी']
-    };
+    var TITLES_GENERIC = [
+      'अनूपशहर विकास समर्थक', 'अनूपशहर युवा शक्ति', 'अनूपशहर गौरव साथी',
+      'जागरूक ग्रामवासी', 'खुशहाली संकल्प साथी', 'अन्नदाता किसान साथी',
+      'मातृशक्ति आशीर्वाद', 'परिवर्तन का सिपाही', 'प्रबुद्ध नागरिक',
+      'सेवा संकल्प साथी', 'निस्वार्थ ग्राम सेवक', 'उज्ज्वल भविष्य समर्थक'
+    ];
 
     var STARTER_MESSAGES = [
       {
         id: 'starter-1',
-        alias: 'अनूपशहर युवा शक्ति #21',
+        alias: 'वार्ड 1 युवा शक्ति #21',
         name: 'सुरेश कुमार जांगिड़',
-        category: 'युवा शक्ति',
         ward: 'वार्ड 1',
         avatar: '🦁',
         message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!',
@@ -1218,10 +1215,9 @@
       },
       {
         id: 'starter-2',
-        alias: 'अन्नदाता किसान भाई #08',
+        alias: 'वार्ड 5 अन्नदाता किसान साथी #08',
         name: 'महावीर सिंह',
-        category: 'किसान भाई',
-        ward: 'ढाणी क्षेत्र',
+        ward: 'वार्ड 5',
         avatar: '🌾',
         message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।',
         likes: 34,
@@ -1229,9 +1225,8 @@
       },
       {
         id: 'starter-3',
-        alias: 'गाँव का गौरव — मातृशक्ति',
+        alias: 'वार्ड 4 मातृशक्ति आशीर्वाद #33',
         name: 'कमला देवी',
-        category: 'मातृशक्ति',
         ward: 'वार्ड 4',
         avatar: '🌟',
         message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।',
@@ -1240,10 +1235,9 @@
       },
       {
         id: 'starter-4',
-        alias: 'सर्व समाज शुभचिंतक #95',
+        alias: 'वार्ड 11 सर्व समाज गौरव #95',
         name: 'रामकुमार शर्मा',
-        category: 'सर्व समाज',
-        ward: 'मेन चौक बस स्टैंड',
+        ward: 'वार्ड 11',
         avatar: '🤝',
         message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!',
         likes: 52,
@@ -1277,9 +1271,21 @@
       } catch (e) {}
     }
 
-    function getRandomAlias(cat, ward) {
-      var arr = TITLES[cat] || TITLES['सर्व समाज'];
-      var base = arr[Math.floor(Math.random() * arr.length)];
+    function getRandomAlias(ward) {
+      var base;
+      if (ward && ward.indexOf('वार्ड') !== -1) {
+        var wardTitles = [
+          ward + ' विकास समर्थक',
+          ward + ' युवा शक्ति',
+          ward + ' गौरव साथी',
+          ward + ' जागरूक नागरिक',
+          ward + ' खुशहाली संकल्प',
+          ward + ' सेवा साथी'
+        ];
+        base = wardTitles[Math.floor(Math.random() * wardTitles.length)];
+      } else {
+        base = TITLES_GENERIC[Math.floor(Math.random() * TITLES_GENERIC.length)];
+      }
       var num = Math.floor(Math.random() * 89) + 10;
       var av = AVATARS[Math.floor(Math.random() * AVATARS.length)];
       return {
@@ -1289,29 +1295,21 @@
       };
     }
 
-    var activeAlias = getRandomAlias('सर्व समाज', '');
+    var activeAlias = getRandomAlias('');
 
     function updateLivePreview() {
       if (!liveAliasText) return;
-      var cat = form && form.elements.category ? form.elements.category.value : 'सर्व समाज';
       var ward = form && form.elements.ward ? form.elements.ward.value : '';
       liveAliasText.textContent = activeAlias.alias;
       if (liveAliasAvatar) liveAliasAvatar.textContent = activeAlias.avatar;
-      if (liveAliasTag) liveAliasTag.textContent = ward || cat || 'अनूपशहर';
+      if (liveAliasTag) liveAliasTag.textContent = ward || 'अनूपशहर';
     }
 
-    if (form) {
-      if (form.elements.category) {
-        form.elements.category.addEventListener('change', function () {
-          activeAlias = getRandomAlias(form.elements.category.value, form.elements.ward ? form.elements.ward.value : '');
-          updateLivePreview();
-        });
-      }
-      if (form.elements.ward) {
-        form.elements.ward.addEventListener('change', function () {
-          updateLivePreview();
-        });
-      }
+    if (form && form.elements.ward) {
+      form.elements.ward.addEventListener('change', function () {
+        activeAlias = getRandomAlias(form.elements.ward.value);
+        updateLivePreview();
+      });
       updateLivePreview();
     }
 
@@ -1358,35 +1356,7 @@
       });
     }
 
-    // Admin PIN toggle
-    if (btnAdminUnlock) {
-      if (isAdmin) {
-        btnAdminUnlock.classList.add('is-active');
-        btnAdminUnlock.innerHTML = '<span aria-hidden="true">🔓</span> ' + esc(t('wall.adminUnlocked'));
-      }
-      btnAdminUnlock.addEventListener('click', function () {
-        if (isAdmin) {
-          isAdmin = false;
-          sessionStorage.removeItem('mka_wall_admin');
-          btnAdminUnlock.classList.remove('is-active');
-          btnAdminUnlock.innerHTML = '<span aria-hidden="true">🔒</span> ' + esc(t('wall.adminBtn'));
-          renderFeed();
-          return;
-        }
-        var pin = prompt(t('wall.adminPrompt') || 'Enter 4-digit PIN:');
-        if (pin === '9529') {
-          isAdmin = true;
-          sessionStorage.setItem('mka_wall_admin', '1');
-          btnAdminUnlock.classList.add('is-active');
-          btnAdminUnlock.innerHTML = '<span aria-hidden="true">🔓</span> ' + esc(t('wall.adminUnlocked'));
-          renderFeed();
-        } else if (pin) {
-          alert('गलत पिन (Incorrect PIN)');
-        }
-      });
-    }
-
-    // Filter pills
+    // Filter pills (Ward 1 to 11)
     filterPills.forEach(function (pill) {
       pill.addEventListener('click', function () {
         filterPills.forEach(function (p) {
@@ -1400,12 +1370,12 @@
       });
     });
 
-    // Render feed cards
+    // Render feed cards (Public view: real name is strictly confidential and NEVER rendered)
     function renderFeed() {
       if (!grid) return;
       var filtered = messagesList.filter(function (m) {
         if (currentFilter === 'all') return true;
-        return m.category === currentFilter;
+        return m.ward === currentFilter;
       });
 
       if (countEl) countEl.textContent = messagesList.length;
@@ -1437,17 +1407,11 @@
                   '<strong class="msg-alias-name">' + esc(msg.alias) + '</strong>' +
                   '<div class="msg-meta-row">' +
                     (msg.ward ? '<span class="msg-ward-tag">📍 ' + esc(msg.ward) + '</span>' : '') +
-                    (msg.category ? '<span class="msg-cat-pill">' + esc(msg.category) + '</span>' : '') +
                     '<span class="msg-time">· ' + esc(timeStr) + '</span>' +
                   '</div>' +
                 '</div>' +
               '</div>' +
             '</div>';
-
-        // If admin unlocked, display real name securely
-        if (isAdmin && msg.name) {
-          html += '<div class="admin-real-name-badge">🔒 ' + esc(t('wall.realName')) + ' <strong>' + esc(msg.name) + '</strong></div>';
-        }
 
         html += '<p class="msg-body-text">' + esc(msg.message) + '</p>';
 
@@ -1539,6 +1503,23 @@
       });
     }
 
+    // Modal Close handlers for support-wall
+    var modalClose = $('#modalClose');
+    var modalBackdrop = $('#modalBackdrop');
+    var modal = $('#photoModal');
+    if (modalClose && modal) {
+      modalClose.addEventListener('click', function () {
+        if (typeof modal.close === 'function') modal.close();
+        else modal.removeAttribute('open');
+      });
+    }
+    if (modalBackdrop && modal) {
+      modalBackdrop.addEventListener('click', function () {
+        if (typeof modal.close === 'function') modal.close();
+        else modal.removeAttribute('open');
+      });
+    }
+
     // Fetch messages from Firestore
     function fetchMessages() {
       fetch(FIRESTORE_BASE, { cache: 'no-store' })
@@ -1558,7 +1539,6 @@
               message: (f.message && f.message.stringValue) || '',
               photo: (f.photo && f.photo.stringValue) || null,
               ward: (f.ward && f.ward.stringValue) || '',
-              category: (f.category && f.category.stringValue) || 'सर्व समाज',
               avatar: (f.avatar && f.avatar.stringValue) || '🦁',
               likes: parseInt((f.likes && f.likes.integerValue) || '0', 10),
               createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
@@ -1591,7 +1571,6 @@
         var name = form.elements.name ? form.elements.name.value.trim() : '';
         var message = form.elements.message ? form.elements.message.value.trim() : '';
         var ward = form.elements.ward ? form.elements.ward.value.trim() : '';
-        var category = form.elements.category ? form.elements.category.value : 'सर्व समाज';
 
         if (!name || !message) {
           if (err) {
@@ -1617,7 +1596,6 @@
             createdAt: { timestampValue: new Date().toISOString() },
             likes: { integerValue: '1' },
             ward: { stringValue: ward || 'ग्राम अनूपशहर' },
-            category: { stringValue: category },
             avatar: { stringValue: activeAlias.avatar }
           }
         };
@@ -1649,10 +1627,10 @@
             form.reset();
             currentPhotoBase64 = null;
             if (previewWrap) previewWrap.hidden = true;
-            activeAlias = getRandomAlias('सर्व समाज', '');
+            activeAlias = getRandomAlias('');
             updateLivePreview();
 
-            trackEvent('support_message_post', { category: category, ward: ward, has_photo: !!currentPhotoBase64 });
+            trackEvent('support_message_post', { ward: ward, has_photo: !!currentPhotoBase64 });
 
             // Refresh feed
             fetchMessages();
@@ -1667,7 +1645,6 @@
               message: message,
               photo: currentPhotoBase64,
               ward: ward || 'ग्राम अनूपशहर',
-              category: category,
               avatar: activeAlias.avatar,
               likes: 1,
               createdAt: new Date().toISOString()
@@ -1686,7 +1663,7 @@
             form.reset();
             currentPhotoBase64 = null;
             if (previewWrap) previewWrap.hidden = true;
-            activeAlias = getRandomAlias('सर्व समाज', '');
+            activeAlias = getRandomAlias('');
             updateLivePreview();
           });
       });
@@ -1696,6 +1673,484 @@
     messagesList = STARTER_MESSAGES.slice();
     renderFeed();
     fetchMessages();
+  }
+
+  /* ---------- Dedicated Candidate & Admin Portal (admin.html) ---------- */
+  function setupAdminPortal() {
+    var adminSection = $('#adminPortal') || $('#adminAuthView') || $('#adminDashboardView');
+    if (!adminSection) return;
+
+    var FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/manoj-acharya-anoopshahar/databases/(default)/documents/support_messages';
+
+    var authView = $('#adminAuthView');
+    var dashView = $('#adminDashboardView');
+    var deniedAlert = $('#authDeniedAlert');
+    var deniedEmailText = $('#deniedEmailText');
+    var btnGoogle = $('#btnGoogleSignIn');
+    var btnSignOut = $('#btnAdminSignOut');
+    var pinInput = $('#adminPinInput');
+    var btnPinLogin = $('#btnAdminPinLogin');
+    var pinError = $('#pinErrorMsg');
+    var userBadge = $('#adminUserEmailBadge');
+
+    var kpiMsgs = $('#kpiTotalMsgs');
+    var kpiLikes = $('#kpiTotalLikes');
+    var kpiPhotos = $('#kpiTotalPhotos');
+    var kpiWards = $('#kpiWardsCount');
+
+    var searchInput = $('#adminSearchInput');
+    var wardSelect = $('#adminWardSelect');
+    var btnExportCsv = $('#btnExportCsv');
+    var btnRefresh = $('#btnRefreshFeed');
+
+    var tableBody = $('#adminTableBody');
+    var mobileCards = $('#adminMobileCards');
+    var noResults = $('#adminNoResults');
+    var showingCount = $('#adminShowingCount');
+
+    var whitelistUl = $('#whitelistUl');
+    var newGmailInput = $('#newGmailInput');
+    var btnGrantGmail = $('#btnGrantGmail');
+    var grantStatus = $('#grantStatusMsg');
+
+    var DEFAULT_AUTHORIZED_GMAILS = [
+      'dineshkumarsuthar259@gmail.com',
+      'manojkumaracharyaanoopshahar@gmail.com',
+      'campaign@manoj-acharya-anoopshahar.web.app'
+    ];
+
+    function getCustomGmails() {
+      try {
+        var raw = store.get('mka_custom_gmails');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function getAllAuthorizedGmails() {
+      var custom = getCustomGmails();
+      var set = {};
+      DEFAULT_AUTHORIZED_GMAILS.forEach(function (e) { set[e.toLowerCase().trim()] = true; });
+      custom.forEach(function (e) { if (e) set[e.toLowerCase().trim()] = true; });
+      return Object.keys(set);
+    }
+
+    function isAuthorized(email) {
+      if (!email) return false;
+      var clean = email.toLowerCase().trim();
+      return getAllAuthorizedGmails().indexOf(clean) !== -1;
+    }
+
+    var allMessages = [];
+    var currentFilterWard = 'all';
+    var currentSearchQuery = '';
+
+    // Render Whitelist UI
+    function renderWhitelist() {
+      if (!whitelistUl) return;
+      var list = getAllAuthorizedGmails();
+      var html = '';
+      list.forEach(function (email) {
+        var isDefault = DEFAULT_AUTHORIZED_GMAILS.indexOf(email) !== -1;
+        html += '<li class="whitelist-item">' +
+          '<span class="whitelist-email">📧 ' + esc(email) + (isDefault ? ' <span class="badge-role">(मुख्य एडमिन / प्रत्याशी)</span>' : ' <span class="badge-role">(अनुमोदित सहयोगी)</span>') + '</span>' +
+          (!isDefault ? '<button type="button" class="btn-remove-gmail" data-remove-email="' + esc(email) + '" title="एक्सेस हटाएं">✕</button>' : '') +
+        '</li>';
+      });
+      whitelistUl.innerHTML = html;
+
+      // Bind remove buttons
+      $$('.btn-remove-gmail', whitelistUl).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var toRemove = btn.getAttribute('data-remove-email');
+          var custom = getCustomGmails().filter(function (e) { return e.toLowerCase().trim() !== toRemove; });
+          store.set('mka_custom_gmails', JSON.stringify(custom));
+          renderWhitelist();
+        });
+      });
+    }
+
+    // Grant Access button
+    if (btnGrantGmail && newGmailInput) {
+      btnGrantGmail.addEventListener('click', function () {
+        var email = newGmailInput.value.trim().toLowerCase();
+        if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1) {
+          if (grantStatus) grantStatus.textContent = 'कृपया एक मान्य जीमेल पता दर्ज करें।';
+          return;
+        }
+        var custom = getCustomGmails();
+        if (custom.indexOf(email) === -1 && DEFAULT_AUTHORIZED_GMAILS.indexOf(email) === -1) {
+          custom.push(email);
+          store.set('mka_custom_gmails', JSON.stringify(custom));
+          newGmailInput.value = '';
+          if (grantStatus) {
+            grantStatus.textContent = 'सफलतापूर्वक अधिकृत किया गया: ' + email;
+            setTimeout(function () { grantStatus.textContent = ''; }, 5000);
+          }
+          renderWhitelist();
+        } else {
+          if (grantStatus) grantStatus.textContent = 'यह जीमेल पहले से अधिकृत है।';
+        }
+      });
+    }
+
+    // Login success handler
+    function onAuthSuccess(email) {
+      sessionStorage.setItem('mka_admin_user', email);
+      if (authView) authView.hidden = true;
+      if (dashView) dashView.hidden = false;
+      if (userBadge) userBadge.textContent = email;
+      if (deniedAlert) deniedAlert.hidden = true;
+      renderWhitelist();
+      loadAdminFeed();
+    }
+
+    // Login denied handler
+    function onAuthDenied(email) {
+      if (deniedEmailText) deniedEmailText.textContent = email ? 'अस्वीकृत खाता: ' + email : '';
+      if (deniedAlert) deniedAlert.hidden = false;
+      if (dashView) dashView.hidden = true;
+      if (authView) authView.hidden = false;
+    }
+
+    // Check existing session
+    var activeSession = sessionStorage.getItem('mka_admin_user');
+    if (activeSession && isAuthorized(activeSession)) {
+      onAuthSuccess(activeSession);
+    } else {
+      if (authView) authView.hidden = false;
+      if (dashView) dashView.hidden = true;
+      renderWhitelist();
+    }
+
+    // Google Sign In
+    if (btnGoogle) {
+      btnGoogle.addEventListener('click', function () {
+        if (deniedAlert) deniedAlert.hidden = true;
+
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          try {
+            if (!firebase.apps || !firebase.apps.length) {
+              firebase.initializeApp(CFG.firebase);
+            }
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+              .then(function (result) {
+                var email = result.user && result.user.email;
+                if (isAuthorized(email)) {
+                  onAuthSuccess(email);
+                } else {
+                  firebase.auth().signOut().catch(function () {});
+                  onAuthDenied(email);
+                }
+              })
+              .catch(function (err) {
+                console.warn('[Admin Auth Popup Error]', err);
+                var emailPrompt = prompt('Google खाता सत्यापन (अथवा 4-अंकीय एडमिन पिन दर्ज करें):', 'dineshkumarsuthar259@gmail.com');
+                if (emailPrompt) {
+                  if (emailPrompt.trim() === '9529') {
+                    onAuthSuccess('dineshkumarsuthar259@gmail.com');
+                  } else if (isAuthorized(emailPrompt.trim())) {
+                    onAuthSuccess(emailPrompt.trim());
+                  } else {
+                    onAuthDenied(emailPrompt.trim());
+                  }
+                }
+              });
+          } catch (e) {
+            console.warn('[Firebase Auth Exception]', e);
+            var pin = prompt('4-अंकीय एडमिन पासकी दर्ज करें:');
+            if (pin === '9529') {
+              onAuthSuccess('dineshkumarsuthar259@gmail.com');
+            } else if (pin) {
+              alert('गलत पिन (Incorrect PIN)');
+            }
+          }
+        } else {
+          var pin = prompt('4-अंकीय एडमिन पासकी दर्ज करें:');
+          if (pin === '9529') {
+            onAuthSuccess('dineshkumarsuthar259@gmail.com');
+          } else if (pin) {
+            alert('गलत पिन (Incorrect PIN)');
+          }
+        }
+      });
+    }
+
+    // Passkey Login Button
+    if (btnPinLogin && pinInput) {
+      btnPinLogin.addEventListener('click', function () {
+        var val = pinInput.value.trim();
+        if (val === '9529') {
+          if (pinError) pinError.hidden = true;
+          onAuthSuccess('dineshkumarsuthar259@gmail.com');
+        } else {
+          if (pinError) {
+            pinError.textContent = 'गलत पासकी (Incorrect Passkey)';
+            pinError.hidden = false;
+          }
+        }
+      });
+      pinInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          btnPinLogin.click();
+        }
+      });
+    }
+
+    // Sign Out
+    if (btnSignOut) {
+      btnSignOut.addEventListener('click', function () {
+        sessionStorage.removeItem('mka_admin_user');
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+          try { firebase.auth().signOut().catch(function () {}); } catch (e) {}
+        }
+        if (dashView) dashView.hidden = true;
+        if (authView) authView.hidden = false;
+        if (deniedAlert) deniedAlert.hidden = true;
+      });
+    }
+
+    // Load feed data
+    function loadAdminFeed() {
+      fetch(FIRESTORE_BASE, { cache: 'no-store' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var docs = data && data.documents ? data.documents : [];
+          var parsed = docs.map(function (doc) {
+            var f = doc.fields || {};
+            var docId = doc.name ? doc.name.split('/').pop() : '';
+            return {
+              id: docId,
+              alias: (f.alias && f.alias.stringValue) || 'अनूपशहर समर्थक',
+              name: (f.name && f.name.stringValue) || '',
+              message: (f.message && f.message.stringValue) || '',
+              photo: (f.photo && f.photo.stringValue) || null,
+              ward: (f.ward && f.ward.stringValue) || 'वार्ड 1',
+              avatar: (f.avatar && f.avatar.stringValue) || '🦁',
+              likes: parseInt((f.likes && f.likes.integerValue) || '0', 10),
+              createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
+            };
+          });
+
+          parsed.sort(function (a, b) {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+
+          allMessages = parsed.concat([
+            { id: 'starter-1', alias: 'वार्ड 1 युवा शक्ति #21', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
+            { id: 'starter-2', alias: 'वार्ड 5 अन्नदाता किसान साथी #08', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
+            { id: 'starter-3', alias: 'वार्ड 4 मातृशक्ति आशीर्वाद #33', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
+            { id: 'starter-4', alias: 'वार्ड 11 सर्व समाज गौरव #95', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
+          ]);
+
+          updateKpis();
+          renderAdminTable();
+        })
+        .catch(function () {
+          allMessages = [
+            { id: 'starter-1', alias: 'वार्ड 1 युवा शक्ति #21', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
+            { id: 'starter-2', alias: 'वार्ड 5 अन्नदाता किसान साथी #08', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
+            { id: 'starter-3', alias: 'वार्ड 4 मातृशक्ति आशीर्वाद #33', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
+            { id: 'starter-4', alias: 'वार्ड 11 सर्व समाज गौरव #95', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
+          ];
+          updateKpis();
+          renderAdminTable();
+        });
+    }
+
+    function updateKpis() {
+      if (kpiMsgs) kpiMsgs.textContent = allMessages.length;
+      var totalLikes = allMessages.reduce(function (sum, m) { return sum + (m.likes || 0); }, 0);
+      if (kpiLikes) kpiLikes.textContent = totalLikes;
+      var totalPhotos = allMessages.filter(function (m) { return !!m.photo; }).length;
+      if (kpiPhotos) kpiPhotos.textContent = totalPhotos;
+
+      var wardsMap = {};
+      allMessages.forEach(function (m) {
+        if (m.ward && m.ward.indexOf('वार्ड') !== -1) wardsMap[m.ward.trim()] = true;
+      });
+      var activeWardsCount = Object.keys(wardsMap).length;
+      if (kpiWards) kpiWards.textContent = activeWardsCount + ' / 11';
+    }
+
+    function getFilteredMessages() {
+      var q = currentSearchQuery.toLowerCase().trim();
+      return allMessages.filter(function (m) {
+        if (currentFilterWard !== 'all' && m.ward !== currentFilterWard) {
+          return false;
+        }
+        if (q) {
+          var matchName = (m.name || '').toLowerCase().indexOf(q) !== -1;
+          var matchAlias = (m.alias || '').toLowerCase().indexOf(q) !== -1;
+          var matchMsg = (m.message || '').toLowerCase().indexOf(q) !== -1;
+          var matchWard = (m.ward || '').toLowerCase().indexOf(q) !== -1;
+          if (!matchName && !matchAlias && !matchMsg && !matchWard) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderAdminTable() {
+      var filtered = getFilteredMessages();
+      if (showingCount) showingCount.textContent = filtered.length + ' संदेश प्रदर्शित';
+
+      if (!filtered.length) {
+        if (tableBody) tableBody.innerHTML = '';
+        if (mobileCards) mobileCards.innerHTML = '';
+        if (noResults) noResults.hidden = false;
+        return;
+      }
+      if (noResults) noResults.hidden = true;
+
+      var tHtml = '';
+      var mHtml = '';
+
+      filtered.forEach(function (m, idx) {
+        var dateStr = '';
+        try {
+          var d = new Date(m.createdAt);
+          dateStr = d.toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+          dateStr = 'हाल ही में';
+        }
+
+        var photoCell = m.photo ?
+          '<button type="button" class="btn-thumb-view" data-full-photo="' + esc(m.photo) + '" title="तस्वीर देखें">' +
+            '<img src="' + esc(m.photo) + '" alt="फ़ोटो">' +
+          '</button>' :
+          '<span class="no-photo-badge">—</span>';
+
+        tHtml += '<tr>' +
+          '<td>' + (idx + 1) + '</td>' +
+          '<td><strong class="real-name-text">🔒 ' + esc(m.name || 'अज्ञात') + '</strong></td>' +
+          '<td><span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span></td>' +
+          '<td><span class="alias-pill-sm">' + (m.avatar || '🦁') + ' ' + esc(m.alias) + '</span></td>' +
+          '<td class="msg-cell-text">' + esc(m.message) + '</td>' +
+          '<td>' + photoCell + '</td>' +
+          '<td><span class="likes-badge">❤️ ' + (m.likes || 0) + '</span></td>' +
+          '<td><time class="time-col">' + esc(dateStr) + '</time></td>' +
+        '</tr>';
+
+        mHtml += '<article class="admin-mobile-card">' +
+          '<div class="admin-mc-head">' +
+            '<div>' +
+              '<span class="admin-mc-num">#' + (idx + 1) + '</span> ' +
+              '<strong class="real-name-text">🔒 ' + esc(m.name || 'अज्ञात') + '</strong>' +
+            '</div>' +
+            '<span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span>' +
+          '</div>' +
+          '<div class="admin-mc-meta">' +
+            '<span class="alias-pill-sm">' + (m.avatar || '🦁') + ' ' + esc(m.alias) + '</span>' +
+            '<span class="likes-badge">❤️ ' + (m.likes || 0) + '</span>' +
+            '<time class="time-col">' + esc(dateStr) + '</time>' +
+          '</div>' +
+          '<p class="admin-mc-msg">' + esc(m.message) + '</p>' +
+          (m.photo ? '<div class="admin-mc-photo"><img src="' + esc(m.photo) + '" alt="तस्वीर" class="btn-thumb-view" data-full-photo="' + esc(m.photo) + '"></div>' : '') +
+        '</article>';
+      });
+
+      if (tableBody) tableBody.innerHTML = tHtml;
+      if (mobileCards) mobileCards.innerHTML = mHtml;
+
+      $$('.btn-thumb-view', dashView).forEach(function (el) {
+        el.addEventListener('click', function () {
+          var src = el.getAttribute('data-full-photo');
+          var modal = $('#adminPhotoModal');
+          if (modal && src) {
+            var modalImg = $('#adminModalImg');
+            if (modalImg) modalImg.src = src;
+            if (typeof modal.showModal === 'function') modal.showModal();
+            else modal.setAttribute('open', '');
+          }
+        });
+      });
+    }
+
+    var modalClose = $('#adminModalClose');
+    var modalBackdrop = $('#adminModalBackdrop');
+    var modal = $('#adminPhotoModal');
+    if (modalClose && modal) {
+      modalClose.addEventListener('click', function () {
+        if (typeof modal.close === 'function') modal.close();
+        else modal.removeAttribute('open');
+      });
+    }
+    if (modalBackdrop && modal) {
+      modalBackdrop.addEventListener('click', function () {
+        if (typeof modal.close === 'function') modal.close();
+        else modal.removeAttribute('open');
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        currentSearchQuery = searchInput.value;
+        renderAdminTable();
+      });
+    }
+    if (wardSelect) {
+      wardSelect.addEventListener('change', function () {
+        currentFilterWard = wardSelect.value;
+        renderAdminTable();
+      });
+    }
+    if (btnRefresh) {
+      btnRefresh.addEventListener('click', function () {
+        loadAdminFeed();
+      });
+    }
+
+    if (btnExportCsv) {
+      btnExportCsv.addEventListener('click', function () {
+        var filtered = getFilteredMessages();
+        var rows = [
+          ['क्र.सं.', 'वास्तविक नाम (गोपनीय)', 'वार्ड', 'सार्वजनिक उपनाम', 'समर्थन संदेश', 'लाइक्स', 'तस्वीर संलग्न', 'दिनांक व समय']
+        ];
+
+        filtered.forEach(function (m, i) {
+          var dateStr = '';
+          try {
+            var d = new Date(m.createdAt);
+            dateStr = d.toLocaleString('hi-IN');
+          } catch (e) {
+            dateStr = m.createdAt || '';
+          }
+          rows.push([
+            String(i + 1),
+            m.name || '',
+            m.ward || '',
+            m.alias || '',
+            m.message ? m.message.replace(/"/g, '""').replace(/\r?\n/g, ' ') : '',
+            String(m.likes || 0),
+            m.photo ? 'हाँ' : 'नहीं',
+            dateStr
+          ]);
+        });
+
+        var csvContent = '\uFEFF' + rows.map(function (row) {
+          return row.map(function (val) {
+            return '"' + String(val).replace(/"/g, '""') + '"';
+          }).join(',');
+        }).join('\r\n');
+
+        var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'anoopshahar-supporters-list.csv');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      });
+    }
   }
 
   /* ---------- QR code (byte mode, error level M, versions 1–10) ----------
@@ -2005,6 +2460,7 @@
     setupDemo();
     setupAsk();
     setupSupportWall();
+    setupAdminPortal();
     setupMeeting();
     setupMeetingMedia();
     setupQr();
@@ -2190,6 +2646,7 @@
   setupDemo();
   setupAsk();
   setupSupportWall();
+  setupAdminPortal();
   setupMeeting();
   setupMeetingMedia();
   setupQr();

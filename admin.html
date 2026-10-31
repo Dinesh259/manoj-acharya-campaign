@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="hi" class="js-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="प्रत्याशी मनोज कुमार आचार्य एवं चुनाव प्रबंधन टीम के लिए अधिकृत पोर्टल — सर्व समाज समर्थन दीवार मतदाता सूची व वास्तविक नाम।">
+  <title data-i18n="title.admin">प्रत्याशी एवं एडमिन पोर्टल | मनोज कुमार आचार्य</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="js/i18n.js?v=danaram" as="script">
+  <link rel="preload" href="js/app.js?v=danaram" as="script">
+  <!-- Firebase Compat for Authentication -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js" defer></script>
+  <script>
+    (function(){try{var d=document.documentElement,l=localStorage.getItem('lang');if(l==='en')d.lang='en';if(localStorage.getItem('largeText')==='1')d.classList.add('large-text');if(localStorage.getItem('contrast')==='1')d.classList.add('hc');}catch(e){}})();
+  </script>
+</head>
+<body data-page="admin.html" data-title="admin">
+  <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
+  <div data-chrome="header"></div>
+
+  <main id="main" class="wrap zone-candidate" id="adminPortal">
+    <p class="zone-label candidate" data-i18n="common.labelCandidate">प्रत्याशी का संदेश / Candidate's message</p>
+
+    <!-- Admin Portal Hero Banner -->
+    <div class="admin-hero">
+      <span class="live-pulse-badge">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span data-i18n="admin.badge">गोपनीय एवं सुरक्षित पोर्टल</span>
+      </span>
+      <h1 data-i18n="admin.title">प्रत्याशी एवं चुनाव संचालन पोर्टल</h1>
+      <p class="lead" data-i18n="admin.subtitle">
+        गाँववासियों के समर्थन संदेश व वास्तविक नामों की अधिकृत सूची (केवल अधिकृत जीमेल आईडी द्वारा सुरक्षित)
+      </p>
+    </div>
+
+    <!-- View 1: Authentication / Sign In View -->
+    <section class="card admin-auth-card" id="adminAuthView" aria-labelledby="authHeading">
+      <div class="card-head-bar">
+        <h2 id="authHeading" class="card-head-title">
+          <span aria-hidden="true">🔒</span> <span data-i18n="admin.loginHeading">अधिकृत जीमेल से साइन इन करें</span>
+        </h2>
+      </div>
+
+      <div class="admin-auth-body">
+        <p class="admin-auth-desc" data-i18n="admin.loginDesc">
+          यह पोर्टल केवल प्रत्याशी मनोज कुमार आचार्य एवं अधिकृत चुनाव प्रबंधन टीम के लिए है। सार्वजनिक दीवार पर दर्ज किए गए मतदाताओं के वास्तविक नाम व वार्डवार विवरण यहाँ देखे जा सकते हैं।
+        </p>
+
+        <!-- Access Denied Banner (if unauthorized email logs in) -->
+        <div class="admin-denied-box" id="authDeniedAlert" role="alert" hidden>
+          <span class="denied-icon" aria-hidden="true">⚠️</span>
+          <div>
+            <strong data-i18n="admin.deniedTitle">प्रवेश अस्वीकृत (Access Denied)</strong>
+            <p id="deniedEmailText" class="denied-email"></p>
+            <p data-i18n="admin.deniedDesc">
+              यह जीमेल आईडी अधिकृत सूची में नहीं है। केवल अधिकृत प्रत्याशी व अभियान एडमिन ही इस पोर्टल को देख सकते हैं।
+            </p>
+          </div>
+        </div>
+
+        <!-- Google Sign In Button -->
+        <div class="google-auth-actions">
+          <button type="button" class="btn btn-primary btn-lg btn-google-signin" id="btnGoogleSignIn">
+            <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span data-i18n="admin.googleSignInBtn">Google / Gmail से लॉगिन करें</span>
+          </button>
+        </div>
+
+        <!-- Emergency Passkey Section for offline or popup blocked -->
+        <div class="admin-passkey-box">
+          <details>
+            <summary class="passkey-summary" data-i18n="admin.passkeyFallback">
+              🔐 आपातकालीन पासकी लॉगिन (Emergency Passkey)
+            </summary>
+            <div class="passkey-form-row">
+              <label for="adminPinInput" class="visually-hidden" data-i18n="admin.enterPasskey">4-अंकीय पासकी दर्ज करें</label>
+              <input type="password" id="adminPinInput" maxlength="6" placeholder="4-अंकीय पासकी दर्ज करें" autocomplete="current-password">
+              <button type="button" class="btn btn-outline btn-sm" id="btnAdminPinLogin" data-i18n="admin.verifyPasskey">सत्यापित करें</button>
+            </div>
+            <p class="passkey-hint" id="pinErrorMsg" role="alert" hidden></p>
+          </details>
+        </div>
+
+        <div class="admin-whitelist-notice">
+          <span class="notice-icon" aria-hidden="true">ℹ️</span>
+          <p data-i18n="admin.authorizedEmailsNotice">
+            अधिकृत जीमेल आईडी: dineshkumarsuthar259@gmail.com, manojkumaracharyaanoopshahar@gmail.com आदि।
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 2: Candidate & Admin Dashboard (Visible when authorized) -->
+    <section class="admin-dashboard-section" id="adminDashboardView" hidden aria-labelledby="dashHeading">
+      <!-- Top User Bar -->
+      <div class="admin-user-bar">
+        <div class="admin-user-pill">
+          <span class="status-online-dot" aria-hidden="true"></span>
+          <span class="user-role-tag">अधिकृत प्रत्याशी / एडमिन:</span>
+          <strong id="adminUserEmailBadge">dineshkumarsuthar259@gmail.com</strong>
+        </div>
+        <div class="admin-user-actions">
+          <button type="button" class="btn btn-outline btn-sm btn-signout" id="btnAdminSignOut">
+            <span aria-hidden="true">🚪</span> <span data-i18n="admin.signOut">लॉग आउट करें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Metrics Grid -->
+      <div class="admin-kpi-grid">
+        <div class="admin-kpi-card">
+          <span class="kpi-icon" aria-hidden="true">💬</span>
+          <span class="kpi-label" data-i18n="admin.statsTotal">कुल समर्थन संदेश</span>
+          <strong class="kpi-value" id="kpiTotalMsgs">0</strong>
+        </div>
+        <div class="admin-kpi-card">
+          <span class="kpi-icon" aria-hidden="true">❤️</span>
+          <span class="kpi-label" data-i18n="admin.statsLikes">कुल जनसमर्थन लाइक्स</span>
+          <strong class="kpi-value" id="kpiTotalLikes">0</strong>
+        </div>
+        <div class="admin-kpi-card">
+          <span class="kpi-icon" aria-hidden="true">📷</span>
+          <span class="kpi-label" data-i18n="admin.statsPhotos">अपलोड की गई तस्वीरें</span>
+          <strong class="kpi-value" id="kpiTotalPhotos">0</strong>
+        </div>
+        <div class="admin-kpi-card">
+          <span class="kpi-icon" aria-hidden="true">📍</span>
+          <span class="kpi-label" data-i18n="admin.statsWards">सक्रिय वार्ड (11 वार्ड)</span>
+          <strong class="kpi-value" id="kpiWardsCount">0 / 11</strong>
+        </div>
+      </div>
+
+      <!-- Feed Filter & Search Controls -->
+      <div class="card admin-controls-card">
+        <div class="admin-controls-row">
+          <div class="search-box-wrap">
+            <label for="adminSearchInput" class="visually-hidden" data-i18n="admin.searchPlaceholder">खोजें</label>
+            <input type="search" id="adminSearchInput" placeholder="वास्तविक नाम, वार्ड, उपनाम या संदेश खोजें..." data-i18n-attr="placeholder:admin.searchPlaceholder">
+          </div>
+
+          <div class="filter-dropdown-wrap">
+            <label for="adminWardSelect" class="visually-hidden" data-i18n="admin.allWards">वार्ड चुनें</label>
+            <select id="adminWardSelect">
+              <option value="all" data-i18n="admin.allWards">सभी वार्ड (1-11)</option>
+              <option value="वार्ड 1">वार्ड 1</option>
+              <option value="वार्ड 2">वार्ड 2</option>
+              <option value="वार्ड 3">वार्ड 3</option>
+              <option value="वार्ड 4">वार्ड 4</option>
+              <option value="वार्ड 5">वार्ड 5</option>
+              <option value="वार्ड 6">वार्ड 6</option>
+              <option value="वार्ड 7">वार्ड 7</option>
+              <option value="वार्ड 8">वार्ड 8</option>
+              <option value="वार्ड 9">वार्ड 9</option>
+              <option value="वार्ड 10">वार्ड 10</option>
+              <option value="वार्ड 11">वार्ड 11</option>
+            </select>
+          </div>
+
+          <div class="export-actions">
+            <button type="button" class="btn btn-primary btn-sm btn-export-csv" id="btnExportCsv">
+              <span aria-hidden="true">📥</span> <span data-i18n="admin.exportCsv">CSV सूची डाउनलोड करें</span>
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="btnRefreshFeed" title="ताज़ा करें">
+              <span aria-hidden="true">🔄</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supporters List / Table -->
+      <div class="card admin-table-card">
+        <div class="card-head-bar">
+          <h2 id="dashHeading" class="card-head-title">
+            <span aria-hidden="true">📋</span> <span>मतदाता समर्थन विवरण (वास्तविक नामों के साथ)</span>
+          </h2>
+          <span class="showing-count" id="adminShowingCount">0 संदेश प्रदर्शित</span>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="adminSupportersTable">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col" data-i18n="admin.realNameCol">वास्तविक नाम (गोपनीय)</th>
+                <th scope="col" data-i18n="admin.wardCol">वार्ड (1-11)</th>
+                <th scope="col" data-i18n="admin.aliasCol">सार्वजनिक उपनाम</th>
+                <th scope="col" data-i18n="admin.messageCol">समर्थन संदेश</th>
+                <th scope="col" data-i18n="admin.photoCol">तस्वीर</th>
+                <th scope="col" data-i18n="admin.likesCol">लाइक्स</th>
+                <th scope="col" data-i18n="admin.dateCol">दिनांक व समय</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div class="admin-mobile-cards" id="adminMobileCards">
+          <!-- Dynamically Populated for Mobile -->
+        </div>
+
+        <div id="adminNoResults" class="admin-no-results" hidden>
+          <p>कोई संदेश नहीं मिला।</p>
+        </div>
+      </div>
+
+      <!-- Manage Whitelist Section (Grant Access to New Gmail) -->
+      <section class="card admin-grant-card" aria-labelledby="grantHeading">
+        <div class="card-head-bar">
+          <h3 id="grantHeading" class="card-head-title">
+            <span aria-hidden="true">👥</span> <span data-i18n="admin.grantHeading">नया जीमेल अधिकृत करें</span>
+          </h3>
+        </div>
+        <div class="grant-body">
+          <p class="grant-desc" data-i18n="admin.grantDesc">
+            केवल मुख्य एडमिन किसी अन्य विश्वसनीय सहयोगी को जीमेल एक्सेस प्रदान कर सकते हैं।
+          </p>
+          <div class="grant-form-row">
+            <label for="newGmailInput" class="visually-hidden">जीमेल आईडी दर्ज करें</label>
+            <input type="email" id="newGmailInput" placeholder="सहयोगी का जीमेल (उदा. volunteer@gmail.com)">
+            <button type="button" class="btn btn-outline" id="btnGrantGmail" data-i18n="admin.grantBtn">एक्सेस प्रदान करें</button>
+          </div>
+          <p class="grant-status" id="grantStatusMsg" aria-live="polite"></p>
+
+          <div class="current-whitelist-box">
+            <h4>वर्तमान अधिकृत जीमेल सूची:</h4>
+            <ul id="whitelistUl" class="whitelist-list">
+              <!-- Rendered list of authorized Gmails -->
+            </ul>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Photo Modal Lightbox for Admin View -->
+  <dialog class="photo-modal" id="adminPhotoModal" aria-label="Photo Viewer">
+    <div class="modal-backdrop" id="adminModalBackdrop"></div>
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="adminModalClose" aria-label="Close">✕</button>
+      <div class="modal-img-wrap">
+        <img id="adminModalImg" alt="समर्थक फ़ोटो">
+      </div>
+      <div class="modal-footer">
+        <p class="modal-caption" id="adminModalCaption">समर्थक तस्वीर</p>
+      </div>
+    </div>
+  </dialog>
+
+  <div data-chrome="footer"></div>
+
+  <script src="js/i18n.js?v=danaram"></script>
+  <script src="js/app.js?v=danaram"></script>
+</body>
+</html>
