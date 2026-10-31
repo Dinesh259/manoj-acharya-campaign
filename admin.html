@@ -160,6 +160,42 @@
         </div>
       </div>
 
+      <!-- Candidate Office Official Post Management Card -->
+      <section class="card admin-official-post-card" id="adminOfficialPostSection">
+        <div class="card-head-bar admin-official-header">
+          <h2 class="card-head-title" style="color: #92400E; margin: 0; font-size: 1.05rem;">
+            <span aria-hidden="true">🏛️</span> <span>प्रत्याशी कार्यालय मुख्य पोस्ट (Candidate Office Official Post)</span>
+          </h2>
+          <span class="fb-pinned-chip" id="officialPostStatusBadge">📌 समर्थन दीवार पर शीर्ष पर पिन</span>
+        </div>
+        <div class="admin-official-body">
+          <p style="font-size: 13.5px; color: #475569; margin: 0 0 12px 0;">
+            यह मुख्य आधिकारिक पोस्ट है जो जन समर्थन दीवार पर समस्त अनूपशहर ग्रामवासियों को सबसे ऊपर दिखती है। इसे केवल एडमिन पासकी द्वारा ही प्रबंधित किया जा सकता है।
+          </p>
+          <div class="admin-official-preview">
+            <img src="assets/campaign-poster.jpg" alt="आधिकारिक चुनावी पोस्टर - काजल रानी एवं मनोज कुमार आचार्य" class="admin-official-img">
+            <div style="flex: 1; min-width: 260px;">
+              <label for="adminOfficialCaptionInput" style="font-size: 13px; font-weight: 700; color: #1E293B; display: block; margin-bottom: 6px;">
+                आधिकारिक संदेश व आह्वान (Caption Text):
+              </label>
+              <textarea id="adminOfficialCaptionInput" rows="5" class="form-control" style="width: 100%; border-radius: 8px; border: 1.5px solid #CBD5E1; padding: 10px; font-size: 13.5px; line-height: 1.5; font-family: inherit;"></textarea>
+              <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; align-items: center;">
+                <button type="button" class="btn btn-primary btn-sm" id="btnPublishOfficialPost">
+                  <span aria-hidden="true">📢</span> <span>आधिकारिक पोस्ट अपडेट / प्रकाशित करें</span>
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" id="btnResetOfficialCaption">
+                  <span>डिफ़ॉल्ट संदेश भरें</span>
+                </button>
+                <a href="support-wall.html" target="_blank" class="btn btn-outline btn-sm">
+                  <span>दीवार पर लाइव देखें ↗️</span>
+                </a>
+              </div>
+              <p id="officialPostAlertMsg" style="margin-top: 8px; font-size: 13px; font-weight: 600;" hidden></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Supporters List / Table -->
       <div class="card admin-table-card">
         <div class="card-head-bar">

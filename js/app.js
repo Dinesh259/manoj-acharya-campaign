@@ -1241,6 +1241,9 @@
   /* Helper: Deterministic & automatic unique avatar for each user */
   function getUserAvatar(userId) {
     var uid = (userId || '').trim();
+    if (uid === 'OFFICE-MKA' || uid === 'CANDIDATE-OFFICE') {
+      return { icon: '🏛️', bgClass: 'avatar-grad-8 avatar-office-special', title: 'प्रत्याशी कार्यालय (काजल रानी - मनोज कुमार आचार्य)' };
+    }
     if (!uid || uid === 'ANP-0000') {
       return { icon: '👤', bgClass: 'avatar-grad-2', title: 'समर्थक' };
     }
@@ -1341,9 +1344,12 @@
       }
     }
 
-    /* Helper: Public author display (Returns "समर्थक ANP-XXXX"; Real name NEVER shown publicly) */
+    /* Helper: Public author display (Returns "समर्थक ANP-XXXX"; Real name NEVER shown publicly; Official post has official title) */
     function getPublicAuthorDisplay(msg) {
       var uid = (msg && (msg.userId || msg.alias)) || '';
+      if (uid === 'OFFICE-MKA' || uid === 'CANDIDATE-OFFICE' || (msg && msg.category === 'candidate_office')) {
+        return 'काजल रानी (सरपंच पद उम्मीदवार) · निवेदक मनोज कुमार आचार्य';
+      }
       if (uid && /^ANP-\d{4}$/.test(uid)) {
         return t('wall.supporterPrefix') + ' ' + uid;
       }
@@ -2165,11 +2171,13 @@
       });
     }
 
-    // Render Facebook Feed cards (Unique User ID displayed publicly; Real name strictly confidential for admin)
+    // Render Facebook Feed cards (Unique User ID displayed publicly; Candidate Office Post pinned on top)
     function renderFeed() {
       if (!grid) return;
       var filtered = messagesList.filter(function (m) {
         if (currentFilter === 'all') return true;
+        // Keep candidate office post visible across all ward filters so every voter sees the campaign message
+        if (m.category === 'candidate_office' || m.alias === 'OFFICE-MKA' || m.userId === 'OFFICE-MKA') return true;
         return m.ward === currentFilter;
       });
 
@@ -2182,26 +2190,51 @@
         return;
       }
 
+      function isOffice(m) {
+        return m.category === 'candidate_office' || m.alias === 'OFFICE-MKA' || m.userId === 'OFFICE-MKA';
+      }
+      var officeList = filtered.filter(isOffice);
+      var regularList = filtered.filter(function (m) { return !isOffice(m); });
+      var ordered = officeList.concat(regularList);
+
       var defaultCommenterName = t('wall.supporterPrefix') + ' ' + myUniqueId;
 
       var html = '';
-      filtered.forEach(function (msg) {
+      ordered.forEach(function (msg) {
+        var isOfficial = isOffice(msg);
         var liked = isLiked(msg.id);
         var publicAuthor = getPublicAuthorDisplay(msg);
         var timeStr = formatRelativeTime(msg.createdAt);
         var comments = getComments(msg.id);
 
-        html += '<article class="card fb-post-card support-msg-card" data-msg-id="' + esc(msg.id) + '">' +
-          '<!-- Facebook Post Header: Unique Supporter ID (Real name confidential for admin) -->' +
+        var bannerTop = isOfficial ?
+          ('<div class="fb-official-banner-top">' +
+            '<div class="fb-official-banner-left">' +
+              '<span class="fb-official-badge">⭐ मुख्य आधिकारिक पोस्ट</span>' +
+              '<span>ग्राम पंचायत अनूपशहर</span>' +
+            '</div>' +
+            '<span class="fb-pinned-chip">📌 शीर्ष पर पिन</span>' +
+          '</div>') : '';
+
+        var authorBadge = isOfficial ?
+          '<span class="verified-supporter-badge fb-official-verified-badge" title="आधिकारिक प्रत्याशी कार्यालय" aria-label="आधिकारिक">⭐</span>' :
+          '<span class="verified-supporter-badge" title="सत्यापित मतदाता पहचान" aria-label="सत्यापित पहचान">✓</span>';
+
+        var wardText = isOfficial ? 'समस्त 11 वार्ड (अनूपशहर)' : (msg.ward || 'अनूपशहर');
+        var cardClass = 'card fb-post-card support-msg-card' + (isOfficial ? ' fb-official-post' : '');
+
+        html += '<article class="' + cardClass + '" data-msg-id="' + esc(msg.id) + '">' +
+          bannerTop +
+          '<!-- Facebook Post Header: Supporter / Official Candidate Office -->' +
           '<div class="fb-card-header">' +
-            renderAvatarDisc(msg.userId || msg.alias, 'avatar-md', 'fb-author-avatar') +
+            renderAvatarDisc(msg.userId || msg.alias, 'avatar-md', 'fb-author-avatar' + (isOfficial ? ' avatar-office-special' : '')) +
             '<div class="fb-author-meta">' +
               '<div class="fb-author-name-row">' +
                 '<strong class="fb-author-name">' + esc(publicAuthor) + '</strong>' +
-                '<span class="verified-supporter-badge" title="सत्यापित मतदाता पहचान" aria-label="सत्यापित पहचान">✓</span>' +
+                authorBadge +
               '</div>' +
               '<div class="fb-post-subrow">' +
-                '<span class="fb-post-ward">📍 ' + esc(msg.ward || 'अनूपशहर') + '</span>' +
+                '<span class="fb-post-ward">📍 ' + esc(wardText) + '</span>' +
                 '<span class="fb-dot-sep">·</span>' +
                 '<span class="fb-post-time">' + esc(timeStr) + '</span>' +
                 '<span class="fb-dot-sep">·</span>' +
@@ -2510,6 +2543,7 @@
               name: realName,
               message: (f.message && f.message.stringValue) || '',
               photo: (f.photo && f.photo.stringValue) || null,
+              category: (f.category && f.category.stringValue) || '',
               ward: (f.ward && f.ward.stringValue) || '',
               avatar: (f.avatar && f.avatar.stringValue) || '👤',
               status: (f.status && f.status.stringValue) || 'active',
@@ -2716,6 +2750,19 @@
     var commentsCount = $('#adminCommentsCount');
     var noComments = $('#adminNoComments');
 
+    var officialCaptionInput = $('#adminOfficialCaptionInput');
+    var btnPublishOfficial = $('#btnPublishOfficialPost');
+    var btnResetOfficial = $('#btnResetOfficialCaption');
+    var officialStatusBadge = $('#officialPostStatusBadge');
+    var officialAlertMsg = $('#officialPostAlertMsg');
+
+    var DEFAULT_OFFICIAL_CAPTION = 'मेरी पंचायत - मेरा सम्मान, मेरी पंचायत - मेरा विकास! 🇮🇳\n' +
+      'अनूपशहर ग्राम पंचायत के सभी सम्मानित बुजुर्गों, माताओं-बहनों, किसान भाइयों और युवा साथियों को सादर प्रणाम।\n\n' +
+      'ग्राम पंचायत अनूपशहर के सर्वांगीण विकास, खुशहाल किसान, आधुनिक शिक्षा व पारदर्शी पंचायत व्यवस्था के निर्माण हेतु सरपंच पद की कर्मठ, शिक्षित एवं संघर्षशील प्रत्याशी श्रीमती काजल रानी (निवेदक: मनोज कुमार आचार्य) आप सभी के बीच सेवा का संकल्प लेकर उपस्थित हैं।\n\n' +
+      'आइए, अनूपशहर के उज्ज्वल भविष्य के लिए अपना आशीर्वाद और समर्थन दें। आप सभी ग्रामवासी नीचे कमेंट में या अपना समर्थन संदेश लिखकर अपने विचार साझा करें।\n' +
+      '"आपका साथ - हमारा संकल्प! आपका वोट - हमारी ताकत!"\n\n' +
+      '— मुख्य चुनाव कार्यालय: काजल रानी (सरपंच प्रत्याशी) एवं मनोज कुमार आचार्य (निवेदक)';
+
     var PASSKEY = '9529';
     var allMessages = [];
     var allComments = [];
@@ -2805,6 +2852,7 @@
               name: (f.name && f.name.stringValue) || '',
               message: (f.message && f.message.stringValue) || '',
               photo: (f.photo && f.photo.stringValue) || null,
+              category: (f.category && f.category.stringValue) || '',
               ward: (f.ward && f.ward.stringValue) || 'वार्ड 1',
               avatar: (f.avatar && f.avatar.stringValue) || '🦁',
               status: (f.status && f.status.stringValue) || 'active',
@@ -2850,6 +2898,7 @@
           updateKpis();
           renderAdminTable();
           renderAdminCommentsTable();
+          syncOfficialPostCard();
         })
         .catch(function (err) {
           console.error('loadAdminFeed error:', err);
@@ -2858,7 +2907,99 @@
           updateKpis();
           renderAdminTable();
           renderAdminCommentsTable();
+          syncOfficialPostCard();
         });
+    }
+
+    function syncOfficialPostCard() {
+      var officialPost = allMessages.find(function (m) {
+        return m.category === 'candidate_office' || m.alias === 'OFFICE-MKA';
+      });
+      if (officialCaptionInput) {
+        if (!officialCaptionInput.value || officialCaptionInput.getAttribute('data-touched') !== '1') {
+          officialCaptionInput.value = officialPost ? officialPost.message : DEFAULT_OFFICIAL_CAPTION;
+        }
+      }
+      if (officialStatusBadge) {
+        if (officialPost) {
+          officialStatusBadge.textContent = '✅ सक्रिय व लाइव (दीवार पर शीर्ष पर पिन)';
+          officialStatusBadge.style.background = '#ECFDF5';
+          officialStatusBadge.style.color = '#065F46';
+          officialStatusBadge.style.borderColor = '#A7F3D0';
+        } else {
+          officialStatusBadge.textContent = '⚠️ अभी तक प्रकाशित नहीं';
+          officialStatusBadge.style.background = '#FEF2F2';
+          officialStatusBadge.style.color = '#991B1B';
+          officialStatusBadge.style.borderColor = '#FECACA';
+        }
+      }
+    }
+
+    if (btnResetOfficial && officialCaptionInput) {
+      btnResetOfficial.addEventListener('click', function () {
+        officialCaptionInput.value = DEFAULT_OFFICIAL_CAPTION;
+        officialCaptionInput.setAttribute('data-touched', '1');
+      });
+    }
+
+    if (btnPublishOfficial && officialCaptionInput) {
+      btnPublishOfficial.addEventListener('click', function () {
+        var text = officialCaptionInput.value.trim();
+        if (!text) {
+          alert('कृपया आधिकारिक संदेश दर्ज करें।');
+          return;
+        }
+        btnPublishOfficial.disabled = true;
+        btnPublishOfficial.textContent = 'प्रकाशित किया जा रहा है...';
+
+        var existing = allMessages.find(function (m) {
+          return m.category === 'candidate_office' || m.alias === 'OFFICE-MKA';
+        });
+
+        var cleanupPromise = existing ? executeDeleteDoc(FIRESTORE_BASE, existing.id) : Promise.resolve();
+
+        cleanupPromise
+          .then(function () {
+            var payload = {
+              fields: {
+                alias: { stringValue: 'OFFICE-MKA' },
+                name: { stringValue: 'काजल रानी (सरपंच पद उम्मीदवार) - निवेदक मनोज कुमार आचार्य' },
+                category: { stringValue: 'candidate_office' },
+                ward: { stringValue: 'समस्त 11 वार्ड (अनूपशहर)' },
+                avatar: { stringValue: '🏛️' },
+                photo: { stringValue: 'assets/campaign-poster.jpg' },
+                message: { stringValue: text },
+                likes: { integerValue: existing ? String(existing.likes || 1) : '1' },
+                createdAt: { timestampValue: new Date().toISOString() }
+              }
+            };
+            return fetch(FIRESTORE_BASE, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) throw new Error('Publish error HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function () {
+            if (officialAlertMsg) {
+              officialAlertMsg.textContent = '✅ मुख्य आधिकारिक पोस्ट सफलतापूर्वक प्रकाशित व अपडेट हो गई!';
+              officialAlertMsg.style.color = '#15803D';
+              officialAlertMsg.hidden = false;
+              setTimeout(function () { officialAlertMsg.hidden = true; }, 5000);
+            }
+            loadAdminFeed();
+          })
+          .catch(function (err) {
+            alert('आधिकारिक पोस्ट प्रकाशित करने में त्रुटि: ' + (err.message || ''));
+          })
+          .finally(function () {
+            btnPublishOfficial.disabled = false;
+            btnPublishOfficial.innerHTML = '<span aria-hidden="true">📢</span> <span>आधिकारिक पोस्ट अपडेट / प्रकाशित करें</span>';
+          });
+      });
     }
 
     function updateKpis() {
@@ -3087,12 +3228,18 @@
           '</button>' :
           '<span class="no-photo-badge">—</span>';
 
-        var purgeUserBtn = (m.name && m.name.trim()) ?
+        var isOfficialPost = (m.category === 'candidate_office' || m.alias === 'OFFICE-MKA');
+        var officialTag = isOfficialPost ? '<br><span class="fb-official-badge" style="font-size:10.5px; margin-top:3px;">⭐ मुख्य आधिकारिक पोस्ट</span>' : '';
+        var purgeUserBtn = (m.name && m.name.trim() && !isOfficialPost) ?
           '<br><button type="button" class="btn-purge-person" data-name="' + esc(m.name) + '" data-alias="' + esc(m.userId || m.alias) + '" title="इस व्यक्ति के सभी पोस्ट व कमेंट हटाएं">👤 सारा डेटा हटाएं</button>' : '';
+
+        var nameCell = isOfficialPost ?
+          ('<div><strong class="real-name-text" style="color:#B45309;">🏛️ ' + esc(m.name || 'प्रत्याशी कार्यालय') + '</strong>' + officialTag + '</div>') :
+          ('<div><strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong>' + purgeUserBtn + '</div>');
 
         tHtml += '<tr>' +
           '<td>' + (idx + 1) + '</td>' +
-          '<td><strong class="real-name-text">👤 ' + esc(m.name || 'अज्ञात') + '</strong>' + purgeUserBtn + '</td>' +
+          '<td>' + nameCell + '</td>' +
           '<td><span class="ward-tag-pill">' + esc(m.ward || 'वार्ड 1') + '</span></td>' +
           '<td><div class="admin-user-cell">' + renderAvatarDisc(m.userId || m.alias, 'avatar-xs') + ' <span class="alias-pill-sm">🆔 ' + esc(m.userId || m.alias || 'ANP-0000') + '</span></div></td>' +
           '<td class="msg-cell-text">' + esc(m.message) + '</td>' +
