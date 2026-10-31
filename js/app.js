@@ -1238,6 +1238,10 @@
     /* Helper: Unique User ID Generation & Persistence (First-time visitor assignment) */
     function getOrCreateUserUniqueId() {
       try {
+        // Support testing as a new user via ?new=1 or ?reset=1 query parameter
+        if (window.location.search && /[?&](new|reset)=1/.test(window.location.search)) {
+          localStorage.removeItem('mka_user_unique_id');
+        }
         var stored = localStorage.getItem('mka_user_unique_id');
         if (stored && /^ANP-\d{4}$/.test(stored)) {
           return stored;
