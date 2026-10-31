@@ -199,80 +199,48 @@
     var current = body.getAttribute('data-page') || 'index.html';
     var head = $('[data-chrome="header"]');
     if (head) {
-      if (current === 'support-wall.html') {
-        head.outerHTML =
-          '<header class="fb-app-header" role="banner">' +
-            '<div class="wrap fb-app-header-inner">' +
-              '<a href="index.html" class="fb-header-back" aria-label="' + esc(t('nav.home')) + '">' +
-                '<span class="fb-back-arrow" aria-hidden="true">←</span> ' +
-                '<span class="fb-back-text" data-i18n="nav.home">' + esc(t('nav.home')) + '</span>' +
-              '</a>' +
-              '<div class="fb-header-title-box">' +
-                '<span class="fb-header-logo-icon" aria-hidden="true">💬</span>' +
-                '<div class="fb-header-title-wrap">' +
-                  '<h1 class="fb-header-title" data-i18n="wall.feedHeading">' + esc(t('wall.feedHeading')) + '</h1>' +
-                  '<span class="fb-header-sub" data-i18n="wall.feedSub">' + esc(t('wall.feedSub')) + '</span>' +
-                '</div>' +
-              '</div>' +
-              '<div class="fb-header-right-tools">' +
-                '<button type="button" class="btn btn-primary fb-header-btn-create" id="btnToggleCreatePost">' +
-                  '<span aria-hidden="true">✍️</span> <span data-i18n="wall.createPostBtn">' + esc(t('wall.createPostBtn')) + '</span>' +
-                '</button>' +
-                (function () {
-                  var isEn = lang === 'en';
-                  return '<button type="button" class="btn-lang' + (isEn ? ' is-on is-en' : '') + '" id="langBtn" aria-pressed="' + (isEn ? 'true' : 'false') + '" data-lang="' + lang + '" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' +
-                    icon('globe') +
-                    '<span class="lang-tag" aria-hidden="true" lang="' + (isEn ? 'hi' : 'en') + '">' + (isEn ? 'HI' : 'EN') + '</span>' +
-                    '<span class="switch-indicator" aria-hidden="true"></span>' +
-                  '</button>';
-                })() +
-              '</div>' +
-            '</div>' +
-          '</header>';
-      } else {
-        head.outerHTML =
-          '<aside class="top-announcement-bar" role="region" aria-label="Announcement">' +
-            '<div class="wrap ann-content">' +
-              '<span class="ann-badge">✨ <span data-i18n="meeting.tag">' + esc(t('meeting.tag')) + '</span></span>' +
-              '<a href="index.html#meeting-gallery" class="ann-link" data-i18n="meeting.alert">' +
-                esc(t('meeting.alert')) +
-              '</a>' +
-            '</div>' +
-          '</aside>' +
-          '<header class="site-header">' +
-            '<div class="wrap bar">' +
-              '<a class="brand" href="index.html"><span class="brand-name" data-i18n="common.siteName">मनोज कुमार आचार्य</span>' +
-              '<span class="brand-role" data-i18n="common.siteRole">सरपंच प्रत्याशी · ग्राम पंचायत अनूपशहर</span></a>' +
-              '<nav class="desktop-nav-links" aria-label="Desktop Navigation">' +
-                '<a href="index.html" class="desktop-nav-link"' + (current === 'index.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.home">मुख्य पेज</span></a>' +
-                '<a href="how-to-vote.html" class="desktop-nav-link"' + (current === 'how-to-vote.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.howToVote">वोट कैसे दें</span></a>' +
-                '<a href="check-name.html" class="desktop-nav-link"' + (current === 'check-name.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.checkName">नाम जाँचें</span></a>' +
-                '<a href="find-booth.html" class="desktop-nav-link"' + (current === 'find-booth.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.findBooth">बूथ खोजें</span></a>' +
-                '<a href="contact.html" class="desktop-nav-link"' + (current === 'contact.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.contact">संपर्क</span></a>' +
-              '</nav>' +
-              '<a href="manifesto.html" class="btn-manifesto-nav"' + (current === 'manifesto.html' ? ' aria-current="page"' : '') + ' data-i18n-attr="aria-label:nav.manifestoNav;title:nav.manifestoNav">' + icon('list') + '<span class="manifesto-nav-text" data-i18n="nav.manifestoNav">मेरे वादे</span></a>' +
-              (function () {
-                var isEn = lang === 'en';
-                return '<button type="button" class="btn-lang' + (isEn ? ' is-on is-en' : '') + '" id="langBtn" aria-pressed="' + (isEn ? 'true' : 'false') + '" data-lang="' + lang + '" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' +
-                  icon('globe') +
-                  '<span class="lang-tag" aria-hidden="true" lang="' + (isEn ? 'hi' : 'en') + '">' + (isEn ? 'HI' : 'EN') + '</span>' +
-                  '<span class="switch-indicator" aria-hidden="true"></span>' +
-                '</button>';
-              })() +
-              '<button type="button" class="btn-menu" id="menuBtn" aria-expanded="false" aria-controls="siteNav">' +
-                '<span class="label" data-i18n="common.menu">मेनू</span></button>' +
-            '</div>' +
-            '<nav id="siteNav" class="site-nav" data-i18n-attr="aria-label:common.navLabel"><div class="wrap">' +
-              '<div class="nav-group"><p class="nav-head" data-i18n="common.navVoter">' + esc(t('common.navVoter')) + '</p><ul>' + navList(NAV_VOTER, current) + '</ul></div>' +
-              '<div class="nav-group cand"><p class="nav-head" data-i18n="common.navCandidate">' + esc(t('common.navCandidate')) + '</p><ul>' + navList(NAV_CAND, current) + '</ul></div>' +
-            '</div></nav>' +
-          '</header>' +
-          '<div class="toolbar-band"><div class="wrap toolbar" role="group" data-i18n-attr="aria-label:common.toolsLabel">' +
-            '<button type="button" class="tool-btn icon-only" id="ttsBtn" aria-pressed="false" data-i18n-attr="aria-label:common.listen;title:common.listen">' + icon('speaker') + '</button>' +
-            '<button type="button" class="tool-btn icon-only" id="textBtn" aria-pressed="false" data-i18n-attr="aria-label:common.largeText;title:common.largeText">' + icon('text') + '</button>' +
-            '<button type="button" class="tool-btn icon-only" id="hcBtn" aria-pressed="false" data-i18n-attr="aria-label:common.contrast;title:common.contrast">' + icon('contrast') + '</button>' +
-          '</div></div>';
-      }
+      head.outerHTML =
+        '<aside class="top-announcement-bar" role="region" aria-label="Announcement">' +
+          '<div class="wrap ann-content">' +
+            '<span class="ann-badge">✨ <span data-i18n="meeting.tag">' + esc(t('meeting.tag')) + '</span></span>' +
+            '<a href="index.html#meeting-gallery" class="ann-link" data-i18n="meeting.alert">' +
+              esc(t('meeting.alert')) +
+            '</a>' +
+          '</div>' +
+        '</aside>' +
+        '<header class="site-header">' +
+          '<div class="wrap bar">' +
+            '<a class="brand" href="index.html"><span class="brand-name" data-i18n="common.siteName">मनोज कुमार आचार्य</span>' +
+            '<span class="brand-role" data-i18n="common.siteRole">सरपंच प्रत्याशी · ग्राम पंचायत अनूपशहर</span></a>' +
+            '<nav class="desktop-nav-links" aria-label="Desktop Navigation">' +
+              '<a href="index.html" class="desktop-nav-link"' + (current === 'index.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.home">मुख्य पेज</span></a>' +
+              '<a href="how-to-vote.html" class="desktop-nav-link"' + (current === 'how-to-vote.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.howToVote">वोट कैसे दें</span></a>' +
+              '<a href="check-name.html" class="desktop-nav-link"' + (current === 'check-name.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.checkName">नाम जाँचें</span></a>' +
+              '<a href="find-booth.html" class="desktop-nav-link"' + (current === 'find-booth.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.findBooth">बूथ खोजें</span></a>' +
+              '<a href="contact.html" class="desktop-nav-link"' + (current === 'contact.html' ? ' aria-current="page"' : '') + '><span data-i18n="nav.contact">संपर्क</span></a>' +
+            '</nav>' +
+            '<a href="manifesto.html" class="btn-manifesto-nav"' + (current === 'manifesto.html' ? ' aria-current="page"' : '') + ' data-i18n-attr="aria-label:nav.manifestoNav;title:nav.manifestoNav">' + icon('list') + '<span class="manifesto-nav-text" data-i18n="nav.manifestoNav">मेरे वादे</span></a>' +
+            (function () {
+              var isEn = lang === 'en';
+              return '<button type="button" class="btn-lang' + (isEn ? ' is-on is-en' : '') + '" id="langBtn" aria-pressed="' + (isEn ? 'true' : 'false') + '" data-lang="' + lang + '" data-i18n-attr="aria-label:common.langBtnLabel;title:common.langBtnLabel">' +
+                icon('globe') +
+                '<span class="lang-tag" aria-hidden="true" lang="' + (isEn ? 'hi' : 'en') + '">' + (isEn ? 'HI' : 'EN') + '</span>' +
+                '<span class="switch-indicator" aria-hidden="true"></span>' +
+              '</button>';
+            })() +
+            '<button type="button" class="btn-menu" id="menuBtn" aria-expanded="false" aria-controls="siteNav">' +
+              '<span class="label" data-i18n="common.menu">मेनू</span></button>' +
+          '</div>' +
+          '<nav id="siteNav" class="site-nav" data-i18n-attr="aria-label:common.navLabel"><div class="wrap">' +
+            '<div class="nav-group"><p class="nav-head" data-i18n="common.navVoter">' + esc(t('common.navVoter')) + '</p><ul>' + navList(NAV_VOTER, current) + '</ul></div>' +
+            '<div class="nav-group cand"><p class="nav-head" data-i18n="common.navCandidate">' + esc(t('common.navCandidate')) + '</p><ul>' + navList(NAV_CAND, current) + '</ul></div>' +
+          '</div></nav>' +
+        '</header>' +
+        '<div class="toolbar-band"><div class="wrap toolbar" role="group" data-i18n-attr="aria-label:common.toolsLabel">' +
+          '<button type="button" class="tool-btn icon-only" id="ttsBtn" aria-pressed="false" data-i18n-attr="aria-label:common.listen;title:common.listen">' + icon('speaker') + '</button>' +
+          '<button type="button" class="tool-btn icon-only" id="textBtn" aria-pressed="false" data-i18n-attr="aria-label:common.largeText;title:common.largeText">' + icon('text') + '</button>' +
+          '<button type="button" class="tool-btn icon-only" id="hcBtn" aria-pressed="false" data-i18n-attr="aria-label:common.contrast;title:common.contrast">' + icon('contrast') + '</button>' +
+        '</div></div>';
     }
     var foot = $('[data-chrome="footer"]');
     if (foot) {
