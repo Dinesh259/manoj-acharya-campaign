@@ -24,24 +24,25 @@
   <div data-chrome="header"></div>
 
   <main id="main" class="wrap fb-feed-wrap">
-    <!-- Facebook Style Feed Header -->
-    <div class="fb-feed-header">
-      <div class="fb-feed-header-text">
-        <h1 class="fb-feed-title" data-i18n="wall.feedHeading">जन समर्थन पोस्ट</h1>
-        <p class="fb-feed-subtitle" data-i18n="wall.feedSub">अनूपशहर के 11 वार्डों से जनसमर्थन व चर्चा</p>
-      </div>
-      <div class="fb-feed-header-stats">
-        <span class="fb-count-badge">
-          <span data-i18n="wall.countLabel">कुल पोस्ट</span>: <strong id="feedCountNumber">0</strong>
-        </span>
-      </div>
+    <!-- Facebook Style "Create Post" Trigger Card -->
+    <div class="fb-create-trigger-card" id="fbCreateTriggerCard">
+      <div class="fb-trigger-avatar" aria-hidden="true">👤</div>
+      <button type="button" class="fb-trigger-fake-input" id="btnTriggerCreatePost" aria-label="पोस्ट लिखें">
+        <span class="fb-trigger-placeholder" data-i18n="wall.triggerPlaceholder">मनोज जी के समर्थन में अपने विचार लिखें...</span>
+      </button>
+      <button type="button" class="btn btn-primary fb-trigger-action-btn" id="btnTriggerCreatePost2">
+        <span aria-hidden="true">✍️</span> <span data-i18n="wall.createPostBtn">पोस्ट लिखें</span>
+      </button>
     </div>
 
-    <!-- Facebook Style "Create Post" Composer Card -->
-    <section class="card fb-composer-card" id="postSupportSection" aria-label="Create Post">
+    <!-- Facebook Style "Create Post" Composer Card (Hidden by default; opens when Create Post is clicked) -->
+    <section class="card fb-composer-card" id="postSupportSection" aria-label="Create Post" hidden>
       <div class="fb-composer-head">
-        <span class="fb-composer-avatar" aria-hidden="true">✍️</span>
-        <h2 class="fb-composer-title" data-i18n="wall.formHeading">पोस्ट लिखें</h2>
+        <div class="fb-composer-head-left">
+          <span class="fb-composer-avatar" aria-hidden="true">✍️</span>
+          <h2 class="fb-composer-title" data-i18n="wall.formHeading">पोस्ट लिखें</h2>
+        </div>
+        <button type="button" class="fb-composer-close-btn" id="btnCloseComposer" aria-label="बंद करें" title="बंद करें">✕</button>
       </div>
 
       <form id="supportForm" novalidate class="fb-composer-form">
@@ -93,29 +94,38 @@
               <span data-i18n="wall.photoAttach">फ़ोटो जोड़ें</span>
             </button>
           </div>
-          <button type="submit" class="btn btn-primary fb-submit-post-btn" id="btnSubmitSupport">
-            <span aria-hidden="true">✍️</span> <span data-i18n="wall.publishPost">पोस्ट करें</span>
-          </button>
+          <div class="fb-composer-right-actions">
+            <button type="button" class="btn btn-outline fb-cancel-btn" id="btnCancelComposer">रद्द करें</button>
+            <button type="submit" class="btn btn-primary fb-submit-post-btn" id="btnSubmitSupport">
+              <span aria-hidden="true">✍️</span> <span data-i18n="wall.publishPost">पोस्ट करें</span>
+            </button>
+          </div>
         </div>
       </form>
     </section>
 
     <!-- Support Feed Stream -->
     <section class="wall-feed-section" id="wallFeedSection" aria-label="Support Posts Feed">
-      <!-- Ward Filter Pills (Ward 1 to 11) -->
-      <div class="filter-pills fb-filter-bar" role="tablist" aria-label="Filter Posts by Ward">
-        <button type="button" class="filter-pill is-active" data-filter="all" role="tab" aria-selected="true" data-i18n="wall.filterAll">सभी 11 वार्ड</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 1" role="tab" aria-selected="false">वार्ड 1</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 2" role="tab" aria-selected="false">वार्ड 2</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 3" role="tab" aria-selected="false">वार्ड 3</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 4" role="tab" aria-selected="false">वार्ड 4</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 5" role="tab" aria-selected="false">वार्ड 5</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 6" role="tab" aria-selected="false">वार्ड 6</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 7" role="tab" aria-selected="false">वार्ड 7</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 8" role="tab" aria-selected="false">वार्ड 8</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 9" role="tab" aria-selected="false">वार्ड 9</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 10" role="tab" aria-selected="false">वार्ड 10</button>
-        <button type="button" class="filter-pill" data-filter="वार्ड 11" role="tab" aria-selected="false">वार्ड 11</button>
+      <!-- Filter Bar & Count -->
+      <div class="fb-filter-row">
+        <!-- Ward Filter Pills (Ward 1 to 11) -->
+        <div class="filter-pills fb-filter-bar" role="tablist" aria-label="Filter Posts by Ward">
+          <button type="button" class="filter-pill is-active" data-filter="all" role="tab" aria-selected="true" data-i18n="wall.filterAll">सभी 11 वार्ड</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 1" role="tab" aria-selected="false">वार्ड 1</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 2" role="tab" aria-selected="false">वार्ड 2</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 3" role="tab" aria-selected="false">वार्ड 3</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 4" role="tab" aria-selected="false">वार्ड 4</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 5" role="tab" aria-selected="false">वार्ड 5</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 6" role="tab" aria-selected="false">वार्ड 6</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 7" role="tab" aria-selected="false">वार्ड 7</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 8" role="tab" aria-selected="false">वार्ड 8</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 9" role="tab" aria-selected="false">वार्ड 9</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 10" role="tab" aria-selected="false">वार्ड 10</button>
+          <button type="button" class="filter-pill" data-filter="वार्ड 11" role="tab" aria-selected="false">वार्ड 11</button>
+        </div>
+        <span class="fb-count-badge">
+          <span data-i18n="wall.countLabel">कुल पोस्ट</span>: <strong id="feedCountNumber">0</strong>
+        </span>
       </div>
 
       <!-- Messages Grid -->
