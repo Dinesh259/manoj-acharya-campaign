@@ -1327,70 +1327,8 @@
     if (btnCloseComposer) btnCloseComposer.addEventListener('click', closeComposer);
     if (btnCancelComposer) btnCancelComposer.addEventListener('click', closeComposer);
 
-    var STARTER_MESSAGES = [
-      {
-        id: 'starter-1',
-        userId: 'ANP-1042',
-        alias: 'ANP-1042',
-        name: 'सुरेश कुमार जांगिड़',
-        ward: 'वार्ड 1',
-        avatar: '🦁',
-        message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!',
-        likes: 28,
-        createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
-      },
-      {
-        id: 'starter-2',
-        userId: 'ANP-5821',
-        alias: 'ANP-5821',
-        name: 'महावीर सिंह',
-        ward: 'वार्ड 5',
-        avatar: '🌾',
-        message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।',
-        likes: 34,
-        createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
-      },
-      {
-        id: 'starter-3',
-        userId: 'ANP-4390',
-        alias: 'ANP-4390',
-        name: 'कमला देवी',
-        ward: 'वार्ड 4',
-        avatar: '🌟',
-        message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।',
-        likes: 41,
-        createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
-      },
-      {
-        id: 'starter-4',
-        userId: 'ANP-9175',
-        alias: 'ANP-9175',
-        name: 'रामकुमार शर्मा',
-        ward: 'वार्ड 11',
-        avatar: '🤝',
-        message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!',
-        likes: 52,
-        createdAt: new Date(Date.now() - 3600000 * 36).toISOString()
-      }
-    ];
-
-    var DEFAULT_COMMENTS = {
-      'starter-1': [
-        { name: 'समर्थक ANP-2184', text: 'खेल मैदान 2 और लाइब्रेरी का संकल्प बहुत ही सराहनीय है। पूरा वार्ड 1 आपके साथ है!', time: new Date(Date.now() - 3600000 * 3).toISOString() },
-        { name: 'समर्थक ANP-7490', text: 'मनोज भाई हमेशा युवाओं के साथ खड़े रहे हैं। विजय निश्चित है!', time: new Date(Date.now() - 3600000 * 2).toISOString() }
-      ],
-      'starter-2': [
-        { name: 'समर्थक ANP-6431', text: 'नालियों और पक्की सड़कों के लिए मनोज जी ही सबसे योग्य प्रत्याशी हैं।', time: new Date(Date.now() - 3600000 * 8).toISOString() },
-        { name: 'समर्थक ANP-8120', text: 'किसान भाइयों की समस्याओं को हमेशा प्रमुखता से उठाया है। समर्थन जारी रहेगा।', time: new Date(Date.now() - 3600000 * 4).toISOString() }
-      ],
-      'starter-3': [
-        { name: 'समर्थक ANP-3920', text: 'गाँव में महिलाओं और बच्चों के लिए पार्क व झूले बहुत जरूरी हैं। हमारा पूरा आशीर्वाद!', time: new Date(Date.now() - 3600000 * 18).toISOString() }
-      ],
-      'starter-4': [
-        { name: 'समर्थक ANP-8512', text: '20 अक्टूबर की ऐतिहासिक जनसभा से साफ हो गया है कि जनता बदलाव चाहती है!', time: new Date(Date.now() - 3600000 * 28).toISOString() },
-        { name: 'समर्थक ANP-1994', text: 'अनूपशहर की खुशहाली के लिए सभी 11 वार्ड एकजुट हैं।', time: new Date(Date.now() - 3600000 * 16).toISOString() }
-      ]
-    };
+    var STARTER_MESSAGES = [];
+    var DEFAULT_COMMENTS = {};
 
     function getComments(msgId) {
       try {
@@ -2079,23 +2017,12 @@
             return new Date(b.createdAt) - new Date(a.createdAt);
           });
 
-          allMessages = parsed.concat([
-            { id: 'starter-1', userId: 'ANP-1042', alias: 'ANP-1042', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
-            { id: 'starter-2', userId: 'ANP-5821', alias: 'ANP-5821', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
-            { id: 'starter-3', userId: 'ANP-4390', alias: 'ANP-4390', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
-            { id: 'starter-4', userId: 'ANP-9175', alias: 'ANP-9175', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
-          ]);
-
+          allMessages = parsed;
           updateKpis();
           renderAdminTable();
         })
         .catch(function () {
-          allMessages = [
-            { id: 'starter-1', userId: 'ANP-1042', alias: 'ANP-1042', name: 'सुरेश कुमार जांगिड़', ward: 'वार्ड 1', avatar: '🦁', message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!', likes: 28, createdAt: new Date(Date.now() - 3600000 * 5).toISOString() },
-            { id: 'starter-2', userId: 'ANP-5821', alias: 'ANP-5821', name: 'महावीर सिंह', ward: 'वार्ड 5', avatar: '🌾', message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।', likes: 34, createdAt: new Date(Date.now() - 3600000 * 12).toISOString() },
-            { id: 'starter-3', userId: 'ANP-4390', alias: 'ANP-4390', name: 'कमला देवी', ward: 'वार्ड 4', avatar: '🌟', message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।', likes: 41, createdAt: new Date(Date.now() - 3600000 * 24).toISOString() },
-            { id: 'starter-4', userId: 'ANP-9175', alias: 'ANP-9175', name: 'रामकुमार शर्मा', ward: 'वार्ड 11', avatar: '🤝', message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!', likes: 52, createdAt: new Date(Date.now() - 3600000 * 36).toISOString() }
-          ];
+          allMessages = [];
           updateKpis();
           renderAdminTable();
         });
