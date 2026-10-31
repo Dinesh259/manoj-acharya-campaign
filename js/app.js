@@ -167,7 +167,8 @@
     alert: '<path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18h.01"/>',
     edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
     calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
-    globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>'
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+    heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>'
   };
   function injectSprite() {
     var s = '';
@@ -183,7 +184,8 @@
   ];
   var NAV_CAND = [
     ['manifesto.html', 'nav.manifesto', 'list'], ['about.html', 'nav.about', 'user'],
-    ['village-issues.html', 'nav.villageIssues', 'people'], ['ask.html', 'nav.ask', 'edit'],
+    ['village-issues.html', 'nav.villageIssues', 'people'], ['support-wall.html', 'nav.supportWall', 'heart'],
+    ['ask.html', 'nav.ask', 'edit'],
     ['contact.html', 'nav.contact', 'phone'], ['flyer.html', 'nav.flyer', 'print']
   ];
   function navList(items, current) {
@@ -1168,6 +1170,534 @@
     });
   }
 
+  /* ---------- Community Support Wall (समर्थन दीवार) ---------- */
+  function setupSupportWall() {
+    var wallSection = $('#wallFeedSection') || $('#postSupportSection');
+    if (!wallSection) return;
+
+    var FIRESTORE_BASE = 'https://firestore.googleapis.com/v1/projects/manoj-acharya-anoopshahar/databases/(default)/documents/support_messages';
+    var form = $('#supportForm');
+    var grid = $('#wallGrid');
+    var countEl = $('#feedCountNumber');
+    var photoInput = $('#wallPhotoInput');
+    var btnPickPhoto = $('#btnPickPhoto');
+    var previewWrap = $('#wallPhotoPreviewWrap');
+    var previewImg = $('#wallPhotoPreview');
+    var btnRemovePhoto = $('#btnRemovePhoto');
+    var liveAliasText = $('#liveAliasText');
+    var liveAliasAvatar = $('#liveAliasAvatar');
+    var liveAliasTag = $('#liveAliasTag');
+    var btnAdminUnlock = $('#btnAdminUnlock');
+    var filterPills = $$('.filter-pill');
+
+    var currentPhotoBase64 = null;
+    var currentFilter = 'all';
+    var isAdmin = sessionStorage.getItem('mka_wall_admin') === '1';
+    var messagesList = [];
+
+    var AVATARS = ['🦁', '🌾', '🇮🇳', '🌟', '✌️', '🤝', '🎯', '🚩', '🏆', '🚜', '📚', '⚡', '🦅', '🕊️'];
+    var TITLES = {
+      'युवा शक्ति': ['अनूपशहर युवा शक्ति', 'नौजवान साथी', 'विकास समर्थक युवा', 'गाँव का युवा गौरव', 'युवा मोर्चा अनूपशहर'],
+      'किसान भाई': ['अन्नदाता किसान साथी', 'मेहनती किसान भाई', 'किसान एकता समर्थक', 'गाँव का कृषक गौरव'],
+      'मातृशक्ति': ['मातृशक्ति आशीर्वाद', 'जागरूक महिला मतदाता', 'गाँव की मातृशक्ति', 'खुशहाल गाँव संकल्प'],
+      'बुज़ुर्ग आशीर्वाद': ['वरिष्ठ बुज़ुर्ग आशीर्वाद', 'प्रबुद्ध ग्रामवासी', 'गाँव का मार्गदर्शक', 'अनुभवी अभिभावक'],
+      'सर्व समाज': ['सर्व समाज शुभचिंतक', 'अनूपशहर गौरव', 'जागरूक मतदाता', 'विकास साथी', 'सच्चा सहयोगी']
+    };
+
+    var STARTER_MESSAGES = [
+      {
+        id: 'starter-1',
+        alias: 'अनूपशहर युवा शक्ति #21',
+        name: 'सुरेश कुमार जांगिड़',
+        category: 'युवा शक्ति',
+        ward: 'वार्ड 1',
+        avatar: '🦁',
+        message: 'गाँव में खेल मैदान नंबर 2 की चारदीवारी और निःशुल्क डिजिटल लाइब्रेरी के संकल्प के साथ हम सभी युवा मनोज कुमार आचार्य जी का पूरा समर्थन करते हैं!',
+        likes: 28,
+        createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
+      },
+      {
+        id: 'starter-2',
+        alias: 'अन्नदाता किसान भाई #08',
+        name: 'महावीर सिंह',
+        category: 'किसान भाई',
+        ward: 'ढाणी क्षेत्र',
+        avatar: '🌾',
+        message: 'सच्चा, ईमानदार और गाँव के विकास के लिए समर्पित प्रत्याशी। अनूपशहर की समस्त गलियों व नालियों के सुधार के लिए मनोज जी को विजयी बनाएँ।',
+        likes: 34,
+        createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
+      },
+      {
+        id: 'starter-3',
+        alias: 'गाँव का गौरव — मातृशक्ति',
+        name: 'कमला देवी',
+        category: 'मातृशक्ति',
+        ward: 'वार्ड 4',
+        avatar: '🌟',
+        message: 'गाँव में सुंदर पार्क, बच्चों के लिए झूले और बड़ों के लिए ओपन जिम का वादा बहुत सराहनीय है। हमारा पूरा आशीर्वाद मनोज भाई के साथ है।',
+        likes: 41,
+        createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
+      },
+      {
+        id: 'starter-4',
+        alias: 'सर्व समाज शुभचिंतक #95',
+        name: 'रामकुमार शर्मा',
+        category: 'सर्व समाज',
+        ward: 'मेन चौक बस स्टैंड',
+        avatar: '🤝',
+        message: '20 अक्टूबर की ऐतिहासिक जनसभा में जो जनसैलाब उमड़ा था, उसने साबित कर दिया है कि पूरा अनूपशहर बदलाव और विकास के साथ खड़ा है!',
+        likes: 52,
+        createdAt: new Date(Date.now() - 3600000 * 36).toISOString()
+      }
+    ];
+
+    function getLikedIds() {
+      try {
+        var raw = store.get('mka_liked_msgs');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function isLiked(id) {
+      return getLikedIds().indexOf(id) !== -1;
+    }
+
+    function setLiked(id, liked) {
+      try {
+        var list = getLikedIds();
+        var idx = list.indexOf(id);
+        if (liked && idx === -1) {
+          list.push(id);
+        } else if (!liked && idx !== -1) {
+          list.splice(idx, 1);
+        }
+        store.set('mka_liked_msgs', JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function getRandomAlias(cat, ward) {
+      var arr = TITLES[cat] || TITLES['सर्व समाज'];
+      var base = arr[Math.floor(Math.random() * arr.length)];
+      var num = Math.floor(Math.random() * 89) + 10;
+      var av = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+      return {
+        alias: base + ' #' + num,
+        avatar: av,
+        ward: ward || 'ग्राम अनूपशहर'
+      };
+    }
+
+    var activeAlias = getRandomAlias('सर्व समाज', '');
+
+    function updateLivePreview() {
+      if (!liveAliasText) return;
+      var cat = form && form.elements.category ? form.elements.category.value : 'सर्व समाज';
+      var ward = form && form.elements.ward ? form.elements.ward.value : '';
+      liveAliasText.textContent = activeAlias.alias;
+      if (liveAliasAvatar) liveAliasAvatar.textContent = activeAlias.avatar;
+      if (liveAliasTag) liveAliasTag.textContent = ward || cat || 'अनूपशहर';
+    }
+
+    if (form) {
+      if (form.elements.category) {
+        form.elements.category.addEventListener('change', function () {
+          activeAlias = getRandomAlias(form.elements.category.value, form.elements.ward ? form.elements.ward.value : '');
+          updateLivePreview();
+        });
+      }
+      if (form.elements.ward) {
+        form.elements.ward.addEventListener('change', function () {
+          updateLivePreview();
+        });
+      }
+      updateLivePreview();
+    }
+
+    // Photo selection and compression
+    if (btnPickPhoto && photoInput) {
+      btnPickPhoto.addEventListener('click', function () {
+        photoInput.click();
+      });
+
+      photoInput.addEventListener('change', function () {
+        var file = photoInput.files && photoInput.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = new Image();
+          img.onload = function () {
+            var maxDimension = 800;
+            var width = img.width, height = img.height;
+            if (width > height) {
+              if (width > maxDimension) { height = Math.round((height * maxDimension) / width); width = maxDimension; }
+            } else {
+              if (height > maxDimension) { width = Math.round((width * maxDimension) / height); height = maxDimension; }
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.72);
+            if (previewImg) previewImg.src = currentPhotoBase64;
+            if (previewWrap) previewWrap.hidden = false;
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (btnRemovePhoto) {
+      btnRemovePhoto.addEventListener('click', function () {
+        currentPhotoBase64 = null;
+        if (photoInput) photoInput.value = '';
+        if (previewWrap) previewWrap.hidden = true;
+      });
+    }
+
+    // Admin PIN toggle
+    if (btnAdminUnlock) {
+      if (isAdmin) {
+        btnAdminUnlock.classList.add('is-active');
+        btnAdminUnlock.innerHTML = '<span aria-hidden="true">🔓</span> ' + esc(t('wall.adminUnlocked'));
+      }
+      btnAdminUnlock.addEventListener('click', function () {
+        if (isAdmin) {
+          isAdmin = false;
+          sessionStorage.removeItem('mka_wall_admin');
+          btnAdminUnlock.classList.remove('is-active');
+          btnAdminUnlock.innerHTML = '<span aria-hidden="true">🔒</span> ' + esc(t('wall.adminBtn'));
+          renderFeed();
+          return;
+        }
+        var pin = prompt(t('wall.adminPrompt') || 'Enter 4-digit PIN:');
+        if (pin === '9529') {
+          isAdmin = true;
+          sessionStorage.setItem('mka_wall_admin', '1');
+          btnAdminUnlock.classList.add('is-active');
+          btnAdminUnlock.innerHTML = '<span aria-hidden="true">🔓</span> ' + esc(t('wall.adminUnlocked'));
+          renderFeed();
+        } else if (pin) {
+          alert('गलत पिन (Incorrect PIN)');
+        }
+      });
+    }
+
+    // Filter pills
+    filterPills.forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        filterPills.forEach(function (p) {
+          p.classList.remove('is-active');
+          p.setAttribute('aria-selected', 'false');
+        });
+        pill.classList.add('is-active');
+        pill.setAttribute('aria-selected', 'true');
+        currentFilter = pill.getAttribute('data-filter') || 'all';
+        renderFeed();
+      });
+    });
+
+    // Render feed cards
+    function renderFeed() {
+      if (!grid) return;
+      var filtered = messagesList.filter(function (m) {
+        if (currentFilter === 'all') return true;
+        return m.category === currentFilter;
+      });
+
+      if (countEl) countEl.textContent = messagesList.length;
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="wall-loading-placeholder">' +
+          '<p data-i18n="wall.noMessages">' + esc(t('wall.noMessages')) + '</p>' +
+        '</div>';
+        return;
+      }
+
+      var html = '';
+      filtered.forEach(function (msg) {
+        var liked = isLiked(msg.id);
+        var timeStr = 'आज';
+        if (msg.createdAt) {
+          try {
+            var d = new Date(msg.createdAt);
+            timeStr = d.toLocaleDateString('hi-IN', { month: 'short', day: 'numeric' });
+          } catch (e) {}
+        }
+
+        html += '<article class="support-msg-card" data-msg-id="' + esc(msg.id) + '">' +
+          '<div class="msg-card-top">' +
+            '<div class="msg-card-head">' +
+              '<div class="msg-author-info">' +
+                '<span class="msg-avatar" aria-hidden="true">' + (msg.avatar || '🦁') + '</span>' +
+                '<div class="msg-alias-wrap">' +
+                  '<strong class="msg-alias-name">' + esc(msg.alias) + '</strong>' +
+                  '<div class="msg-meta-row">' +
+                    (msg.ward ? '<span class="msg-ward-tag">📍 ' + esc(msg.ward) + '</span>' : '') +
+                    (msg.category ? '<span class="msg-cat-pill">' + esc(msg.category) + '</span>' : '') +
+                    '<span class="msg-time">· ' + esc(timeStr) + '</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+
+        // If admin unlocked, display real name securely
+        if (isAdmin && msg.name) {
+          html += '<div class="admin-real-name-badge">🔒 ' + esc(t('wall.realName')) + ' <strong>' + esc(msg.name) + '</strong></div>';
+        }
+
+        html += '<p class="msg-body-text">' + esc(msg.message) + '</p>';
+
+        if (msg.photo) {
+          html += '<div class="msg-attached-photo" data-photo="' + esc(msg.photo) + '">' +
+            '<img src="' + esc(msg.photo) + '" alt="Supporter attached photo" loading="lazy">' +
+          '</div>';
+        }
+
+        html += '</div>' +
+          '<div class="msg-card-actions">' +
+            '<button type="button" class="btn-like' + (liked ? ' is-liked' : '') + '" data-like-id="' + esc(msg.id) + '" aria-pressed="' + (liked ? 'true' : 'false') + '">' +
+              '<span class="like-icon" aria-hidden="true">❤️</span> ' +
+              '<span class="like-count">' + (msg.likes || 0) + '</span> ' +
+              '<span class="like-label" data-i18n="wall.likeBtn">' + esc(t('wall.likeBtn')) + '</span>' +
+            '</button>' +
+            '<button type="button" class="btn-share-post" data-share-text="' + esc(msg.message) + '" data-share-alias="' + esc(msg.alias) + '">' +
+              '<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-wa"></use></svg> ' +
+              '<span data-i18n="wall.shareMsg">' + esc(t('wall.shareMsg')) + '</span>' +
+            '</button>' +
+          '</div>' +
+        '</article>';
+      });
+
+      grid.innerHTML = html;
+
+      // Bind Likes
+      $$('.btn-like', grid).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-like-id');
+          var msg = messagesList.find(function (m) { return m.id === id; });
+          if (!msg) return;
+          var liked = isLiked(id);
+          var countSpan = btn.querySelector('.like-count');
+          var oldCount = parseInt(countSpan ? countSpan.textContent : msg.likes, 10) || 0;
+          var newCount = liked ? Math.max(0, oldCount - 1) : oldCount + 1;
+
+          // Optimistic UI
+          msg.likes = newCount;
+          setLiked(id, !liked);
+          btn.classList.toggle('is-liked', !liked);
+          btn.setAttribute('aria-pressed', (!liked) ? 'true' : 'false');
+          if (countSpan) countSpan.textContent = newCount;
+
+          trackEvent('support_message_like', { id: id, liked: !liked });
+
+          // Sync with Firestore if non-starter
+          if (id.indexOf('starter-') === -1) {
+            var patchUrl = FIRESTORE_BASE + '/' + id + '?updateMask.fieldPaths=likes';
+            fetch(patchUrl, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fields: { likes: { integerValue: String(newCount) } } })
+            }).catch(function () {});
+          }
+        });
+      });
+
+      // Bind WhatsApp Share on post
+      $$('.btn-share-post', grid).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var shareText = btn.getAttribute('data-share-text') || '';
+          var shareAlias = btn.getAttribute('data-share-alias') || '';
+          var url = 'https://manoj-acharya-anoopshahar.web.app/support-wall.html';
+          var full = '✨ ' + shareAlias + ' का समर्थन संदेश: "' + shareText + '"\n\nअनूपशहर के विकास के लिए मनोज कुमार आचार्य जी को समर्थन दें और अपना संदेश दर्ज करें:\n' + url;
+          trackEvent('support_message_share', { alias: shareAlias });
+          if (navigator.share) {
+            navigator.share({ title: 'समर्थन संदेश — मनोज कुमार आचार्य', text: full, url: url }).catch(function () {});
+          } else {
+            openExternal(waLink(full));
+          }
+        });
+      });
+
+      // Bind Photo Lightbox expansion
+      $$('.msg-attached-photo', grid).forEach(function (wrap) {
+        wrap.addEventListener('click', function () {
+          var src = wrap.getAttribute('data-photo');
+          var modal = $('#photoModal');
+          if (modal && src) {
+            var modalImg = $('#modalImg');
+            var modalCaption = $('#modalCaption');
+            if (modalImg) modalImg.src = src;
+            if (modalCaption) modalCaption.textContent = 'गाँववासी समर्थन तस्वीर';
+            if (typeof modal.showModal === 'function') modal.showModal();
+            else modal.setAttribute('open', '');
+          }
+        });
+      });
+    }
+
+    // Fetch messages from Firestore
+    function fetchMessages() {
+      fetch(FIRESTORE_BASE, { cache: 'no-store' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var docs = data && data.documents ? data.documents : [];
+          var parsed = docs.map(function (doc) {
+            var f = doc.fields || {};
+            var docId = doc.name ? doc.name.split('/').pop() : '';
+            return {
+              id: docId,
+              alias: (f.alias && f.alias.stringValue) || 'अनूपशहर समर्थक',
+              name: (f.name && f.name.stringValue) || '',
+              message: (f.message && f.message.stringValue) || '',
+              photo: (f.photo && f.photo.stringValue) || null,
+              ward: (f.ward && f.ward.stringValue) || '',
+              category: (f.category && f.category.stringValue) || 'सर्व समाज',
+              avatar: (f.avatar && f.avatar.stringValue) || '🦁',
+              likes: parseInt((f.likes && f.likes.integerValue) || '0', 10),
+              createdAt: (f.createdAt && f.createdAt.timestampValue) || new Date().toISOString()
+            };
+          });
+
+          // Sort newest first
+          parsed.sort(function (a, b) {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
+
+          // Merge live docs with starters (live docs on top)
+          messagesList = parsed.concat(STARTER_MESSAGES);
+          renderFeed();
+        })
+        .catch(function () {
+          // Fallback to starters
+          messagesList = STARTER_MESSAGES.slice();
+          renderFeed();
+        });
+    }
+
+    // Handle Form Submit
+    if (form) {
+      var err = $('.form-error', form), status = $('.form-status', form);
+      var submitBtn = $('#btnSubmitSupport');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var name = form.elements.name ? form.elements.name.value.trim() : '';
+        var message = form.elements.message ? form.elements.message.value.trim() : '';
+        var ward = form.elements.ward ? form.elements.ward.value.trim() : '';
+        var category = form.elements.category ? form.elements.category.value : 'सर्व समाज';
+
+        if (!name || !message) {
+          if (err) {
+            err.textContent = t('wall.errorMsg');
+            err.hidden = false;
+          }
+          if (!name && form.elements.name) form.elements.name.focus();
+          else if (!message && form.elements.message) form.elements.message.focus();
+          return;
+        }
+
+        if (err) err.hidden = true;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = t('wall.submitting');
+        }
+
+        var payload = {
+          fields: {
+            alias: { stringValue: activeAlias.alias },
+            name: { stringValue: name },
+            message: { stringValue: message },
+            createdAt: { timestampValue: new Date().toISOString() },
+            likes: { integerValue: '1' },
+            ward: { stringValue: ward || 'ग्राम अनूपशहर' },
+            category: { stringValue: category },
+            avatar: { stringValue: activeAlias.avatar }
+          }
+        };
+
+        if (currentPhotoBase64) {
+          payload.fields.photo = { stringValue: currentPhotoBase64 };
+        }
+
+        fetch(FIRESTORE_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error('Save error');
+            return res.json();
+          })
+          .then(function (createdDoc) {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<span aria-hidden="true">✍️</span> ' + esc(t('wall.submit'));
+            }
+            if (status) {
+              status.textContent = t('wall.successMsg');
+              setTimeout(function () { status.textContent = ''; }, 6000);
+            }
+
+            // Reset form
+            form.reset();
+            currentPhotoBase64 = null;
+            if (previewWrap) previewWrap.hidden = true;
+            activeAlias = getRandomAlias('सर्व समाज', '');
+            updateLivePreview();
+
+            trackEvent('support_message_post', { category: category, ward: ward, has_photo: !!currentPhotoBase64 });
+
+            // Refresh feed
+            fetchMessages();
+          })
+          .catch(function () {
+            // Local fallback if offline or network error
+            var fallbackId = 'local-' + Date.now();
+            var newLocal = {
+              id: fallbackId,
+              alias: activeAlias.alias,
+              name: name,
+              message: message,
+              photo: currentPhotoBase64,
+              ward: ward || 'ग्राम अनूपशहर',
+              category: category,
+              avatar: activeAlias.avatar,
+              likes: 1,
+              createdAt: new Date().toISOString()
+            };
+            messagesList.unshift(newLocal);
+            renderFeed();
+
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<span aria-hidden="true">✍️</span> ' + esc(t('wall.submit'));
+            }
+            if (status) {
+              status.textContent = t('wall.successMsg');
+              setTimeout(function () { status.textContent = ''; }, 6000);
+            }
+            form.reset();
+            currentPhotoBase64 = null;
+            if (previewWrap) previewWrap.hidden = true;
+            activeAlias = getRandomAlias('सर्व समाज', '');
+            updateLivePreview();
+          });
+      });
+    }
+
+    // Initialize with starters and fetch live docs
+    messagesList = STARTER_MESSAGES.slice();
+    renderFeed();
+    fetchMessages();
+  }
+
   /* ---------- QR code (byte mode, error level M, versions 1–10) ----------
      Compact implementation of the QR Code standard (ISO/IEC 18004),
      structured after Project Nayuki's public QR generator algorithm. */
@@ -1474,6 +2004,7 @@
     setupIssues();
     setupDemo();
     setupAsk();
+    setupSupportWall();
     setupMeeting();
     setupMeetingMedia();
     setupQr();
@@ -1658,6 +2189,7 @@
   setupIssues();
   setupDemo();
   setupAsk();
+  setupSupportWall();
   setupMeeting();
   setupMeetingMedia();
   setupQr();

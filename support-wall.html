@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="hi" class="js-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="description" content="मनोज कुमार आचार्य के समर्थन में गाँववासियों के प्रेरक संदेश, शुभकामनाएँ व तस्वीरें — सर्व समाज जन समर्थन दीवार।">
+  <title data-i18n="title.supportWall">जन समर्थन दीवार | मनोज कुमार आचार्य</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=optional"></noscript>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preload" href="js/i18n.js?v=danaram" as="script">
+  <link rel="preload" href="js/app.js?v=danaram" as="script">
+  <script>
+    (function(){try{var d=document.documentElement,l=localStorage.getItem('lang');if(l==='en')d.lang='en';if(localStorage.getItem('largeText')==='1')d.classList.add('large-text');if(localStorage.getItem('contrast')==='1')d.classList.add('hc');}catch(e){}})();
+  </script>
+</head>
+<body data-page="support-wall.html" data-title="supportWall">
+  <a class="skip" href="#main" data-i18n="common.skip">मुख्य जानकारी पर जाएँ</a>
+  <div data-chrome="header"></div>
+
+  <main id="main" class="wrap zone-candidate">
+    <p class="zone-label candidate" data-i18n="common.labelCandidate">प्रत्याशी का संदेश / Candidate's message</p>
+
+    <!-- Support Wall Hero Banner -->
+    <div class="wall-hero">
+      <span class="live-pulse-badge">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span data-i18n="wall.badge">सर्व समाज जनसमर्थन</span>
+      </span>
+      <h1 data-i18n="wall.title">जन समर्थन दीवार (Public Support Wall)</h1>
+      <p class="lead" data-i18n="wall.subtitle">मनोज कुमार आचार्य जी के समर्थन में गाँववासियों के प्रेरक संदेश व तस्वीरें</p>
+      <p class="wall-intro-text" data-i18n="wall.intro">
+        अनूपशहर के विकास, युवाओं के भविष्य और गाँव की खुशहाली के लिए अपना समर्थन संदेश लिखें और तस्वीर साझा करें। आपका एक-एक संदेश गाँव में नई ऊर्जा का संचार करता है!
+      </p>
+
+      <div class="wall-privacy-alert">
+        <span class="alert-icon" aria-hidden="true">🔒</span>
+        <p data-i18n="wall.privacyNotice">
+          🔒 निजता सुरक्षा: आपका वास्तविक नाम केवल प्रत्याशी व एडमिन को दिखेगा। जनता को आपकी पहचान एक रैंडम उपनाम (जैसे 'अनूपशहर युवा शक्ति') के रूप में दिखेगी।
+        </p>
+      </div>
+    </div>
+
+    <!-- Message Posting Form Card -->
+    <section class="card wall-form-card" id="postSupportSection" aria-labelledby="post-form-heading">
+      <div class="card-head-bar">
+        <h2 id="post-form-heading" class="card-head-title">
+          <span aria-hidden="true">✍️</span> <span data-i18n="wall.formHeading">अपना समर्थन संदेश व तस्वीर जोड़ें</span>
+        </h2>
+      </div>
+
+      <form id="supportForm" novalidate>
+        <div class="form-row two-col">
+          <div class="form-field">
+            <label for="wallName">
+              <span data-i18n="wall.nameLabel">आपका वास्तविक नाम (केवल एडमिन/प्रत्याशी को दिखेगा)</span>
+              <span class="req-star" aria-hidden="true">*</span>
+            </label>
+            <input id="wallName" name="name" type="text" autocomplete="name" required data-i18n-attr="placeholder:wall.namePlaceholder">
+            <span class="field-hint">यह नाम जनता को नहीं दिखेगा। केवल उम्मीदवार व टीम को दिखेगा।</span>
+          </div>
+
+          <div class="form-field">
+            <label for="wallWard" data-i18n="wall.wardLabel">वार्ड / क्षेत्र</label>
+            <select id="wallWard" name="ward">
+              <option value="" data-i18n="wall.selectWard">वार्ड चुनें (वैकल्पिक)</option>
+              <option value="वार्ड 1">वार्ड नं. 1</option>
+              <option value="वार्ड 2">वार्ड नं. 2</option>
+              <option value="वार्ड 3">वार्ड नं. 3</option>
+              <option value="वार्ड 4">वार्ड नं. 4</option>
+              <option value="वार्ड 5">वार्ड नं. 5</option>
+              <option value="वार्ड 6">वार्ड नं. 6</option>
+              <option value="वार्ड 7">वार्ड नं. 7</option>
+              <option value="वार्ड 8">वार्ड नं. 8</option>
+              <option value="वार्ड 9">वार्ड नं. 9</option>
+              <option value="वार्ड 10">वार्ड नं. 10</option>
+              <option value="वार्ड 11">वार्ड नं. 11</option>
+              <option value="मेन चौक / बस स्टैंड">मेन चौक / बस स्टैंड</option>
+              <option value="ढाणी / कृषि क्षेत्र">ढाणी / कृषि क्षेत्र</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-field">
+            <label for="wallCategory" data-i18n="wall.categoryLabel">वर्ग / प्रेरणा</label>
+            <select id="wallCategory" name="category">
+              <option value="सर्व समाज" data-i18n="wall.catSamaj">सर्व समाज (All Communities)</option>
+              <option value="युवा शक्ति" data-i18n="wall.catYouth">युवा शक्ति (Youth)</option>
+              <option value="किसान भाई" data-i18n="wall.catFarmer">किसान भाई (Farmer)</option>
+              <option value="बुज़ुर्ग आशीर्वाद" data-i18n="wall.catElder">बुज़ुर्ग आशीर्वाद (Elders)</option>
+              <option value="मातृशक्ति" data-i18n="wall.catWomen">मातृशक्ति (Women)</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="wallPhotoInput" data-i18n="wall.photoLabel">तस्वीर जोड़ें (वैकल्पिक)</label>
+            <div class="file-upload-trigger-wrap">
+              <input type="file" id="wallPhotoInput" accept="image/*" style="display:none" aria-hidden="true">
+              <button type="button" class="btn btn-outline btn-photo-pick" id="btnPickPhoto">
+                <span aria-hidden="true">📷</span> <span data-i18n="wall.photoHint">तस्वीर चुनें (गैलरी या कैमरा)</span>
+              </button>
+            </div>
+            <!-- Thumbnail preview if photo selected -->
+            <div id="wallPhotoPreviewWrap" class="photo-preview-wrap" hidden>
+              <img id="wallPhotoPreview" alt="Selected preview">
+              <button type="button" class="btn-remove-photo" id="btnRemovePhoto" data-i18n-attr="aria-label:wall.removePhoto;title:wall.removePhoto">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="wallMessage">
+            <span data-i18n="wall.messageLabel">आपका समर्थन संदेश या संकल्प</span>
+            <span class="req-star" aria-hidden="true">*</span>
+          </label>
+          <textarea id="wallMessage" name="message" rows="3" required data-i18n-attr="placeholder:wall.messagePlaceholder"></textarea>
+        </div>
+
+        <!-- Real-time generated alias pill preview -->
+        <div class="alias-preview-box">
+          <span class="alias-preview-label">सार्वजनिक दीवार पर आपकी पहचान (Random Identity):</span>
+          <div class="alias-pill" id="liveAliasPill">
+            <span class="alias-avatar" id="liveAliasAvatar">🦁</span>
+            <span class="alias-text" id="liveAliasText">अनूपशहर युवा शक्ति</span>
+            <span class="alias-tag" id="liveAliasTag">वार्ड 1</span>
+          </div>
+        </div>
+
+        <p class="form-error" role="alert" hidden></p>
+        <p class="form-status" aria-live="polite"></p>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="btnSubmitSupport">
+            <span aria-hidden="true">✍️</span> <span data-i18n="wall.submit">समर्थन संदेश पोस्ट करें</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Support Feed Stream -->
+    <section class="wall-feed-section" id="wallFeedSection" aria-labelledby="feed-heading">
+      <div class="feed-header-bar">
+        <div>
+          <h2 id="feed-heading" class="feed-title">
+            <span aria-hidden="true">💬</span> <span data-i18n="wall.badge">गाँववासियों का जनसमर्थन</span>
+          </h2>
+          <span class="feed-count-pill" id="feedCountPill">
+            <span data-i18n="wall.countLabel">कुल संदेश</span>: <strong id="feedCountNumber">0</strong>
+          </span>
+        </div>
+
+        <!-- Filter and Admin button -->
+        <div class="feed-controls">
+          <button type="button" class="btn btn-sm btn-outline btn-admin-toggle" id="btnAdminUnlock">
+            <span aria-hidden="true">🔒</span> <span data-i18n="wall.adminBtn">प्रत्याशी / एडमिन देखें</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="filter-pills" role="tablist" aria-label="Filter Messages">
+        <button type="button" class="filter-pill is-active" data-filter="all" role="tab" aria-selected="true" data-i18n="wall.filterAll">सभी संदेश</button>
+        <button type="button" class="filter-pill" data-filter="युवा शक्ति" role="tab" aria-selected="false" data-i18n="wall.catYouth">युवा शक्ति</button>
+        <button type="button" class="filter-pill" data-filter="किसान भाई" role="tab" aria-selected="false" data-i18n="wall.catFarmer">किसान भाई</button>
+        <button type="button" class="filter-pill" data-filter="मातृशक्ति" role="tab" aria-selected="false" data-i18n="wall.catWomen">मातृशक्ति</button>
+        <button type="button" class="filter-pill" data-filter="बुज़ुर्ग आशीर्वाद" role="tab" aria-selected="false" data-i18n="wall.catElder">बुज़ुर्ग आशीर्वाद</button>
+      </div>
+
+      <!-- Messages Grid -->
+      <div class="wall-grid" id="wallGrid" role="region" aria-label="Support Messages Feed">
+        <div class="wall-loading-placeholder">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span>समर्थन संदेश लोड हो रहे हैं...</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div data-chrome="footer"></div>
+
+  <script src="js/i18n.js?v=danaram"></script>
+  <script src="js/app.js?v=danaram"></script>
+</body>
+</html>
