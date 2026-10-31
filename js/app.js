@@ -1243,6 +1243,10 @@
           localStorage.removeItem('mka_user_unique_id');
           localStorage.removeItem('mka_registered_voter_name');
           localStorage.removeItem('mka_registered_voter_ward');
+          try {
+            var cleanUrl = window.location.pathname + window.location.hash;
+            window.history.replaceState({}, document.title, cleanUrl);
+          } catch (e) {}
         }
         var stored = localStorage.getItem('mka_user_unique_id');
         if (stored && /^ANP-\d{4}$/.test(stored)) {
@@ -1316,87 +1320,45 @@
     function syncVoterIdentityUI() {
       var regName = getRegisteredVoterName();
       var regWard = getRegisteredVoterWard();
+      var myUid = getOrCreateUserUniqueId();
 
       var nameInput = $('#wallName');
       var wardSelect = $('#wallWard');
       var wardWrap = $('#fbSelectWardWrap');
-      var wardLockedBadge = $('#voterWardLockedBadge');
       var authorWrap = $('#fbAuthorInputWrap');
       var authorIcon = $('#fbAuthorIcon');
-      var lockedBadge = $('#voterNameLockedBadge');
-      var proxyBanner = $('#proxyPreventionBanner');
-      var proxyText = $('#proxyPreventionText');
-      var firstTimeBanner = $('#firstTimeVoterBanner');
 
       if (regName) {
-        // Voter has previously posted — lock identity (BOTH Name and Ward) to prevent proxy submissions
+        // Voter has previously posted — lock identity on device
+        // Display Public ID only; Real Name is NEVER displayed in application!
         if (nameInput) {
-          nameInput.value = regName;
+          nameInput.value = (lang === 'en') ? ('Supporter ' + myUid) : ('समर्थक ' + myUid);
           nameInput.readOnly = true;
           nameInput.setAttribute('aria-readonly', 'true');
-          nameInput.setAttribute('title', (lang === 'en') ? 'Your registered name is locked to prevent proxy submissions' : 'प्रॉक्सी रोकथाम के लिए आपका पंजीकृत नाम लॉक है');
         }
         if (wardSelect) {
           if (regWard) wardSelect.value = regWard;
           wardSelect.disabled = true;
           wardSelect.setAttribute('aria-disabled', 'true');
-          wardSelect.setAttribute('title', (lang === 'en') ? 'Your registered ward is locked to prevent proxy submissions' : 'प्रॉक्सी रोकथाम के लिए आपका पंजीकृत वार्ड लॉक है');
         }
         if (wardWrap) wardWrap.classList.add('is-locked');
-        if (wardLockedBadge) {
-          wardLockedBadge.hidden = false;
-          wardLockedBadge.style.display = 'inline-flex';
-        }
         if (authorWrap) authorWrap.classList.add('is-locked');
-        if (authorIcon) authorIcon.textContent = '🔒';
-        if (lockedBadge) {
-          lockedBadge.hidden = false;
-          lockedBadge.style.display = 'inline-flex';
-        }
-        if (proxyBanner) {
-          proxyBanner.hidden = false;
-          proxyBanner.style.display = 'flex';
-        }
-        if (proxyText) {
-          proxyText.innerHTML = (lang === 'en')
-            ? '🔒 You previously posted as <strong>' + esc(regName) + '</strong> (' + esc(regWard || 'Ward') + '). To prevent proxy submissions, your name and ward are locked for all future posts.'
-            : '🔒 आप पहले "<strong>' + esc(regName) + '</strong>" (' + esc(regWard || 'वार्ड') + ') के रूप में पोस्ट कर चुके हैं। अभियान में निष्पक्षता व प्रॉक्सी रोकथाम हेतु आपका नाम एवं वार्ड लॉक है; सभी नई पोस्ट इसी पहचान से दर्ज होंगी।';
-        }
-        if (firstTimeBanner) {
-          firstTimeBanner.hidden = true;
-          firstTimeBanner.style.display = 'none';
-        }
+        if (authorIcon) authorIcon.textContent = '👤';
       } else {
         // First-time poster
         if (nameInput) {
+          nameInput.value = '';
           nameInput.readOnly = false;
           nameInput.removeAttribute('aria-readonly');
-          nameInput.removeAttribute('title');
         }
         if (wardSelect) {
           wardSelect.disabled = false;
           wardSelect.removeAttribute('aria-disabled');
-          wardSelect.removeAttribute('title');
+          wardSelect.value = '';
         }
         if (wardWrap) wardWrap.classList.remove('is-locked');
-        if (wardLockedBadge) {
-          wardLockedBadge.hidden = true;
-          wardLockedBadge.style.display = 'none';
-        }
         if (authorWrap) authorWrap.classList.remove('is-locked');
         if (authorIcon) authorIcon.textContent = '👤';
-        if (lockedBadge) {
-          lockedBadge.hidden = true;
-          lockedBadge.style.display = 'none';
-        }
-        if (proxyBanner) {
-          proxyBanner.hidden = true;
-          proxyBanner.style.display = 'none';
-        }
-        if (firstTimeBanner) {
-          firstTimeBanner.hidden = false;
-          firstTimeBanner.style.display = 'flex';
-        }
       }
     }
 
@@ -1930,35 +1892,12 @@
         var regName = getRegisteredVoterName();
         var regWard = getRegisteredVoterWard();
 
-        // Anti-Proxy Verification for Name:
-        // If voter has already posted, strictly enforce the identical registered name!
+        // If voter has already posted from this device:
+        // Automatically enforce registered real name & ward for Admin/Firestore (real name never shown in UI)
         if (regName) {
-          if (rawName && rawName !== regName) {
-            if (err) {
-              err.textContent = (lang === 'en')
-                ? 'Proxy posting is not allowed! You can only post with your registered name: ' + regName
-                : 'प्रॉक्सी पोस्टिंग की अनुमति नहीं है! आप केवल अपने पंजीकृत नाम "' + regName + '" से ही पोस्ट कर सकते हैं।';
-              err.hidden = false;
-            }
-            if (form.elements.name) form.elements.name.value = regName;
-            return;
-          }
           rawName = regName;
         }
-
-        // Anti-Proxy Verification for Ward:
-        // If voter has already posted, strictly enforce the identical registered ward!
         if (regWard) {
-          if (rawWard && rawWard !== regWard) {
-            if (err) {
-              err.textContent = (lang === 'en')
-                ? 'Proxy ward selection is not allowed! Your registered ward is: ' + regWard
-                : 'प्रॉक्सी वार्ड चयन की अनुमति नहीं है! आपका पंजीकृत वार्ड है: ' + regWard;
-              err.hidden = false;
-            }
-            if (form.elements.ward) form.elements.ward.value = regWard;
-            return;
-          }
           rawWard = regWard;
         }
 

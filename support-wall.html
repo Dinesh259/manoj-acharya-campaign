@@ -58,7 +58,6 @@
             <input id="wallName" name="name" type="text" autocomplete="name" required
                    data-i18n-attr="placeholder:wall.namePlaceholder"
                    placeholder="आपका नाम लिखें (Your Name)..." class="fb-author-input">
-            <span class="voter-name-locked-badge" id="voterNameLockedBadge" hidden title="पंजीकृत नाम लॉक है">🔒 <span data-i18n="wall.lockedBadge">पंजीकृत (लॉक)</span></span>
           </div>
           <div class="fb-select-ward-wrap" id="fbSelectWardWrap">
             <select id="wallWard" name="ward" class="fb-ward-select" required aria-label="वार्ड चुनें">
@@ -75,18 +74,7 @@
               <option value="वार्ड 10">वार्ड नं. 10</option>
               <option value="वार्ड 11">वार्ड नं. 11</option>
             </select>
-            <span class="voter-ward-locked-badge" id="voterWardLockedBadge" hidden title="वार्ड लॉक है">🔒 <span data-i18n="wall.lockedWardBadge">वार्ड लॉक</span></span>
           </div>
-        </div>
-
-        <!-- Anti-Proxy Guidance / Registered Notice -->
-        <div class="proxy-prevention-banner" id="proxyPreventionBanner" hidden>
-          <span class="proxy-icon" aria-hidden="true">🔒</span>
-          <span class="proxy-text" id="proxyPreventionText"></span>
-        </div>
-        <div class="first-time-voter-banner" id="firstTimeVoterBanner">
-          <span class="first-voter-icon" aria-hidden="true">ℹ️</span>
-          <span class="first-voter-text" data-i18n="wall.firstTimeNameHint">कृपया अपना वास्तविक नाम एवं वार्ड चुनें। पहली पोस्ट के बाद नाम व वार्ड सुरक्षित रूप से लॉक हो जाएगा (प्रॉक्सी रोकथाम)।</span>
         </div>
 
         <div class="fb-composer-textarea-wrap">

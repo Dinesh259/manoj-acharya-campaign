@@ -3598,7 +3598,6 @@ dialog.photo-modal::backdrop {
   border-color: #CBD5E1;
   color: #1E293B;
   cursor: not-allowed;
-  padding-right: 76px;
 }
 .proxy-prevention-banner {
   display: flex;
