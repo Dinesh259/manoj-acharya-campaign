@@ -2682,11 +2682,19 @@
       pendingDeleteAction = action;
       if (!deleteModal) return;
       if (action.type === 'post') {
+        var related = allComments.filter(function (c) {
+          return c.postId === action.id;
+        });
         if (deleteTitle) deleteTitle.textContent = t('admin.confirmDeleteTitle') || 'हटाने की पुष्टि करें';
         if (deleteMessage) deleteMessage.textContent = t('admin.confirmDeletePost') || 'क्या आप वाकई इस समर्थन संदेश को स्थायी रूप से हटाना चाहते हैं?';
         if (deleteDetails) {
           deleteDetails.style.display = 'block';
-          deleteDetails.innerHTML = '<strong>संदेश:</strong> ' + esc(action.msg || '') + '<br><strong>मतदाता:</strong> ' + esc(action.name || 'अज्ञात') + ' (' + esc(action.alias || '') + ')';
+          var cascadeMsg = related.length > 0 ?
+            ('<br><span style="color:#DC2626; font-size:12.5px; font-weight:600;">💬 इस पोस्ट से जुड़े ' + related.length + ' कमेंट्स भी एडमिन व डेटाबेस से हमेशा के लिए हटा दिए जाएंगे।</span>') :
+            ('<br><span style="color:#64748B; font-size:12px;">(इस पोस्ट पर वर्तमान में कोई कमेंट नहीं है)</span>');
+          deleteDetails.innerHTML = '<strong>संदेश:</strong> ' + esc(action.msg || '') +
+            '<br><strong>मतदाता:</strong> ' + esc(action.name || 'अज्ञात') + ' (' + esc(action.alias || '') + ')' +
+            cascadeMsg;
         }
       } else if (action.type === 'comment') {
         if (deleteTitle) deleteTitle.textContent = t('admin.confirmDeleteTitle') || 'हटाने की पुष्टि करें';
@@ -2700,7 +2708,7 @@
         if (deleteMessage) deleteMessage.textContent = t('admin.confirmPurgeUser') || 'क्या आप वाकई इस मतदाता के सभी पोस्ट और टिप्पणियां हटाना चाहते हैं?';
         if (deleteDetails) {
           deleteDetails.style.display = 'block';
-          deleteDetails.innerHTML = '<strong>मतदाता:</strong> ' + esc(action.name || '') + '<br><strong>पब्लिक आईडी:</strong> ' + esc(action.alias || '') + '<br><span style="color:#DC2626; font-size:12px;">⚠️ इस व्यक्ति द्वारा पोस्ट किए गए सभी समर्थन संदेश व टिप्पणियाँ पूरी तरह हटा दी जाएंगी।</span>';
+          deleteDetails.innerHTML = '<strong>मतदाता:</strong> ' + esc(action.name || '') + '<br><strong>पब्लिक आईडी:</strong> ' + esc(action.alias || '') + '<br><span style="color:#DC2626; font-size:12px;">⚠️ इस व्यक्ति द्वारा पोस्ट किए गए सभी समर्थन संदेश व संबंधित टिप्पणियाँ पूरी तरह हटा दी जाएंगी।</span>';
         }
       }
       if (typeof deleteModal.showModal === 'function') deleteModal.showModal();
@@ -2739,19 +2747,34 @@
       });
     }
 
+    // Cascading Delete: Deletes the post AND all comments associated with this post
+    function executeDeletePostWithComments(postId) {
+      var promises = [executeDeleteDoc(FIRESTORE_BASE, postId)];
+      var related = allComments.filter(function (c) {
+        return c.postId === postId;
+      });
+      related.forEach(function (c) {
+        promises.push(executeDeleteDoc(FIRESTORE_COMMENTS, c.id));
+      });
+      return Promise.all(promises);
+    }
+
     function executePurgePerson(personName, personAlias) {
       var promises = [];
+      var purgedPostIds = {};
       allMessages.forEach(function (m) {
         var matchName = personName && m.name && m.name.trim().toLowerCase() === personName.trim().toLowerCase();
         var matchAlias = personAlias && (m.userId === personAlias || m.alias === personAlias);
         if (matchName || matchAlias) {
+          purgedPostIds[m.id] = true;
           promises.push(executeDeleteDoc(FIRESTORE_BASE, m.id));
         }
       });
       allComments.forEach(function (c) {
         var matchName = personName && c.name && c.name.trim().toLowerCase() === personName.trim().toLowerCase();
         var matchAuthor = personAlias && c.authorId === personAlias;
-        if (matchName || matchAuthor) {
+        var matchPost = c.postId && purgedPostIds[c.postId];
+        if (matchName || matchAuthor || matchPost) {
           promises.push(executeDeleteDoc(FIRESTORE_COMMENTS, c.id));
         }
       });
@@ -2767,7 +2790,7 @@
 
         var promise;
         if (act.type === 'post') {
-          promise = executeDeleteDoc(FIRESTORE_BASE, act.id);
+          promise = executeDeletePostWithComments(act.id);
         } else if (act.type === 'comment') {
           promise = executeDeleteDoc(FIRESTORE_COMMENTS, act.id);
         } else if (act.type === 'person') {
