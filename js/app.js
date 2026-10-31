@@ -2712,6 +2712,17 @@
     messagesList = STARTER_MESSAGES.slice();
     renderFeed();
     fetchMessages();
+
+    // Real-time synchronization: listen for admin updates via storage event, light interval polling, and window focus
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'mka_wall_updated') {
+        fetchMessages();
+      }
+    });
+    window.addEventListener('focus', function () {
+      fetchMessages();
+    });
+    setInterval(fetchMessages, 12000);
   }
 
   /* ---------- Dedicated Candidate & Admin Portal (admin.html) ---------- */
@@ -2750,18 +2761,58 @@
     var commentsCount = $('#adminCommentsCount');
     var noComments = $('#adminNoComments');
 
-    var officialCaptionInput = $('#adminOfficialCaptionInput');
-    var btnPublishOfficial = $('#btnPublishOfficialPost');
-    var btnResetOfficial = $('#btnResetOfficialCaption');
+    // Candidate Official Post Studio elements
+    var studioSection = $('#adminCandidateStudioSection');
+    var studioForm = $('#adminCandidatePostForm');
+    var studioModeTitle = $('#adminStudioModeTitle');
+    var btnCancelEditPost = $('#btnAdminCancelEditPost');
+    var editDocIdInput = $('#adminPostEditDocId');
+    var postCategorySelect = $('#adminPostCategorySelect');
+    var postWardSelect = $('#adminPostWardSelect');
+    var postCaptionInput = $('#adminPostCaptionInput');
+    var captionCount = $('#adminCaptionCount');
+    var btnPrefillVision = $('#btnAdminPrefillVision');
+    var btnPrefillMeeting = $('#btnAdminPrefillMeeting');
+    var btnPrefillAppeal = $('#btnAdminPrefillAppeal');
+    var radioImgPoster = $('#radioImgPoster');
+    var radioImgCustom = $('#radioImgCustom');
+    var radioImgNone = $('#radioImgNone');
+    var customPhotoWrap = $('#adminCustomPhotoWrap');
+    var photoFileInput = $('#adminPostPhotoFileInput');
+    var imgPreviewBox = $('#adminPostImgPreviewBox');
+    var imgPreview = $('#adminPostImgPreview');
+    var imgLabel = $('#adminPostImgLabel');
+    var btnClearPhoto = $('#btnAdminClearPhoto');
+    var btnSubmitStudio = $('#btnAdminSubmitOfficialPost');
+    var submitBtnLabel = $('#adminSubmitBtnLabel');
+    var btnResetStudio = $('#btnAdminResetStudioForm');
+    var studioFeedback = $('#adminStudioFeedbackMsg');
+    var candidatePostsList = $('#adminCandidatePostsList');
+    var candidatePostsCount = $('#adminCandidatePostsCount');
     var officialStatusBadge = $('#officialPostStatusBadge');
-    var officialAlertMsg = $('#officialPostAlertMsg');
 
-    var DEFAULT_OFFICIAL_CAPTION = 'मेरी पंचायत - मेरा सम्मान, मेरी पंचायत - मेरा विकास! 🇮🇳\n' +
+    var currentStudioPhoto = 'assets/campaign-poster.jpg';
+
+    var TEMPLATE_VISION = 'मेरी पंचायत - मेरा सम्मान, मेरी पंचायत - मेरा विकास! 🇮🇳\n' +
       'अनूपशहर ग्राम पंचायत के सभी सम्मानित बुजुर्गों, माताओं-बहनों, किसान भाइयों और युवा साथियों को सादर प्रणाम।\n\n' +
       'ग्राम पंचायत अनूपशहर के सर्वांगीण विकास, खुशहाल किसान, आधुनिक शिक्षा व पारदर्शी पंचायत व्यवस्था के निर्माण हेतु सरपंच पद की कर्मठ, शिक्षित एवं संघर्षशील प्रत्याशी श्रीमती काजल रानी (निवेदक: मनोज कुमार आचार्य) आप सभी के बीच सेवा का संकल्प लेकर उपस्थित हैं।\n\n' +
       'आइए, अनूपशहर के उज्ज्वल भविष्य के लिए अपना आशीर्वाद और समर्थन दें। आप सभी ग्रामवासी नीचे कमेंट में या अपना समर्थन संदेश लिखकर अपने विचार साझा करें।\n' +
       '"आपका साथ - हमारा संकल्प! आपका वोट - हमारी ताकत!"\n\n' +
       '— मुख्य चुनाव कार्यालय: काजल रानी (सरपंच प्रत्याशी) एवं मनोज कुमार आचार्य (निवेदक)';
+
+    var TEMPLATE_MEETING = '📢 ग्राम पंचायत अनूपशहर — जनसभा एवं विचार-विमर्श आमंत्रण!\n\n' +
+      'सरपंच पद उम्मीदवार श्रीमती काजल रानी एवं निवेदक मनोज कुमार आचार्य जी आप सभी ग्रामवासियों के बीच उपस्थित रहेंगे।\n\n' +
+      'स्थान: मुख्य चौपाल / पंचायत भवन, अनूपशहर\n' +
+      'मुद्दे: शुद्ध पेयजल, पक्की नालियां, किसान समृद्धि, युवाओं के खेल मैदान व पारदर्शी जनसुनवाई।\n\n' +
+      'सभी बुजुर्गों, युवाओं व माताओं-बहनों से विनम्र निवेदन है कि अधिक से अधिक संख्या में पधारकर अपने सुझाव साझा करें।\n\n' +
+      '— मुख्य चुनाव संचालन समिति, अनूपशहर';
+
+    var TEMPLATE_APPEAL = '🙏 विनम्र अपील — अनूपशहर के उज्ज्वल भविष्य के लिए!\n\n' +
+      'एक ईमानदार, शिक्षित और हर समय सुख-दुख में साथ खड़े रहने वाली कर्मठ नेतृत्व क्षमता के लिए:\n' +
+      'सरपंच पद हेतु प्रत्याशी श्रीमती काजल रानी (निवेदक: मनोज कुमार आचार्य) को अपना बहुमूल्य मत व पूर्ण समर्थन प्रदान करें।\n\n' +
+      '"समृद्ध पंचायत - खुशहाल किसान"\n' +
+      'आप सभी वार्डवासी नीचे कमेंट में अपना आशीर्वाद और समर्थन अवश्य दर्ज करें।\n\n' +
+      '— मुख्य चुनाव कार्यालय';
 
     var PASSKEY = '9529';
     var allMessages = [];
@@ -2898,7 +2949,7 @@
           updateKpis();
           renderAdminTable();
           renderAdminCommentsTable();
-          syncOfficialPostCard();
+          renderCandidatePostsList();
         })
         .catch(function (err) {
           console.error('loadAdminFeed error:', err);
@@ -2907,100 +2958,341 @@
           updateKpis();
           renderAdminTable();
           renderAdminCommentsTable();
-          syncOfficialPostCard();
+          renderCandidatePostsList();
         });
     }
 
-    function syncOfficialPostCard() {
-      var officialPost = allMessages.find(function (m) {
-        return m.category === 'candidate_office' || m.alias === 'OFFICE-MKA';
-      });
-      if (officialCaptionInput) {
-        if (!officialCaptionInput.value || officialCaptionInput.getAttribute('data-touched') !== '1') {
-          officialCaptionInput.value = officialPost ? officialPost.message : DEFAULT_OFFICIAL_CAPTION;
-        }
+    // Live Caption Count
+    function updateCaptionCount() {
+      if (captionCount && postCaptionInput) {
+        captionCount.textContent = (postCaptionInput.value || '').length + ' / 1000 अक्षर';
       }
+    }
+
+    if (postCaptionInput) {
+      postCaptionInput.addEventListener('input', updateCaptionCount);
+    }
+
+    // Prefill Templates
+    if (btnPrefillVision && postCaptionInput) {
+      btnPrefillVision.addEventListener('click', function () {
+        postCaptionInput.value = TEMPLATE_VISION;
+        if (postCategorySelect) postCategorySelect.value = 'candidate_office';
+        updateCaptionCount();
+      });
+    }
+
+    if (btnPrefillMeeting && postCaptionInput) {
+      btnPrefillMeeting.addEventListener('click', function () {
+        postCaptionInput.value = TEMPLATE_MEETING;
+        if (postCategorySelect) postCategorySelect.value = 'rally_meeting';
+        updateCaptionCount();
+      });
+    }
+
+    if (btnPrefillAppeal && postCaptionInput) {
+      btnPrefillAppeal.addEventListener('click', function () {
+        postCaptionInput.value = TEMPLATE_APPEAL;
+        if (postCategorySelect) postCategorySelect.value = 'gratitude_appeal';
+        updateCaptionCount();
+      });
+    }
+
+    // Image Choice Handlers
+    function handleImageChoiceChange() {
+      var val = 'poster';
+      var radios = $$('input[name="adminImageChoice"]');
+      radios.forEach(function (r) { if (r.checked) val = r.value; });
+
+      if (val === 'poster') {
+        currentStudioPhoto = 'assets/campaign-poster.jpg';
+        if (customPhotoWrap) customPhotoWrap.style.display = 'none';
+        if (imgPreviewBox) imgPreviewBox.style.display = 'flex';
+        if (imgPreview) imgPreview.src = 'assets/campaign-poster.jpg';
+        if (imgLabel) imgLabel.textContent = 'मुख्य चुनावी पोस्टर (काजल रानी व मनोज कुमार आचार्य)';
+      } else if (val === 'custom') {
+        if (customPhotoWrap) customPhotoWrap.style.display = 'block';
+        if (imgPreviewBox) {
+          imgPreviewBox.style.display = (currentStudioPhoto && currentStudioPhoto !== 'assets/campaign-poster.jpg') ? 'flex' : 'none';
+        }
+        if (imgLabel) imgLabel.textContent = 'अपलोड की गई नई तस्वीर';
+      } else if (val === 'none') {
+        currentStudioPhoto = null;
+        if (customPhotoWrap) customPhotoWrap.style.display = 'none';
+        if (imgPreviewBox) imgPreviewBox.style.display = 'none';
+      }
+    }
+
+    $$('input[name="adminImageChoice"]').forEach(function (r) {
+      r.addEventListener('change', handleImageChoiceChange);
+    });
+
+    if (btnClearPhoto) {
+      btnClearPhoto.addEventListener('click', function () {
+        if (radioImgNone) radioImgNone.checked = true;
+        handleImageChoiceChange();
+      });
+    }
+
+    // File Upload Handler with Canvas Compression
+    if (photoFileInput) {
+      photoFileInput.addEventListener('change', function () {
+        var file = photoFileInput.files && photoFileInput.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            var maxDim = 800;
+            var w = img.width, h = img.height;
+            if (w > h) {
+              if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            } else {
+              if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            var c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            var ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            currentStudioPhoto = c.toDataURL('image/jpeg', 0.75);
+            if (imgPreview) imgPreview.src = currentStudioPhoto;
+            if (imgPreviewBox) imgPreviewBox.style.display = 'flex';
+            if (imgLabel) imgLabel.textContent = 'अपलोड की गई नई तस्वीर';
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function enterCreateMode() {
+      if (editDocIdInput) editDocIdInput.value = '';
+      if (studioModeTitle) studioModeTitle.textContent = '➕ नई आधिकारिक पोस्ट बनाएं (Create New Post)';
+      if (btnCancelEditPost) btnCancelEditPost.style.display = 'none';
+      if (submitBtnLabel) submitBtnLabel.textContent = 'तुरंत पोस्ट प्रकाशित करें';
+      if (postCategorySelect) postCategorySelect.value = 'candidate_office';
+      if (postWardSelect) postWardSelect.value = 'समस्त 11 वार्ड (अनूपशहर)';
+      if (postCaptionInput) postCaptionInput.value = TEMPLATE_VISION;
+      updateCaptionCount();
+      if (radioImgPoster) radioImgPoster.checked = true;
+      handleImageChoiceChange();
+    }
+
+    function enterPostEditMode(post) {
+      if (!post) return;
+      if (editDocIdInput) editDocIdInput.value = post.id;
+      if (studioModeTitle) studioModeTitle.textContent = '✏️ आधिकारिक पोस्ट संपादित करें (ID: ' + post.id + ')';
+      if (btnCancelEditPost) btnCancelEditPost.style.display = 'inline-block';
+      if (submitBtnLabel) submitBtnLabel.textContent = '💾 परिवर्तन सहेजें (Save Changes)';
+      if (postCategorySelect) postCategorySelect.value = post.category || 'candidate_office';
+      if (postWardSelect) postWardSelect.value = post.ward || 'समस्त 11 वार्ड (अनूपशहर)';
+      if (postCaptionInput) postCaptionInput.value = post.message || '';
+      updateCaptionCount();
+
+      if (post.photo === 'assets/campaign-poster.jpg') {
+        if (radioImgPoster) radioImgPoster.checked = true;
+        currentStudioPhoto = 'assets/campaign-poster.jpg';
+        if (imgPreview) imgPreview.src = 'assets/campaign-poster.jpg';
+      } else if (post.photo) {
+        if (radioImgCustom) radioImgCustom.checked = true;
+        currentStudioPhoto = post.photo;
+        if (imgPreview) imgPreview.src = post.photo;
+      } else {
+        if (radioImgNone) radioImgNone.checked = true;
+        currentStudioPhoto = null;
+      }
+      handleImageChoiceChange();
+
+      if (studioSection && typeof studioSection.scrollIntoView === 'function') {
+        studioSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    if (btnCancelEditPost) {
+      btnCancelEditPost.addEventListener('click', enterCreateMode);
+    }
+    if (btnResetStudio) {
+      btnResetStudio.addEventListener('click', enterCreateMode);
+    }
+
+    function renderCandidatePostsList() {
+      if (!candidatePostsList) return;
+      var cPosts = allMessages.filter(function (m) {
+        return m.category === 'candidate_office' || m.category === 'rally_meeting' || m.category === 'ward_development' || m.category === 'gratitude_appeal' || m.alias === 'OFFICE-MKA' || m.userId === 'OFFICE-MKA';
+      });
+
+      if (candidatePostsCount) candidatePostsCount.textContent = cPosts.length + ' पोस्ट्स';
+
       if (officialStatusBadge) {
-        if (officialPost) {
-          officialStatusBadge.textContent = '✅ सक्रिय व लाइव (दीवार पर शीर्ष पर पिन)';
+        if (cPosts.length > 0) {
+          officialStatusBadge.textContent = '✅ सक्रिय व लाइव (' + cPosts.length + ' आधिकारिक पोस्ट्स)';
           officialStatusBadge.style.background = '#ECFDF5';
           officialStatusBadge.style.color = '#065F46';
           officialStatusBadge.style.borderColor = '#A7F3D0';
         } else {
-          officialStatusBadge.textContent = '⚠️ अभी तक प्रकाशित नहीं';
+          officialStatusBadge.textContent = '⚠️ अभी तक कोई पोस्ट प्रकाशित नहीं';
           officialStatusBadge.style.background = '#FEF2F2';
           officialStatusBadge.style.color = '#991B1B';
           officialStatusBadge.style.borderColor = '#FECACA';
         }
       }
-    }
 
-    if (btnResetOfficial && officialCaptionInput) {
-      btnResetOfficial.addEventListener('click', function () {
-        officialCaptionInput.value = DEFAULT_OFFICIAL_CAPTION;
-        officialCaptionInput.setAttribute('data-touched', '1');
+      if (!cPosts.length) {
+        candidatePostsList.innerHTML = '<p style="color:#64748B; font-size:12.5px; margin:4px 0;">वर्तमान में कोई आधिकारिक पोस्ट नहीं है। ऊपर दिए गए फ़ॉर्म से नई पोस्ट बनाएं।</p>';
+        return;
+      }
+
+      var cHtml = '';
+      cPosts.forEach(function (p) {
+        var thumb = p.photo ?
+          ('<img src="' + esc(p.photo) + '" class="admin-cand-thumb" alt="पोस्टर">') :
+          ('<div class="admin-cand-thumb" style="display:flex;align-items:center;justify-content:center;background:#FEF3C7;font-size:20px;">🏛️</div>');
+
+        var catBadge = '⭐ मुख्य विजन';
+        if (p.category === 'rally_meeting') catBadge = '📢 जनसभा आमंत्रण';
+        else if (p.category === 'ward_development') catBadge = '🏗️ विकास संकल्प';
+        else if (p.category === 'gratitude_appeal') catBadge = '🙏 वोट अपील';
+
+        cHtml += '<div class="admin-cand-item" data-id="' + esc(p.id) + '">' +
+          thumb +
+          '<div class="admin-cand-content">' +
+            '<div class="admin-cand-meta">' +
+              '<span class="fb-official-badge" style="font-size:10px;">' + esc(catBadge) + '</span>' +
+              '<span class="ward-tag-pill" style="font-size:10.5px;">📍 ' + esc(p.ward || 'समस्त अनूपशहर') + '</span>' +
+              '<span style="font-size:11px; color:#64748B;">❤️ ' + (p.likes || 0) + ' लाइक्स</span>' +
+            '</div>' +
+            '<p class="admin-cand-text">' + esc(p.message || '') + '</p>' +
+            '<div class="admin-cand-actions">' +
+              '<button type="button" class="btn-edit-cand-post" data-cand-id="' + esc(p.id) + '">✏️ संपादित करें</button>' +
+              '<button type="button" class="btn-delete-row btn-delete-post" data-id="' + esc(p.id) + '" data-name="' + esc(p.name) + '" data-alias="' + esc(p.userId || p.alias) + '" data-msg="' + esc(p.message) + '" style="font-size:11px; padding:3px 8px;">🗑️ हटाएं</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+
+      candidatePostsList.innerHTML = cHtml;
+
+      // Bind Edit Buttons
+      $$('.btn-edit-cand-post', candidatePostsList).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var cid = btn.getAttribute('data-cand-id');
+          var target = cPosts.find(function (p) { return p.id === cid; });
+          if (target) enterPostEditMode(target);
+        });
+      });
+
+      // Bind Delete Buttons in studio list
+      $$('.btn-delete-post', candidatePostsList).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-id');
+          var name = btn.getAttribute('data-name');
+          var alias = btn.getAttribute('data-alias');
+          var msg = btn.getAttribute('data-msg');
+          openDeleteModal({ type: 'post', id: id, name: name, alias: alias, msg: msg });
+        });
       });
     }
 
-    if (btnPublishOfficial && officialCaptionInput) {
-      btnPublishOfficial.addEventListener('click', function () {
-        var text = officialCaptionInput.value.trim();
+    if (studioForm) {
+      studioForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var text = postCaptionInput ? postCaptionInput.value.trim() : '';
         if (!text) {
           alert('कृपया आधिकारिक संदेश दर्ज करें।');
+          if (postCaptionInput) postCaptionInput.focus();
           return;
         }
-        btnPublishOfficial.disabled = true;
-        btnPublishOfficial.textContent = 'प्रकाशित किया जा रहा है...';
 
-        var existing = allMessages.find(function (m) {
-          return m.category === 'candidate_office' || m.alias === 'OFFICE-MKA';
-        });
+        var catVal = postCategorySelect ? postCategorySelect.value : 'candidate_office';
+        var wardVal = postWardSelect ? postWardSelect.value : 'समस्त 11 वार्ड (अनूपशहर)';
+        var editId = editDocIdInput ? editDocIdInput.value.trim() : '';
 
-        var cleanupPromise = existing ? executeDeleteDoc(FIRESTORE_BASE, existing.id) : Promise.resolve();
+        if (btnSubmitStudio) {
+          btnSubmitStudio.disabled = true;
+          if (submitBtnLabel) submitBtnLabel.textContent = 'सहेजा जा रहा है...';
+        }
 
-        cleanupPromise
-          .then(function () {
-            var payload = {
-              fields: {
-                alias: { stringValue: 'OFFICE-MKA' },
-                name: { stringValue: 'काजल रानी (सरपंच पद उम्मीदवार) - निवेदक मनोज कुमार आचार्य' },
-                category: { stringValue: 'candidate_office' },
-                ward: { stringValue: 'समस्त 11 वार्ड (अनूपशहर)' },
-                avatar: { stringValue: '🏛️' },
-                photo: { stringValue: 'assets/campaign-poster.jpg' },
-                message: { stringValue: text },
-                likes: { integerValue: existing ? String(existing.likes || 1) : '1' },
-                createdAt: { timestampValue: new Date().toISOString() }
-              }
-            };
-            return fetch(FIRESTORE_BASE, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
-          })
-          .then(function (res) {
-            if (!res.ok) throw new Error('Publish error HTTP ' + res.status);
+        var savePromise;
+        if (editId) {
+          // In-place edit of existing message using authorized admin passkey (valid under firestore rules)
+          var patchUrl = FIRESTORE_BASE + '/' + editId + '?updateMask.fieldPaths=message&updateMask.fieldPaths=ward&updateMask.fieldPaths=category&updateMask.fieldPaths=adminPasskey';
+          var patchFields = {
+            message: { stringValue: text },
+            ward: { stringValue: wardVal },
+            category: { stringValue: catVal },
+            adminPasskey: { stringValue: PASSKEY }
+          };
+          if (currentStudioPhoto) {
+            patchUrl += '&updateMask.fieldPaths=photo';
+            patchFields.photo = { stringValue: currentStudioPhoto };
+          }
+          savePromise = fetch(patchUrl, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: patchFields })
+          }).then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.json();
-          })
-          .then(function () {
-            if (officialAlertMsg) {
-              officialAlertMsg.textContent = '✅ मुख्य आधिकारिक पोस्ट सफलतापूर्वक प्रकाशित व अपडेट हो गई!';
-              officialAlertMsg.style.color = '#15803D';
-              officialAlertMsg.hidden = false;
-              setTimeout(function () { officialAlertMsg.hidden = true; }, 5000);
+          });
+        } else {
+          // Create new official candidate office post
+          var payload = {
+            fields: {
+              alias: { stringValue: 'OFFICE-MKA' },
+              name: { stringValue: 'काजल रानी (सरपंच पद उम्मीदवार) - निवेदक मनोज कुमार आचार्य' },
+              category: { stringValue: catVal },
+              ward: { stringValue: wardVal },
+              avatar: { stringValue: '🏛️' },
+              message: { stringValue: text },
+              likes: { integerValue: '1' },
+              createdAt: { timestampValue: new Date().toISOString() }
             }
+          };
+          if (currentStudioPhoto) {
+            payload.fields.photo = { stringValue: currentStudioPhoto };
+          }
+          savePromise = fetch(FIRESTORE_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          });
+        }
+
+        savePromise
+          .then(function () {
+            // Trigger 0-delay real-time synchronization on support wall tabs
+            try {
+              localStorage.setItem('mka_wall_updated', String(Date.now()));
+            } catch (e) {}
+
+            if (studioFeedback) {
+              studioFeedback.textContent = editId ?
+                '✅ आधिकारिक पोस्ट सफलतापूर्वक अपडेट हो गई (दीवार पर तुरंत लाइव)!' :
+                '✅ नई आधिकारिक पोस्ट सफलतापूर्वक प्रकाशित हो गई (दीवार पर तुरंत लाइव)!';
+              studioFeedback.style.color = '#15803D';
+              studioFeedback.hidden = false;
+              setTimeout(function () { studioFeedback.hidden = true; }, 5000);
+            }
+            enterCreateMode();
             loadAdminFeed();
           })
           .catch(function (err) {
-            alert('आधिकारिक पोस्ट प्रकाशित करने में त्रुटि: ' + (err.message || ''));
+            alert('पोस्ट सहेजने में त्रुटि: ' + (err.message || 'पुनः प्रयास करें'));
           })
           .finally(function () {
-            btnPublishOfficial.disabled = false;
-            btnPublishOfficial.innerHTML = '<span aria-hidden="true">📢</span> <span>आधिकारिक पोस्ट अपडेट / प्रकाशित करें</span>';
+            if (btnSubmitStudio) {
+              btnSubmitStudio.disabled = false;
+              if (submitBtnLabel) submitBtnLabel.textContent = editDocIdInput && editDocIdInput.value ? '💾 परिवर्तन सहेजें' : 'तुरंत पोस्ट प्रकाशित करें';
+            }
           });
       });
     }
+
+    // Initialize Studio Form with Defaults
+    enterCreateMode();
 
     function updateKpis() {
       if (kpiMsgs) kpiMsgs.textContent = allMessages.length;

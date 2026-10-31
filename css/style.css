@@ -5186,6 +5186,98 @@ html.hc .admin-official-header h2 {
   color: #FDE68A !important;
 }
 
+/* Candidate Posts in Admin Studio */
+.admin-candidate-posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-cand-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.15s ease;
+}
+
+.admin-cand-item:hover {
+  border-color: #CBD5E1;
+}
+
+.admin-cand-thumb {
+  width: 50px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #CBD5E1;
+  flex-shrink: 0;
+}
+
+.admin-cand-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-cand-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.admin-cand-text {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.4;
+  margin: 0 0 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.admin-cand-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-edit-cand-post {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-edit-cand-post:hover {
+  background: #DBEAFE;
+}
+
+html.hc .admin-cand-item {
+  background: #1E293B !important;
+  border-color: #475569 !important;
+}
+
+html.hc .admin-cand-text {
+  color: #F8FAFC !important;
+}
+
+html.hc .btn-edit-cand-post {
+  background: #1E3A8A !important;
+  border-color: #3B82F6 !important;
+  color: #93C5FD !important;
+}
+
 /* High Contrast mode for replies & avatars */
 html.hc .btn-reply-comment {
   color: #FDBA74 !important;

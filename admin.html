@@ -160,37 +160,154 @@
         </div>
       </div>
 
-      <!-- Candidate Office Official Post Management Card -->
-      <section class="card admin-official-post-card" id="adminOfficialPostSection">
+      <!-- Sarpanch Candidate Account & Official Post Studio -->
+      <section class="card admin-official-post-card" id="adminCandidateStudioSection">
         <div class="card-head-bar admin-official-header">
-          <h2 class="card-head-title" style="color: #92400E; margin: 0; font-size: 1.05rem;">
-            <span aria-hidden="true">🏛️</span> <span>प्रत्याशी कार्यालय मुख्य पोस्ट (Candidate Office Official Post)</span>
-          </h2>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="user-avatar-disc avatar-sm avatar-grad-8 avatar-office-special" aria-hidden="true">🏛️</span>
+            <div>
+              <h2 class="card-head-title" style="color: #92400E; margin: 0; font-size: 1.05rem;">
+                सरपंच पद उम्मीदवार हैंडल (Candidate Official Post Studio)
+              </h2>
+              <span style="font-size: 11.5px; color: #78350F; font-weight: 600;">श्रीमती काजल रानी (सरपंच प्रत्याशी) · निवेदक: मनोज कुमार आचार्य</span>
+            </div>
+          </div>
           <span class="fb-pinned-chip" id="officialPostStatusBadge">📌 समर्थन दीवार पर शीर्ष पर पिन</span>
         </div>
+
         <div class="admin-official-body">
-          <p style="font-size: 13.5px; color: #475569; margin: 0 0 12px 0;">
-            यह मुख्य आधिकारिक पोस्ट है जो जन समर्थन दीवार पर समस्त अनूपशहर ग्रामवासियों को सबसे ऊपर दिखती है। इसे केवल एडमिन पासकी द्वारा ही प्रबंधित किया जा सकता है।
-          </p>
-          <div class="admin-official-preview">
-            <img src="assets/campaign-poster.jpg" alt="आधिकारिक चुनावी पोस्टर - काजल रानी एवं मनोज कुमार आचार्य" class="admin-official-img">
-            <div style="flex: 1; min-width: 260px;">
-              <label for="adminOfficialCaptionInput" style="font-size: 13px; font-weight: 700; color: #1E293B; display: block; margin-bottom: 6px;">
-                आधिकारिक संदेश व आह्वान (Caption Text):
-              </label>
-              <textarea id="adminOfficialCaptionInput" rows="5" class="form-control" style="width: 100%; border-radius: 8px; border: 1.5px solid #CBD5E1; padding: 10px; font-size: 13.5px; line-height: 1.5; font-family: inherit;"></textarea>
-              <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; align-items: center;">
-                <button type="button" class="btn btn-primary btn-sm" id="btnPublishOfficialPost">
-                  <span aria-hidden="true">📢</span> <span>आधिकारिक पोस्ट अपडेट / प्रकाशित करें</span>
-                </button>
-                <button type="button" class="btn btn-outline btn-sm" id="btnResetOfficialCaption">
-                  <span>डिफ़ॉल्ट संदेश भरें</span>
-                </button>
-                <a href="support-wall.html" target="_blank" class="btn btn-outline btn-sm">
-                  <span>दीवार पर लाइव देखें ↗️</span>
-                </a>
+          <!-- Active Mode Notice & Reset -->
+          <div id="adminStudioModeBar" style="display:flex; justify-content:space-between; align-items:center; background:#FEF3C7; border:1px solid #FDE68A; padding:8px 12px; border-radius:8px; margin-bottom:14px;">
+            <strong id="adminStudioModeTitle" style="font-size:13px; color:#92400E;">
+              ➕ नई आधिकारिक पोस्ट बनाएं (Create New Post)
+            </strong>
+            <button type="button" class="btn btn-outline btn-xs" id="btnAdminCancelEditPost" style="display:none;">
+              ✕ संपादन रद्द करें
+            </button>
+          </div>
+
+          <!-- Hidden input for edit mode -->
+          <input type="hidden" id="adminPostEditDocId" value="">
+
+          <form id="adminCandidatePostForm" novalidate>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:12px;">
+              <!-- Field 1: Category / Purpose -->
+              <div>
+                <label for="adminPostCategorySelect" style="font-size:12.5px; font-weight:700; color:#1E293B; display:block; margin-bottom:4px;">
+                  संदेश श्रेणी / प्रकार (Post Category):
+                </label>
+                <select id="adminPostCategorySelect" class="form-control" style="width:100%; border-radius:8px; border:1.5px solid #CBD5E1; padding:7px 10px; font-size:13px;">
+                  <option value="candidate_office">⭐ मुख्य चुनावी विजन व घोषणा</option>
+                  <option value="rally_meeting">📢 जनसभा / नुक्कड़ सभा आमंत्रण</option>
+                  <option value="ward_development">🏗️ वार्डवार विकास संकल्प व योजना</option>
+                  <option value="gratitude_appeal">🙏 ग्रामवासियों का आभार व अपील</option>
+                </select>
               </div>
-              <p id="officialPostAlertMsg" style="margin-top: 8px; font-size: 13px; font-weight: 600;" hidden></p>
+
+              <!-- Field 2: Target Ward -->
+              <div>
+                <label for="adminPostWardSelect" style="font-size:12.5px; font-weight:700; color:#1E293B; display:block; margin-bottom:4px;">
+                  लक्षित वार्ड कवरेज (Ward):
+                </label>
+                <select id="adminPostWardSelect" class="form-control" style="width:100%; border-radius:8px; border:1.5px solid #CBD5E1; padding:7px 10px; font-size:13px;">
+                  <option value="समस्त 11 वार्ड (अनूपशहर)">समस्त 11 वार्ड (अनूपशहर)</option>
+                  <option value="वार्ड 1">वार्ड 1</option>
+                  <option value="वार्ड 2">वार्ड 2</option>
+                  <option value="वार्ड 3">वार्ड 3</option>
+                  <option value="वार्ड 4">वार्ड 4</option>
+                  <option value="वार्ड 5">वार्ड 5</option>
+                  <option value="वार्ड 6">वार्ड 6</option>
+                  <option value="वार्ड 7">वार्ड 7</option>
+                  <option value="वार्ड 8">वार्ड 8</option>
+                  <option value="वार्ड 9">वार्ड 9</option>
+                  <option value="वार्ड 10">वार्ड 10</option>
+                  <option value="वार्ड 11">वार्ड 11</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Field 3: Caption Textarea -->
+            <div style="margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label for="adminPostCaptionInput" style="font-size:12.5px; font-weight:700; color:#1E293B;">
+                  आधिकारिक संदेश व कैप्शन (Caption):
+                </label>
+                <span id="adminCaptionCount" style="font-size:11.5px; color:#64748B;">0 / 1000 अक्षर</span>
+              </div>
+              <textarea id="adminPostCaptionInput" rows="5" class="form-control" style="width:100%; border-radius:8px; border:1.5px solid #CBD5E1; padding:10px; font-size:13.5px; line-height:1.5; font-family:inherit;" placeholder="प्रत्याशी काजल रानी जी की ओर से ग्रामवासियों के लिए आधिकारिक संदेश लिखें..." required></textarea>
+              <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-xs" id="btnAdminPrefillVision">💡 मुख्य विजन संदेश</button>
+                <button type="button" class="btn btn-outline btn-xs" id="btnAdminPrefillMeeting">📢 जनसभा सूचना</button>
+                <button type="button" class="btn btn-outline btn-xs" id="btnAdminPrefillAppeal">🙏 वोट अपील</button>
+              </div>
+            </div>
+
+            <!-- Field 4: Image Options -->
+            <div style="margin-bottom:14px; background:#F8FAFC; border:1px solid #E2E8F0; padding:12px; border-radius:8px;">
+              <label style="font-size:12.5px; font-weight:700; color:#1E293B; display:block; margin-bottom:6px;">
+                तस्वीर / पोस्टर विकल्प (Post Image):
+              </label>
+              <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px;">
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:13px; cursor:pointer;">
+                  <input type="radio" name="adminImageChoice" value="poster" checked id="radioImgPoster">
+                  <span>🖼️ मुख्य चुनावी पोस्टर</span>
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:13px; cursor:pointer;">
+                  <input type="radio" name="adminImageChoice" value="custom" id="radioImgCustom">
+                  <span>📸 नया फ़ोटो अपलोड करें</span>
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:13px; cursor:pointer;">
+                  <input type="radio" name="adminImageChoice" value="none" id="radioImgNone">
+                  <span>🚫 कोई तस्वीर नहीं (केवल टेक्स्ट)</span>
+                </label>
+              </div>
+
+              <!-- Upload input for custom photo -->
+              <div id="adminCustomPhotoWrap" style="display:none; margin-bottom:10px;">
+                <input type="file" id="adminPostPhotoFileInput" accept="image/*" class="form-control" style="font-size:12.5px;">
+                <small style="color:#64748B; font-size:11.5px;">(JPEG/PNG, स्वतः कम्प्रेस होकर जुड़ेगा)</small>
+              </div>
+
+              <!-- Image Preview Box -->
+              <div id="adminPostImgPreviewBox" style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+                <img id="adminPostImgPreview" src="assets/campaign-poster.jpg" alt="पूर्वावलोकन" style="width:90px; height:120px; object-fit:cover; border-radius:6px; border:1px solid #CBD5E1;">
+                <div>
+                  <span id="adminPostImgLabel" style="font-size:12.5px; font-weight:600; color:#334155;">मुख्य चुनावी पोस्टर (काजल रानी व मनोज कुमार आचार्य)</span>
+                  <br>
+                  <button type="button" class="btn btn-outline btn-xs" id="btnAdminClearPhoto" style="margin-top:6px;">
+                    ✕ तस्वीर हटाएं
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <button type="submit" class="btn btn-primary" id="btnAdminSubmitOfficialPost">
+                <span aria-hidden="true">📢</span> <span id="adminSubmitBtnLabel">तुरंत पोस्ट प्रकाशित करें</span>
+              </button>
+              <button type="button" class="btn btn-outline" id="btnAdminResetStudioForm">
+                <span>फ़ॉर्म साफ़ करें</span>
+              </button>
+              <a href="support-wall.html" target="_blank" class="btn btn-outline">
+                <span>समर्थन दीवार लाइव देखें ↗️</span>
+              </a>
+            </div>
+            <p id="adminStudioFeedbackMsg" style="margin-top:8px; font-size:13px; font-weight:600;" hidden></p>
+          </form>
+
+          <hr style="border:none; border-top:1px solid #E2E8F0; margin:18px 0 14px 0;">
+
+          <!-- Existing Candidate Posts List for Quick Edit/Delete -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <h3 style="font-size:13.5px; font-weight:700; color:#1E293B; margin:0;">
+                📑 प्रत्याशी कार्यालय की सभी सक्रिय पोस्ट्स (Candidate Official Posts)
+              </h3>
+              <span id="adminCandidatePostsCount" style="font-size:12px; color:#64748B;">0 पोस्ट्स</span>
+            </div>
+            <div id="adminCandidatePostsList" class="admin-candidate-posts-list">
+              <!-- Dynamically populated -->
             </div>
           </div>
         </div>

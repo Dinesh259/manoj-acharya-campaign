@@ -29,9 +29,9 @@ rules_version = '2';
 // Access Patterns:
 //   - Read: Public (anyone can read messages individually or query the collection)
 //   - Create: Public with strict schema, field length, and type validation
-//   - Update: Public ONLY for incrementing (+1) or decrementing (-1) the `likes` field,
-//             OR authorized admin removal (setting status: 'removed', adminPasskey: '9529').
-//             All other fields (name, alias, message, photo, createdAt, etc.) are immutable.
+//   - Update: Public for incrementing (+1) or decrementing (-1) the `likes` field,
+//             OR authorized admin removal (setting status: 'removed', adminPasskey: '9529'),
+//             OR authorized admin post editing with passkey ('9529').
 //   - Delete: Allowed when document was marked for admin deletion (status == 'removed' && adminPasskey == '9529')
 //
 // Collection: support_comments
@@ -103,6 +103,12 @@ service cloud.firestore {
       return diff.affectedKeys().hasOnly(['status', 'adminPasskey']) &&
              request.resource.data.status == 'removed' &&
              request.resource.data.adminPasskey == '9529';
+    }
+
+    // Validates admin message editing: adminPasskey must match '9529',
+    // and the updated document must remain a valid message.
+    function isValidAdminMessageEdit() {
+      return request.resource.data.adminPasskey == '9529';
     }
 
     // Validates document deletion: document must have been marked for admin deletion
@@ -234,8 +240,8 @@ service cloud.firestore {
       // 2. Public Create: Validated supporter message submission
       allow create: if isValidMessageCreate();
 
-      // 3. Update: Liking / unliking (+1 or -1) OR admin removal with passkey
-      allow update: if isValidMessage(request.resource.data) && (isValidLikeUpdate() || isValidAdminRemoval());
+      // 3. Update: Liking / unliking (+1 or -1), admin removal with passkey, OR authorized admin post editing
+      allow update: if isValidMessage(request.resource.data) && (isValidLikeUpdate() || isValidAdminRemoval() || isValidAdminMessageEdit());
 
       // 4. Delete: Allowed when document was marked for admin deletion
       allow delete: if isMarkedForAdminDeletion();
