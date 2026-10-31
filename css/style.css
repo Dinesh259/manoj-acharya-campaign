@@ -3145,111 +3145,78 @@ dialog.photo-modal::backdrop {
   margin-bottom: 24px;
 }
 .admin-auth-card {
-  max-width: 580px;
-  margin: 0 auto 36px auto;
+  max-width: 480px;
+  margin: 20px auto 40px auto;
   border: 1.5px solid #CBD5E1;
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
 }
 .admin-auth-body {
-  padding-top: 8px;
+  padding-top: 10px;
 }
 .admin-auth-desc {
   font-size: 0.9375rem;
   color: #475569;
   line-height: 1.55;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
-.admin-denied-box {
-  background: #FEF2F2;
-  border: 1.5px solid #F87171;
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  color: #991B1B;
-}
-.denied-icon {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-.denied-email {
-  font-weight: 700;
-  margin: 4px 0 6px 0;
-  word-break: break-all;
-}
-.google-auth-actions {
+.passkey-login-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 20px;
 }
-.btn-google-signin {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+.passkey-input-box label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #1E293B;
+  margin-bottom: 8px;
+}
+.passkey-input-box input {
   width: 100%;
+  padding: 12px 16px;
+  font-size: 1.25rem;
+  letter-spacing: 0.25em;
+  text-align: center;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.passkey-input-box input:focus {
+  border-color: #EA580C;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+.passkey-error-text {
+  font-size: 0.875rem;
+  color: #DC2626;
+  font-weight: 700;
+  margin: -4px 0 0 0;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.passkey-actions button {
+  width: 100%;
+  padding: 12px 18px;
   font-size: 1rem;
   font-weight: 700;
-  background: #0F172A;
-  color: #FFFFFF;
-  border: 1px solid #0F172A;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
-  cursor: pointer;
-  padding: 12px 18px;
-  border-radius: 8px;
 }
-.btn-google-signin:hover {
-  background: #1E293B;
-  border-color: #1E293B;
-}
-.admin-passkey-box {
+.admin-security-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: #F8FAFC;
   border: 1px dashed #CBD5E1;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 18px;
-}
-.passkey-summary {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #334155;
-  outline: none;
-}
-.passkey-form-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-.passkey-form-row input {
-  max-width: 180px;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-}
-.passkey-hint {
-  font-size: 0.8125rem;
-  color: #DC2626;
-  margin: 6px 0 0 0;
-  font-weight: 600;
-}
-.admin-whitelist-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   font-size: 0.8125rem;
-  color: #1E40AF;
+  color: #64748B;
 }
-.admin-whitelist-notice p {
+.admin-security-notice p {
   margin: 0;
-  line-height: 1.4;
-  word-break: break-all;
 }
 
 /* Dashboard Styles */
@@ -3555,80 +3522,6 @@ dialog.photo-modal::backdrop {
   font-size: 0.9375rem;
 }
 
-/* Whitelist Management */
-.admin-grant-card {
-  margin-bottom: 30px;
-}
-.grant-body {
-  padding-top: 10px;
-}
-.grant-desc {
-  font-size: 0.875rem;
-  color: #64748B;
-  margin-bottom: 14px;
-}
-.grant-form-row {
-  display: flex;
-  gap: 8px;
-  max-width: 500px;
-  margin-bottom: 12px;
-}
-.grant-form-row input {
-  flex: 1;
-  padding: 8px 12px;
-  font-size: 0.875rem;
-}
-.grant-status {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #16A34A;
-  margin-bottom: 16px;
-}
-.current-whitelist-box h4 {
-  font-size: 0.875rem;
-  margin: 0 0 10px 0;
-  color: #1E293B;
-}
-.whitelist-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.whitelist-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.8125rem;
-}
-.whitelist-email {
-  word-break: break-all;
-  color: #334155;
-  font-weight: 600;
-}
-.badge-role {
-  color: #EA580C;
-  font-size: 0.75rem;
-}
-.btn-remove-gmail {
-  background: transparent;
-  border: none;
-  color: #94A3B8;
-  cursor: pointer;
-  font-size: 0.875rem;
-  padding: 2px 6px;
-}
-.btn-remove-gmail:hover {
-  color: #DC2626;
-}
-
 .footer-admin-row {
   margin: 12px 0;
 }
@@ -3651,7 +3544,7 @@ dialog.photo-modal::backdrop {
 }
 
 /* High Contrast mode for admin portal */
-html.hc .admin-auth-card, html.hc .admin-kpi-card, html.hc .admin-user-bar, html.hc .admin-table-card, html.hc .admin-grant-card {
+html.hc .admin-auth-card, html.hc .admin-kpi-card, html.hc .admin-user-bar, html.hc .admin-table-card {
   background: #0F172A !important;
   border-color: #334155 !important;
   color: #F8FAFC !important;
@@ -3678,7 +3571,11 @@ html.hc .admin-mobile-card {
   border-color: #334155 !important;
   color: #F8FAFC !important;
 }
-html.hc .admin-passkey-box, html.hc .whitelist-item {
+html.hc .passkey-input-box input, html.hc .admin-security-notice {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
   background: #1E293B !important;
   border-color: #334155 !important;
   color: #F8FAFC !important;

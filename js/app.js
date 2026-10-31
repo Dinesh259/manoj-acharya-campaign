@@ -1684,14 +1684,11 @@
 
     var authView = $('#adminAuthView');
     var dashView = $('#adminDashboardView');
-    var deniedAlert = $('#authDeniedAlert');
-    var deniedEmailText = $('#deniedEmailText');
-    var btnGoogle = $('#btnGoogleSignIn');
-    var btnSignOut = $('#btnAdminSignOut');
+    var passkeyForm = $('#adminPasskeyForm');
     var pinInput = $('#adminPinInput');
     var btnPinLogin = $('#btnAdminPinLogin');
     var pinError = $('#pinErrorMsg');
-    var userBadge = $('#adminUserEmailBadge');
+    var btnSignOut = $('#btnAdminSignOut');
 
     var kpiMsgs = $('#kpiTotalMsgs');
     var kpiLikes = $('#kpiTotalLikes');
@@ -1708,208 +1705,61 @@
     var noResults = $('#adminNoResults');
     var showingCount = $('#adminShowingCount');
 
-    var whitelistUl = $('#whitelistUl');
-    var newGmailInput = $('#newGmailInput');
-    var btnGrantGmail = $('#btnGrantGmail');
-    var grantStatus = $('#grantStatusMsg');
-
-    var DEFAULT_AUTHORIZED_GMAILS = [
-      'dineshkumarsuthar259@gmail.com',
-      'manojkumaracharyaanoopshahar@gmail.com',
-      'campaign@manoj-acharya-anoopshahar.web.app'
-    ];
-
-    function getCustomGmails() {
-      try {
-        var raw = store.get('mka_custom_gmails');
-        return raw ? JSON.parse(raw) : [];
-      } catch (e) {
-        return [];
-      }
-    }
-
-    function getAllAuthorizedGmails() {
-      var custom = getCustomGmails();
-      var set = {};
-      DEFAULT_AUTHORIZED_GMAILS.forEach(function (e) { set[e.toLowerCase().trim()] = true; });
-      custom.forEach(function (e) { if (e) set[e.toLowerCase().trim()] = true; });
-      return Object.keys(set);
-    }
-
-    function isAuthorized(email) {
-      if (!email) return false;
-      var clean = email.toLowerCase().trim();
-      return getAllAuthorizedGmails().indexOf(clean) !== -1;
-    }
-
+    var PASSKEY = '9529';
     var allMessages = [];
     var currentFilterWard = 'all';
     var currentSearchQuery = '';
 
-    // Render Whitelist UI
-    function renderWhitelist() {
-      if (!whitelistUl) return;
-      var list = getAllAuthorizedGmails();
-      var html = '';
-      list.forEach(function (email) {
-        var isDefault = DEFAULT_AUTHORIZED_GMAILS.indexOf(email) !== -1;
-        html += '<li class="whitelist-item">' +
-          '<span class="whitelist-email">📧 ' + esc(email) + (isDefault ? ' <span class="badge-role">(मुख्य एडमिन / प्रत्याशी)</span>' : ' <span class="badge-role">(अनुमोदित सहयोगी)</span>') + '</span>' +
-          (!isDefault ? '<button type="button" class="btn-remove-gmail" data-remove-email="' + esc(email) + '" title="एक्सेस हटाएं">✕</button>' : '') +
-        '</li>';
-      });
-      whitelistUl.innerHTML = html;
-
-      // Bind remove buttons
-      $$('.btn-remove-gmail', whitelistUl).forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var toRemove = btn.getAttribute('data-remove-email');
-          var custom = getCustomGmails().filter(function (e) { return e.toLowerCase().trim() !== toRemove; });
-          store.set('mka_custom_gmails', JSON.stringify(custom));
-          renderWhitelist();
-        });
-      });
-    }
-
-    // Grant Access button
-    if (btnGrantGmail && newGmailInput) {
-      btnGrantGmail.addEventListener('click', function () {
-        var email = newGmailInput.value.trim().toLowerCase();
-        if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1) {
-          if (grantStatus) grantStatus.textContent = 'कृपया एक मान्य जीमेल पता दर्ज करें।';
-          return;
-        }
-        var custom = getCustomGmails();
-        if (custom.indexOf(email) === -1 && DEFAULT_AUTHORIZED_GMAILS.indexOf(email) === -1) {
-          custom.push(email);
-          store.set('mka_custom_gmails', JSON.stringify(custom));
-          newGmailInput.value = '';
-          if (grantStatus) {
-            grantStatus.textContent = 'सफलतापूर्वक अधिकृत किया गया: ' + email;
-            setTimeout(function () { grantStatus.textContent = ''; }, 5000);
-          }
-          renderWhitelist();
-        } else {
-          if (grantStatus) grantStatus.textContent = 'यह जीमेल पहले से अधिकृत है।';
-        }
-      });
-    }
-
-    // Login success handler
-    function onAuthSuccess(email) {
-      sessionStorage.setItem('mka_admin_user', email);
+    function unlockPortal() {
+      sessionStorage.setItem('mka_admin_auth', '1');
       if (authView) authView.hidden = true;
       if (dashView) dashView.hidden = false;
-      if (userBadge) userBadge.textContent = email;
-      if (deniedAlert) deniedAlert.hidden = true;
-      renderWhitelist();
+      if (pinError) pinError.hidden = true;
       loadAdminFeed();
     }
 
-    // Login denied handler
-    function onAuthDenied(email) {
-      if (deniedEmailText) deniedEmailText.textContent = email ? 'अस्वीकृत खाता: ' + email : '';
-      if (deniedAlert) deniedAlert.hidden = false;
+    function lockPortal() {
+      sessionStorage.removeItem('mka_admin_auth');
       if (dashView) dashView.hidden = true;
       if (authView) authView.hidden = false;
+      if (pinInput) { pinInput.value = ''; }
+      if (pinError) pinError.hidden = true;
     }
 
     // Check existing session
-    var activeSession = sessionStorage.getItem('mka_admin_user');
-    if (activeSession && isAuthorized(activeSession)) {
-      onAuthSuccess(activeSession);
+    if (sessionStorage.getItem('mka_admin_auth') === '1') {
+      unlockPortal();
     } else {
-      if (authView) authView.hidden = false;
-      if (dashView) dashView.hidden = true;
-      renderWhitelist();
+      lockPortal();
     }
 
-    // Google Sign In
-    if (btnGoogle) {
-      btnGoogle.addEventListener('click', function () {
-        if (deniedAlert) deniedAlert.hidden = true;
-
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-          try {
-            if (!firebase.apps || !firebase.apps.length) {
-              firebase.initializeApp(CFG.firebase);
-            }
-            var provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-              .then(function (result) {
-                var email = result.user && result.user.email;
-                if (isAuthorized(email)) {
-                  onAuthSuccess(email);
-                } else {
-                  firebase.auth().signOut().catch(function () {});
-                  onAuthDenied(email);
-                }
-              })
-              .catch(function (err) {
-                console.warn('[Admin Auth Popup Error]', err);
-                var emailPrompt = prompt('Google खाता सत्यापन (अथवा 4-अंकीय एडमिन पिन दर्ज करें):', 'dineshkumarsuthar259@gmail.com');
-                if (emailPrompt) {
-                  if (emailPrompt.trim() === '9529') {
-                    onAuthSuccess('dineshkumarsuthar259@gmail.com');
-                  } else if (isAuthorized(emailPrompt.trim())) {
-                    onAuthSuccess(emailPrompt.trim());
-                  } else {
-                    onAuthDenied(emailPrompt.trim());
-                  }
-                }
-              });
-          } catch (e) {
-            console.warn('[Firebase Auth Exception]', e);
-            var pin = prompt('4-अंकीय एडमिन पासकी दर्ज करें:');
-            if (pin === '9529') {
-              onAuthSuccess('dineshkumarsuthar259@gmail.com');
-            } else if (pin) {
-              alert('गलत पिन (Incorrect PIN)');
-            }
-          }
-        } else {
-          var pin = prompt('4-अंकीय एडमिन पासकी दर्ज करें:');
-          if (pin === '9529') {
-            onAuthSuccess('dineshkumarsuthar259@gmail.com');
-          } else if (pin) {
-            alert('गलत पिन (Incorrect PIN)');
-          }
+    // Passkey submit handler
+    function handlePasskeySubmit(e) {
+      if (e) e.preventDefault();
+      var val = pinInput ? pinInput.value.trim() : '';
+      if (val === PASSKEY) {
+        if (pinError) pinError.hidden = true;
+        unlockPortal();
+      } else {
+        if (pinError) {
+          pinError.textContent = t('admin.errorPasskey') || 'गलत पासकी! कृपया सही 4-अंकीय पासकी दर्ज करें।';
+          pinError.hidden = false;
         }
-      });
+        if (pinInput) pinInput.focus();
+      }
     }
 
-    // Passkey Login Button
-    if (btnPinLogin && pinInput) {
-      btnPinLogin.addEventListener('click', function () {
-        var val = pinInput.value.trim();
-        if (val === '9529') {
-          if (pinError) pinError.hidden = true;
-          onAuthSuccess('dineshkumarsuthar259@gmail.com');
-        } else {
-          if (pinError) {
-            pinError.textContent = 'गलत पासकी (Incorrect Passkey)';
-            pinError.hidden = false;
-          }
-        }
-      });
-      pinInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          btnPinLogin.click();
-        }
-      });
+    if (passkeyForm) {
+      passkeyForm.addEventListener('submit', handlePasskeySubmit);
+    }
+    if (btnPinLogin) {
+      btnPinLogin.addEventListener('click', handlePasskeySubmit);
     }
 
-    // Sign Out
+    // Lock portal / Sign Out
     if (btnSignOut) {
       btnSignOut.addEventListener('click', function () {
-        sessionStorage.removeItem('mka_admin_user');
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-          try { firebase.auth().signOut().catch(function () {}); } catch (e) {}
-        }
-        if (dashView) dashView.hidden = true;
-        if (authView) authView.hidden = false;
-        if (deniedAlert) deniedAlert.hidden = true;
+        lockPortal();
       });
     }
 
