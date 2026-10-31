@@ -286,7 +286,6 @@
           '<p data-i18n="footer.place">' + esc(t('footer.place')) + '</p>' +
           '<p data-i18n="footer.date">' + esc(t('footer.date')) + '</p>' +
           '<p data-i18n="footer.privacy">' + esc(t('footer.privacy')) + '</p>' +
-          '<p class="footer-admin-row"><a href="admin.html" class="footer-admin-link">🔒 <span data-i18n="nav.adminLink">' + esc(t('nav.adminLink')) + '</span></a></p>' +
           '<p><button type="button" class="btn btn-outline" data-share-site>' + icon('share') + '<span data-i18n="common.share">' + esc(t('common.share')) + '</span></button></p>' +
         '</div></footer>' +
         '<a class="wa-float" data-link="wa" target="_blank" rel="noopener" data-i18n-attr="aria-label:common.waFloat">' + icon('wa') + '</a>' +
